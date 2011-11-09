@@ -50,7 +50,7 @@ public class MainActivity extends Activity
         byte[] buffer = new byte[49];
         long length = yourFile.length();
         stream.write(longToBytes(length)); // storlek
-        stream.write(new byte[11]);//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0});
+        stream.write(new byte[12]);//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0});
         Log.d("Bluetooth", "length" + length);
         for (int i = 0; i < length; i+=50) {
             if (i > length) break;
@@ -58,7 +58,6 @@ public class MainActivity extends Activity
             long upper = (i+49 > length) ? length - 1 : i+49;
             //Log.d("bluetooth", "i = " + i + " upper = " + upper + " length = " + length);
                 buf.read(buffer, 0, (int)49);
-                if (i == 0) Log.d("bluetooth", "sending first " + buffer[0] + buffer[1] + buffer[2]);
                 stream.write(buffer);
             stream.flush();
         }
