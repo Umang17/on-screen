@@ -21,7 +21,7 @@ public class ImageController {
     
     public ImageController(String serviceFolder, ImageInterface imageInterface) {
         images = new Vector<File>(10);
-        folder = serviceFolder + "images";
+        folder = serviceFolder + "images\\";
         this.imageInterface = imageInterface;
     }
     
@@ -45,7 +45,6 @@ public class ImageController {
             imageReciver = new ImageReciver(folder);
         }
         File added = imageReciver.reciveImage(stream, noti);
-        System.out.print(added + " is the name of the file...");
         images.add(added);
         noti.notify(added.getName());
         display(added);

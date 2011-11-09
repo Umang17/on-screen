@@ -30,11 +30,10 @@ public class OnScreen {
         not.notify("Hello!");
 
         frame.pack();
-        frame.setVisible(true);
+        frame.setVisible(false); //FIXME
         
         String homeFolder = System.getProperty("user.home");
-        String separator = System.getProperty("path.separator");
-        String fileLocation = homeFolder + separator + "OnScreen" + separator;
+        String fileLocation = homeFolder + "\\OnScreen\\";
         ImageInterface imageInterface = new ImageInterface();
         imageController = new ImageController(fileLocation, imageInterface); 
         imageController.display(new File("C:\\test.jpg"));

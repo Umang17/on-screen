@@ -61,7 +61,7 @@ public class ProcessConnectionThread implements Runnable {
                     case CONTROLLER:
                        break;
                     default:
-                       // noti.notify("Unknown control sequence " + command);
+                        noti.notify("Unknown control sequence " + command);
                         break;
                 }
             }
