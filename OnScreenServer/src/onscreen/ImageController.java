@@ -5,8 +5,11 @@
 package onscreen;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -36,8 +39,12 @@ public class ImageController {
     }
     
     public synchronized boolean display(File displayImage) {
-        imageInterface.displayImage(displayImage);
-        return false;
+        try {
+            imageInterface.displayImage(displayImage);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
     }
     
     public synchronized int recive(InputStream stream, Notification noti) {

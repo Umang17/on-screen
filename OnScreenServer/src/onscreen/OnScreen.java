@@ -24,20 +24,22 @@ public class OnScreen {
     public static void main(String[] args) {
         JFrame frame = new JFrame("On Screen");
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setSize(800, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Notification not = new Notification();
         not.notify("Hello!");
 
         frame.pack();
-        frame.setVisible(false); //FIXME
+        frame.setVisible(true);
+        
         
         String homeFolder = System.getProperty("user.home");
         String fileLocation = homeFolder + "\\OnScreen\\";
         ImageInterface imageInterface = new ImageInterface();
         imageController = new ImageController(fileLocation, imageInterface); 
         imageController.display(new File("C:\\test.jpg"));
-        frame.add(imageInterface);
+        frame.getContentPane().add(imageInterface);
 
         Thread waitThread = new Thread(new WaitThread(not));
         waitThread.start();
