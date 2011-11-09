@@ -40,7 +40,7 @@ public class MainActivity extends Activity
             File dir = Environment.getExternalStorageDirectory();
             File yourFile = new File(dir, "download/IMG_4750.jpeg");
             BufferedInputStream buf = new BufferedInputStream(new FileInputStream(yourFile));
-            byte buffer = new byte[50];
+            byte buffer = new byte[49];
             long length = yourFile.length();
             stream.write(longToBytes(length)); // storlek
             stream.write(new byte[11] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0});
