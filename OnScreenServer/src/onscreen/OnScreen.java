@@ -4,6 +4,7 @@
  */
 package onscreen;
 
+import java.io.File;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -16,23 +17,30 @@ import javax.swing.JTextArea;
  */
 public class OnScreen {
 
+    public static ImageController imageController;
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame("On Screen");
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JTextArea textArea = new JTextArea(50, 80);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        textArea.setEditable(false);
-        frame.setContentPane(scrollPane);
-        textArea.append("Started application\n");
+        Notification not = new Notification();
+        not.notify("Hello!");
 
         frame.pack();
         frame.setVisible(true);
+        
+        String homeFolder = System.getProperty("user.home");
+        String separator = System.getProperty("path.separator");
+        String fileLocation = homeFolder + separator + "OnScreen" + separator;
+        ImageInterface imageInterface = new ImageInterface();
+        imageController = new ImageController(fileLocation, imageInterface); 
+        imageController.display(new File("C:\\test.jpg"));
+        frame.add(imageInterface);
 
-        Thread waitThread = new Thread(new WaitThread(textArea));
+        Thread waitThread = new Thread(new WaitThread(not));
         waitThread.start();
     }
 }

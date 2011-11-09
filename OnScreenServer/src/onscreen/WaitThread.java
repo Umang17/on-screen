@@ -14,11 +14,11 @@ import javax.swing.JTextArea;
 
 public class WaitThread implements Runnable {
 
-    JTextArea textArea;
+    Notification noti;
 
     /** Constructor */
-    public WaitThread(JTextArea textArea) {
-        this.textArea = textArea;
+    public WaitThread(Notification noti) {
+        this.noti = noti;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class WaitThread implements Runnable {
             local = LocalDevice.getLocalDevice();
             local.setDiscoverable(DiscoveryAgent.GIAC);
             
-            textArea.append(local.getBluetoothAddress());
+            noti.notify(local.getBluetoothAddress() + "\n");
 
             UUID uuid = new UUID(80087355); // "04c6093b-0000-1000-8000-00805f9b34fb"
             String url = "btspp://localhost:" + uuid.toString() + ";name=OnScreen";
@@ -51,11 +51,11 @@ public class WaitThread implements Runnable {
         // waiting for connection
         while (true) {
             try {
-                textArea.append("waiting for connection...");
+                noti.notify("waiting for connection...\n");
                 connection = notifier.acceptAndOpen();
-                textArea.append("got connection...");
+                noti.notify("got connection...\n");
 
-                Thread processThread = new Thread(new ProcessConnectionThread(connection, textArea));
+                Thread processThread = new Thread(new ProcessConnectionThread(connection, noti));
                 processThread.start();
             } catch (Exception e) {
                 e.printStackTrace();

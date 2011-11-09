@@ -4,25 +4,24 @@ package onscreen;
  *
  * @author Mattias
  */
-import java.awt.Robot;
-import java.awt.event.KeyEvent;
 import java.io.InputStream;
 
+import java.io.OutputStream;
 import javax.microedition.io.StreamConnection;
 import javax.swing.JTextArea;
 
 public class ProcessConnectionThread implements Runnable {
 
     private StreamConnection mConnection;
-    private JTextArea textArea;
-    // Constant that indicate command from devices
+    private Notification noti;
     private static final int EXIT_CMD = -1;
-    private static final int KEY_RIGHT = 1;
-    private static final int KEY_LEFT = 2;
+    private static final int IMAGES = 1;
+    private static final int CONTROLLER = 2;
+    private ImageReciver imageReciver = null;
 
-    ProcessConnectionThread(StreamConnection connection, JTextArea textArea) {
+    ProcessConnectionThread(StreamConnection connection, Notification noti) {
         mConnection = connection;
-        this.textArea = textArea;
+        this.noti = noti;
     }
 
     @Override
@@ -30,39 +29,41 @@ public class ProcessConnectionThread implements Runnable {
         try {
             // prepare to receive data
             InputStream inputStream = mConnection.openInputStream();
-
-            textArea.append("waiting for input");
+            OutputStream out = mConnection.openOutputStream();
 
             while (true) {
                 int command = inputStream.read();
+                
+                /**
+                 * Transmission protocol
+                 * 1: Type
+                 * 20: Length
+                 * 1-*: Data!
+                 * 
+                 * EXIT -1
+                 * 
+                 * IMAGE 1
+                 * 255: File name
+                 * 1-* Data...
+                 * 
+                 * CONTROLLER 2
+                 * 
+                 * 
+                 */
 
-                if (command == EXIT_CMD) {
-                    textArea.append("finish process");
-                    break;
+                switch (command) {
+                    case EXIT_CMD:
+                       break;
+                    case IMAGES:
+                        noti.notify("Reciving image");
+                        OnScreen.imageController.recive(inputStream, noti);
+                        break;
+                    case CONTROLLER:
+                       break;
+                    default:
+                       // noti.notify("Unknown control sequence " + command);
+                        break;
                 }
-                processCommand(command);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Process the command from client
-     * @param command the command code
-     */
-    private void processCommand(int command) {
-        try {
-            Robot robot = new Robot();
-            switch (command) {
-                case KEY_RIGHT:
-                    //robot.keyPress(KeyEvent.VK_RIGHT);
-                    textArea.append("Right");
-                    break;
-                case KEY_LEFT:
-                    //robot.keyPress(KeyEvent.VK_LEFT);
-                    textArea.append("Left");
-                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
