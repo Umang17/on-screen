@@ -11,6 +11,8 @@ import javax.swing.JTextArea;
 /**
  *
  * @author Mattias
+ * 
+ * just a test
  */
 public class OnScreen {
 
