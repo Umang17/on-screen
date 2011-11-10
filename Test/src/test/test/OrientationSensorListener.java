@@ -1,5 +1,8 @@
 package test.test;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,11 +13,16 @@ public class OrientationSensorListener implements SensorEventListener {
 	private float startValues[] = null, prevValues[] = null;
 	private float rotation, pitch;
 	private static final int ROTATION = 0, PITCH = 1;
-	private static final int SENSITIVITY = 5;
+	private static final int SENSITIVITY = 1;
 	private static final String TAG = "Orientation",
 			START_VALUES = "StartValues", PREV_VALUES = "PrevValues";
+	private OutputStream stream = null;
 
 	public OrientationSensorListener() {
+	}
+
+	public void setStream(OutputStream stream) {
+		this.stream = stream;
 	}
 
 	public void save(Bundle b) {
@@ -52,27 +60,52 @@ public class OrientationSensorListener implements SensorEventListener {
 		}
 		pitch = event.values[PITCH];
 
-		if (prevValues == null) {
-			// First time should be centered so no need to calculate any
-			// changes.
-			// TODO Send center
-			Log.d(TAG, "Centering.");
-			prevValues = new float[2];
-		} else {
-			float rotationDiff = prevValues[ROTATION] - rotation;
-			float pitchDiff = prevValues[PITCH] - pitch;
+		if (stream != null) {
+			try {
+				if (prevValues == null) {
+					// First time should be centered so no need to calculate any
+					// changes.
+					// TODO Send center
+					stream.write(2);
+					stream.write(5);
+					stream.write(1);
+					stream.flush();
+					Log.d(TAG, "Centering.");
+					prevValues = new float[2];
+				} else {
+					float rotationDiff = prevValues[ROTATION] - rotation;
+					float pitchDiff = prevValues[PITCH] - pitch;
 
-			if (Math.abs(rotationDiff) > SENSITIVITY) {
-				prevValues[ROTATION] = rotation;
-				Log.d(TAG, "Rotation changed.");
-				// TODO Send stuff
-			}
-			if (Math.abs(pitchDiff) > SENSITIVITY) {
-				prevValues[PITCH] = pitch;
-				Log.d(TAG, "Pitch changed.");
-				// TODO Send stuff
+					if (Math.abs(rotationDiff) > SENSITIVITY) {
+						prevValues[ROTATION] = rotation;
+						Log.d(TAG, "Rotation changed.");
+						
+						stream.write(2);
+						if (rotationDiff > 0) {
+							stream.write(3);
+						} else {
+							stream.write(4);
+						}
+						stream.write(Math.round(Math.abs(rotationDiff)));
+						stream.flush();
+					}
+					if (Math.abs(pitchDiff) > SENSITIVITY) {
+						prevValues[PITCH] = pitch;
+						Log.d(TAG, "Pitch changed.");
+						
+						stream.write(2);
+						if (pitch > 0) {
+							stream.write(1);
+						} else {
+							stream.write(2);
+						}
+						stream.write(Math.round(Math.abs(pitch)));
+						stream.flush();
+					}
+				}
+			} catch (IOException e) {
+				Log.e(TAG, e.getLocalizedMessage());
 			}
 		}
 	}
-
 }
