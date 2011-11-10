@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,7 +23,7 @@ public class ImageReciver {
 
     public static int byteArrayToInt(byte[] b, int offset) {
         int i = 0;
-        int pos = 4;
+        int pos = offset;
         i += unsignedByteToInt(b[pos++]) << 24;
         i += unsignedByteToInt(b[pos++]) << 16;
         i += unsignedByteToInt(b[pos++]) << 8;
@@ -44,7 +46,7 @@ public class ImageReciver {
             noti.notify("Failed in reciving name");
         }
 
-        int size = byteArrayToInt(sizeBytes, 0);
+        int size = byteArrayToInt(sizeBytes, 4);
         noti.notify("size is " + size);
 
         //TODO
@@ -53,29 +55,35 @@ public class ImageReciver {
             si += b;
         }
         noti.notify("Size array = " + si);
-
+        
+        //Get the length of the name
+        byte[] imageNameLength = new byte[4];
+        try {
+            stream.read(imageNameLength, 0, 4);
+        } catch (IOException ex) {
+            noti.notify("Failed in reciving name length");
+        }
+        int nameSize = byteArrayToInt(imageNameLength, 0);
+        noti.notify("size of name = " + nameSize);
         // Get the image name
-        byte[] imageNameByte = new byte[12];
+        byte[] imageNameByte = new byte[nameSize];
 
         try {
-            int read = stream.read(imageNameByte, 0, 12);
+            int read = stream.read(imageNameByte, 0, nameSize);
         } catch (IOException ex) {
-            noti.notify("Failed in reciving bytes");
+            noti.notify("Failed in reciving name");
         }
-        //FIXME
-        String imageName = imageNameByte.toString();
-        String imageFormat = "jpg";//imageName.split(".")[1];
-
-        String na = "";
-        for (Byte b : imageNameByte) {
-            na += b;
+        
+        char[] chars = new char[imageNameByte.length];
+        for (int i = 0; i < imageNameByte.length; i++) {
+            chars[i] = (char)imageNameByte[i];
         }
-        noti.notify("name array = " + na);
-
-        //imageName = imageName.split(".")[0];
-        //FIXME 
-        imageName = "myimage";
-
+         
+        String imageName = String.copyValueOf(chars);
+        noti.notify(imageName);
+        String imageFormat = "jpeg";//imageName.split(".")[1];
+        imageName = "fiel";//imageName.split(".")[0];
+        
         String filePath = fileLocation + imageName + "." + imageFormat;
         File imageFile = new File(filePath);
         int i = 0;
@@ -92,9 +100,9 @@ public class ImageReciver {
         }
 
         for (int a = 0; a<size;) {
-            byte[] bytes = new byte[50];
+            byte[] bytes = new byte[1000];
             try {
-                int read = stream.read(bytes, 0, 50);
+                int read = stream.read(bytes, 0, 1000);
                 if (read == -1) {
                     out.close();
                     return imageFile;

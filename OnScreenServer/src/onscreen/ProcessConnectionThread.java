@@ -15,9 +15,9 @@ public class ProcessConnectionThread implements Runnable {
     private Notification noti;
     private static final int EXIT_CMD = -1;
     private static final int IMAGES = 1;
-    private static final int CONTROLLER = 2;
+    private static final int MOUSECONTROLLER = 2;
     private static final int REQUESTCONTROL = 3;
-    private static final int RELEASECONTROL = 5;
+    private static final int RELEASECONTROL = 4;
     private ImageReciver imageReciver = null;
     private static ProcessConnectionThread lockOwner = null;
     
@@ -27,7 +27,7 @@ public class ProcessConnectionThread implements Runnable {
     }
     
     private synchronized boolean lockControl() {
-        if (canControl()) {
+        if (lockOwner == null) {
             lockOwner = this;
             return true;
         }
@@ -35,7 +35,7 @@ public class ProcessConnectionThread implements Runnable {
     }
     
     private synchronized boolean canControl() {
-        if (lockOwner == null) {
+        if (lockOwner == this) {
             return true;
         }
         return false;
@@ -81,7 +81,7 @@ public class ProcessConnectionThread implements Runnable {
                     case IMAGES:
                         OnScreen.imageController.recive(inputStream, noti);
                         break;
-                    case CONTROLLER:
+                    case MOUSECONTROLLER:
                         if (canControl()) {
                             OnScreen.mouseController.recive(inputStream, noti);
                         }
@@ -102,6 +102,7 @@ public class ProcessConnectionThread implements Runnable {
                 }
             }
         } catch (Exception e) {
+            noti.notify("Something went wrong " );
             e.printStackTrace();
         }
         OnScreen.frame.setVisible(false);
