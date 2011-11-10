@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package onscreen;
 
 import java.awt.AWTException;
@@ -39,12 +35,12 @@ public class MouseController {
         screenY = (int) toolkit.getScreenSize().getHeight();
     }
 
-    public void recive(InputStream stream, Notification noti) {
+    public void recive(InputStream stream) {
         byte[] recivedBytes = new byte[2];
         try {
             int result = stream.read(recivedBytes, 0, 2);
         } catch (IOException ex) {
-            noti.notify("Some error while reciving.");
+            Notification.notify("Some error while reciving.");
         }
         int x = MouseInfo.getPointerInfo().getLocation().x;
         int y = MouseInfo.getPointerInfo().getLocation().y;
@@ -76,7 +72,7 @@ public class MouseController {
                 y = screenY / 2;
                 break;
             default:
-                noti.notify("unknown control byte");
+                Notification.notify("unknown control byte");
                 break;
         }
         robot.mouseMove(x, y);

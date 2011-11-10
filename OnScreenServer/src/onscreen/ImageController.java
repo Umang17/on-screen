@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package onscreen;
 
 import java.io.File;
@@ -45,14 +41,13 @@ public class ImageController {
         return true;
     }
     
-    public synchronized int recive(InputStream stream, Notification noti) {
+    public synchronized void recive(InputStream stream) {
         if (imageReciver == null) {
             imageReciver = new ImageReciver(folder);
         }
-        File added = imageReciver.reciveImage(stream, noti);
+        File added = imageReciver.reciveImage(stream);
         images.add(added);
-        noti.notify(added.getName());
+        Notification.notify(added.getName());
         display(added);
-        return images.indexOf(added);
     }
 }

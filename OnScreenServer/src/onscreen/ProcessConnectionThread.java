@@ -12,7 +12,6 @@ import javax.microedition.io.StreamConnection;
 public class ProcessConnectionThread implements Runnable {
 
     private StreamConnection mConnection;
-    private Notification noti;
     private static final int EXIT_CMD = -1;
     private static final int IMAGES = 1;
     private static final int MOUSECONTROLLER = 2;
@@ -21,9 +20,8 @@ public class ProcessConnectionThread implements Runnable {
     private ImageReciver imageReciver = null;
     private static ProcessConnectionThread lockOwner = null;
     
-    ProcessConnectionThread(StreamConnection connection, Notification noti) {
+    ProcessConnectionThread(StreamConnection connection) {
         mConnection = connection;
-        this.noti = noti;
     }
     
     private synchronized boolean lockControl() {
@@ -57,33 +55,16 @@ public class ProcessConnectionThread implements Runnable {
 
             while (true) {
                 int command = inputStream.read();
-                
-                /**
-                 * Transmission protocol
-                 * 1: Type
-                 * 20: Length
-                 * 1-*: Data!
-                 * 
-                 * EXIT -1
-                 * 
-                 * IMAGE 1
-                 * 255: File name
-                 * 1-* Data...
-                 * 
-                 * CONTROLLER 2
-                 * 
-                 * 
-                 */
 
                 switch (command) {
                     case EXIT_CMD:
                        break;
                     case IMAGES:
-                        OnScreen.imageController.recive(inputStream, noti);
+                        OnScreen.imageController.recive(inputStream);
                         break;
                     case MOUSECONTROLLER:
                         if (canControl()) {
-                            OnScreen.mouseController.recive(inputStream, noti);
+                            OnScreen.mouseController.recive(inputStream);
                         }
                         break;
                     case REQUESTCONTROL:
@@ -97,12 +78,12 @@ public class ProcessConnectionThread implements Runnable {
                         releaseControl();
                         break;
                     default:
-                        noti.notify("Unknown control sequence " + command);
+                        Notification.notify("Unknown control sequence " + command);
                         break;
                 }
             }
         } catch (Exception e) {
-            noti.notify("Something went wrong " );
+            Notification.notify("Something went wrong " );
             e.printStackTrace();
         }
         OnScreen.frame.setVisible(false);
