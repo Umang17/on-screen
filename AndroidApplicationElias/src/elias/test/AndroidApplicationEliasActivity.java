@@ -46,25 +46,24 @@ public class AndroidApplicationEliasActivity extends Activity {
             
             
             File dir = Environment.getExternalStorageDirectory();
-            File yourFile = new File(dir, "/DCIM/.thumbnails/1308403829869.jpg");
+            File yourFile = new File(dir, "/DCIM/.thumbnails/13.jpg");
             BufferedInputStream buf = new BufferedInputStream(new FileInputStream(yourFile));
             byte[] buffer = new byte[50];
             long length = yourFile.length();
             stream.write(longToBytes(length)); // storlek
             stream.write(new byte[12]);
-            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream("/mnt/sdcard/download/test5.jpg"));
+            //BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream("/sdcard/DCIM/.thumbnails/2.jpg"));
             long i=0;
             for(;i<=length; i+=50) {
             	buf.read(buffer);
             	stream.write(buffer);
             	stream.flush();
             }
-            if(i>length) {
-            	buf.read(buffer, 0, (int)(50+(length-i)));
-            	stream.write(buffer, 0, (int)(50+(length-i)));
-            }
-            stream.flush();
-            
+//            if(i>length) {
+//            	buf.read(buffer, 0, (int)(50+(length-i)));
+//            	stream.write(buffer, 0, (int)(50+(length-i)));
+//            }
+//            stream.flush();
             Log.d("BLUETOOTH", "i = " + i + " length = " + length);
                         
         } catch (IOException ex) {
