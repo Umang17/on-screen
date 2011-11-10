@@ -31,58 +31,28 @@ public class AndroidApplicationEliasActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("00:1F:E1:EB:3B:DE");
+        String deviceAddr = "00:1F:E1:EB:3B:DE";
+        Bluetooth bluetooth = Bluetooth.getInstance();
         try {
-            mmSocket = device.createInsecureRfcommSocketToServiceRecord(
-                                MY_UUID_INSECURE);
-            
-            mmSocket.connect();
+			bluetooth.init(deviceAddr);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        try {
             Log.d("BLUETOOTH", "Connected!");
-            OutputStream stream = mmSocket.getOutputStream();
-            
-            stream.write(1); // typ
-            
+
             
             File dir = Environment.getExternalStorageDirectory();
-            File yourFile = new File(dir, "/DCIM/.thumbnails/13.jpg");
-            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(yourFile));
-            byte[] buffer = new byte[50];
-            long length = yourFile.length();
-            stream.write(longToBytes(length)); // storlek
-            stream.write(new byte[12]);
-            //BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream("/sdcard/DCIM/.thumbnails/2.jpg"));
-            long i=0;
-            for(;i<=length; i+=50) {
-            	buf.read(buffer);
-            	stream.write(buffer);
-            	stream.flush();
-            }
-//            if(i>length) {
-//            	buf.read(buffer, 0, (int)(50+(length-i)));
-//            	stream.write(buffer, 0, (int)(50+(length-i)));
-//            }
-//            stream.flush();
-            Log.d("BLUETOOTH", "i = " + i + " length = " + length);
+//            File yourFile = new File(dir, "/DCIM/.thumbnails/1308403829869.jpg");
+            File yourFile = new File(dir, "/download/IMG_4750.jpeg");
+            bluetooth.sendPicture(yourFile);   
+            
                         
         } catch (IOException ex) {
             Logger.getLogger(AndroidApplicationEliasActivity.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public final byte[] longToBytes(long v) {
-        byte[] writeBuffer = new byte[ 8 ];
 
-        writeBuffer[0] = (byte)(v >>> 56);
-        writeBuffer[1] = (byte)(v >>> 48);
-        writeBuffer[2] = (byte)(v >>> 40);
-        writeBuffer[3] = (byte)(v >>> 32);
-        writeBuffer[4] = (byte)(v >>> 24);
-        writeBuffer[5] = (byte)(v >>> 16);
-        writeBuffer[6] = (byte)(v >>>  8);
-        writeBuffer[7] = (byte)(v >>>  0);
-
-        return writeBuffer;
-    }
 }
