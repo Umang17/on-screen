@@ -17,7 +17,7 @@ import javax.microedition.io.StreamConnectionNotifier;
 import com.intel.bluetooth.gcf.socket.ServerSocketConnection;
 
 public class WaitThread implements Runnable {
-	private static final boolean USE_BLUETOOTH = false;
+	private static final boolean USE_BLUETOOTH = true;
 
 	@Override
 	public void run() {
