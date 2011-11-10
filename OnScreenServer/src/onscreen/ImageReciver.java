@@ -91,10 +91,10 @@ public class ImageReciver {
             noti.notify("Failed in writing/open file");
         }
 
-        for (int a = 0; a < size;) {
-            byte[] bytes = new byte[49];
+        for (int a = 0; a<size;) {
+            byte[] bytes = new byte[50];
             try {
-                int read = stream.read(bytes, 0, 49);
+                int read = stream.read(bytes, 0, 50);
                 if (read == -1) {
                     out.close();
                     return imageFile;

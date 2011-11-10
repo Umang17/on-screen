@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 
@@ -23,11 +25,12 @@ class ImageInterface extends JLabel {
 
     public void displayImage(File imageFile) throws IOException {
         image = ImageIO.read(imageFile);
-        this.repaint();       
+        this.repaint();
+        
     }
     
     @Override
     public void paint(Graphics g) {
-        g.drawImage( image, 0, 0, null);
+        g.drawImage(image, 0, 0, null);
     }
 }

@@ -18,29 +18,30 @@ import javax.swing.JTextArea;
 public class OnScreen {
 
     public static ImageController imageController;
+    public static MouseController mouseController;
+    public static JFrame frame;
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        JFrame frame = new JFrame("On Screen");
+        frame = new JFrame("On Screen");
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setSize(800, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setUndecorated(true);
 
         Notification not = new Notification();
-        not.notify("Hello!");
 
         frame.pack();
-        frame.setVisible(true);
         
+        mouseController = new MouseController();
         
         String homeFolder = System.getProperty("user.home");
         String fileLocation = homeFolder + "\\OnScreen\\";
         ImageInterface imageInterface = new ImageInterface();
         imageController = new ImageController(fileLocation, imageInterface); 
-        imageController.display(new File("C:\\test.jpg"));
         frame.getContentPane().add(imageInterface);
-
+        frame.setVisible(false);
         Thread waitThread = new Thread(new WaitThread(not));
         waitThread.start();
     }

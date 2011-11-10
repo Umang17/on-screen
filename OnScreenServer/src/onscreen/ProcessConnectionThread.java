@@ -8,7 +8,6 @@ import java.io.InputStream;
 
 import java.io.OutputStream;
 import javax.microedition.io.StreamConnection;
-import javax.swing.JTextArea;
 
 public class ProcessConnectionThread implements Runnable {
 
@@ -27,6 +26,7 @@ public class ProcessConnectionThread implements Runnable {
     @Override
     public void run() {
         try {
+            OnScreen.frame.setVisible(true);
             // prepare to receive data
             InputStream inputStream = mConnection.openInputStream();
             OutputStream out = mConnection.openOutputStream();
@@ -55,10 +55,10 @@ public class ProcessConnectionThread implements Runnable {
                     case EXIT_CMD:
                        break;
                     case IMAGES:
-                        noti.notify("Reciving image");
                         OnScreen.imageController.recive(inputStream, noti);
                         break;
                     case CONTROLLER:
+                        OnScreen.mouseController.recive(inputStream, noti);
                        break;
                     default:
                         noti.notify("Unknown control sequence " + command);
@@ -68,5 +68,8 @@ public class ProcessConnectionThread implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        OnScreen.frame.setVisible(false);
     }
+    
+    
 }

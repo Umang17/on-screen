@@ -10,6 +10,7 @@ import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
+import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
 public class WaitThread implements Runnable {
