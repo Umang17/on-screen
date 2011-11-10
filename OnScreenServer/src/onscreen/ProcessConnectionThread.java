@@ -16,13 +16,37 @@ public class ProcessConnectionThread implements Runnable {
     private static final int EXIT_CMD = -1;
     private static final int IMAGES = 1;
     private static final int CONTROLLER = 2;
+    private static final int REQUESTCONTROL = 3;
+    private static final int RELEASECONTROL = 5;
     private ImageReciver imageReciver = null;
-
+    private static ProcessConnectionThread lockOwner = null;
+    
     ProcessConnectionThread(StreamConnection connection, Notification noti) {
         mConnection = connection;
         this.noti = noti;
     }
-
+    
+    private synchronized boolean lockControl() {
+        if (canControl()) {
+            lockOwner = this;
+            return true;
+        }
+        return false;        
+    }
+    
+    private synchronized boolean canControl() {
+        if (lockOwner == null) {
+            return true;
+        }
+        return false;
+    }
+    
+    private synchronized void releaseControl() {
+        if (canControl()) {
+            lockOwner = null;
+        }
+    }
+    
     @Override
     public void run() {
         try {
@@ -58,8 +82,20 @@ public class ProcessConnectionThread implements Runnable {
                         OnScreen.imageController.recive(inputStream, noti);
                         break;
                     case CONTROLLER:
-                        OnScreen.mouseController.recive(inputStream, noti);
-                       break;
+                        if (canControl()) {
+                            OnScreen.mouseController.recive(inputStream, noti);
+                        }
+                        break;
+                    case REQUESTCONTROL:
+                        if(lockControl()){
+                            out.write(1);
+                        } else {
+                            out.write(0);
+                        }
+                        break;
+                    case RELEASECONTROL:
+                        releaseControl();
+                        break;
                     default:
                         noti.notify("Unknown control sequence " + command);
                         break;
