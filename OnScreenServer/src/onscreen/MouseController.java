@@ -32,7 +32,7 @@ public class MouseController {
 			Logger.getLogger(MouseController.class.getName()).log(Level.SEVERE,
 					null, ex);
 		}
-		robot.setAutoDelay(10);
+		robot.setAutoDelay(5);
 		mouseThread = new MouseThread(robot);
 		mouseThread.start();
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -53,10 +53,10 @@ public class MouseController {
 
 		switch (type) {
 		case UP:
-			mouseThread.setY(value);
+			mouseThread.setY(-value);
 			break;
 		case DOWN:
-			mouseThread.setY(-value);
+			mouseThread.setY(value);
 			break;
 		case RIGHT:
 			mouseThread.setX(value);
