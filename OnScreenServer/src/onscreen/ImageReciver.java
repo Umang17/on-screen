@@ -35,7 +35,7 @@ public class ImageReciver {
     }
 
     public synchronized File reciveImage(InputStream stream) {
-
+        Notification.notify("Starting to recive image");
         // Get the size of the packet
         byte[] sizeBytes = new byte[8];
         try {
@@ -69,34 +69,28 @@ public class ImageReciver {
             chars[i] = (char) imageNameByte[i];
         }
         String imageName = String.copyValueOf(chars);
-
-        String filePath = fileLocation + imageName;
-        File imageFile = new File(filePath);
-
-        for (int i = 0; imageFile.exists();) {
-            imageFile = new File(fileLocation + i++ + imageName);
-        }
-
-        BufferedOutputStream out = null;
-        try {
-            out = new BufferedOutputStream(new FileOutputStream(imageFile));
-        } catch (FileNotFoundException ex) {
-            Notification.notify("Failed in open file");
-        }
+        
+        FileWriterThread fw = new FileWriterThread(fileLocation, imageName);
+        fw.start();
 
         long timeS = System.currentTimeMillis();
-        for (int a = 0; a < size + NUM_BYTES;) {
-            byte[] bytes = new byte[NUM_BYTES];
-            try {
-                a += stream.read(bytes, 0, NUM_BYTES);
-                out.write(bytes);
-                out.flush();
-            } catch (IOException ex) {
-                Notification.notify("Failed in reciving or writing data");
+        
+        try {
+            for (int a = 0; a < size + NUM_BYTES;) {
+                byte[] bytes = new byte[NUM_BYTES];
+                int read = stream.read(bytes);
+                if (read < 0) break;
+                a += read;
+                fw.write(bytes);
             }
+            
+        } catch (IOException ex) {
+            Notification.notify("Failed in reciving or writing data");
         }
+        File fileName = fw.getFile();
+        fw.close();
         double t = (System.currentTimeMillis() - timeS) / 1000;
         Notification.notify("It took: " + t + "seconds");
-        return imageFile;
+        return fileName;
     }
 }
