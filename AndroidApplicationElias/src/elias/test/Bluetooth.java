@@ -92,6 +92,8 @@ public class Bluetooth {
 		while (buf.read(buffer) != -1) {
 			mConnectedThread.write(buffer);
 		}
+		
+		mConnectedThread.write(intToBytes(10));
 
 		return true;
 	}
