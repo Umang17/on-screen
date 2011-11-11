@@ -32,7 +32,7 @@ public class MouseController {
 			Logger.getLogger(MouseController.class.getName()).log(Level.SEVERE,
 					null, ex);
 		}
-		robot.setAutoDelay(1);
+		robot.setAutoDelay(10);
 		mouseThread = new MouseThread(robot);
 		mouseThread.start();
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -105,13 +105,23 @@ public class MouseController {
 			ySpeed = 0;
 		}
 
+		private synchronized int getX() {
+			return MouseInfo.getPointerInfo().getLocation().x + xSpeed;
+		}
+
+		private synchronized int getY() {
+			return MouseInfo.getPointerInfo().getLocation().y + ySpeed;
+		}
+
 		@Override
 		public void run() {
-			int x, y;
 			while (true) {
-				x = MouseInfo.getPointerInfo().getLocation().x;
-				y = MouseInfo.getPointerInfo().getLocation().y;
-				r.mouseMove(x + xSpeed, y + ySpeed);
+				int x, y;
+				synchronized (MouseThread.this) {
+					x = getX();
+					y = getY();
+					r.mouseMove(x, y);
+				}
 			}
 		}
 	}
