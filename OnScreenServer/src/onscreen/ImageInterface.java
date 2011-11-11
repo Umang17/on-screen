@@ -42,7 +42,7 @@ public class ImageInterface extends JLabel {
         graphics2D.dispose();
         
         image = scaledImage;
-
+        OnScreen.frame.setVisible(true);
         this.repaint();
     }
 

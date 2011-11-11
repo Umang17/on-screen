@@ -13,7 +13,7 @@ import javax.microedition.io.StreamConnection;
 public class ProcessConnectionThread implements Runnable {
 
     private StreamConnection mConnection;
-    private static final int EXIT_CMD = -1;
+    private static final int EXIT_CMD = 10;
     private static final int IMAGES = 1;
     private static final int MOUSECONTROLLER = 2;
     private static final int REQUESTCONTROL = 3;
@@ -48,7 +48,6 @@ public class ProcessConnectionThread implements Runnable {
     @Override
     public void run() {
         try {
-            OnScreen.frame.setVisible(true);
             // prepare to receive data
             InputStream inputStream = mConnection.openInputStream();
             OutputStream out = mConnection.openOutputStream();
@@ -59,7 +58,8 @@ public class ProcessConnectionThread implements Runnable {
 
                 switch (command) {
                     case EXIT_CMD:
-                       break;
+                        mConnection.close();
+                        return;
                     case IMAGES:
                         OnScreen.imageController.recive(bufferedInputStream);
                         break;

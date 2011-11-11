@@ -18,7 +18,6 @@ public class MouseController {
 
 	public MouseController() {
 		mouseThread = MouseControllThread.getInstance();
-		mouseThread.start();
 	}
 
 	public void recive(InputStream stream) {

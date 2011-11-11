@@ -47,6 +47,7 @@ public class FileWriterThread extends Thread {
     public synchronized void write(byte[] bytes) {
         try {
             out.write(bytes);
+            out.flush();
         } catch (IOException ex) {}
     }
     
@@ -60,5 +61,16 @@ public class FileWriterThread extends Thread {
     
     public synchronized File getFile() {
         return imageFile;
+    }
+
+    void write(byte[] bytes, int read) {
+        for (int i = 0; i < read; i++) {
+            byte[] toW = new byte[1];
+            toW[0] = bytes[i];
+            try {
+                out.write(toW);
+                out.flush();
+            } catch (IOException ex) {}
+        }
     }
 }

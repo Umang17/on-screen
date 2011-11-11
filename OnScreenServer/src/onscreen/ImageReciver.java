@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -79,9 +81,14 @@ public class ImageReciver {
             for (int a = 0; a < size + NUM_BYTES;) {
                 byte[] bytes = new byte[NUM_BYTES];
                 int read = stream.read(bytes);
+                Notification.notify("Read once read = " + read);
                 if (read < 0) break;
+                if (read == NUM_BYTES) fw.write(bytes);
+                if (read < NUM_BYTES) {
+                    fw.write(bytes, read);
+                    break;
+                }
                 a += read;
-                fw.write(bytes);
             }
             
         } catch (IOException ex) {
