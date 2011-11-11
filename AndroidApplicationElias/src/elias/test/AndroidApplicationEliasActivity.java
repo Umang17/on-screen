@@ -22,11 +22,6 @@ import android.util.Log;
 public class AndroidApplicationEliasActivity extends Activity {
     /** Called when the activity is first created. */
 	
-	private BluetoothAdapter mBluetoothAdapter;
-    private static final UUID MY_UUID_INSECURE =
-        UUID.fromString("04c6093b-0000-1000-8000-00805f9b34fb");
-    private BluetoothSocket mmSocket;
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +35,9 @@ public class AndroidApplicationEliasActivity extends Activity {
 		}
         
         try {
-            Log.d("BLUETOOTH", "Connected!");
+            Log.d("BLUETOOTH", "waiting for connection!");
 
-            
+            while (!bluetooth.isConnected()) {}
             File dir = Environment.getExternalStorageDirectory();
 //            File yourFile = new File(dir, "/DCIM/.thumbnails/1308403829869.jpg");
             File yourFile = new File(dir, "/download/IMG_4750.jpeg");
