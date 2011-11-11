@@ -7,29 +7,34 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
+import android.widget.TextView;
 
 public class AcceleratorListener implements SensorEventListener {
-	private int xAcc, zAcc, xPrev = Integer.MAX_VALUE,
-			zPrev = Integer.MAX_VALUE;
-	private float xGrav, zGrav;
-	private long lastX = 0, lastZ = 0;
-	private static final int X = 0, Z = 2;
-	private static final int SENSITIVITY = 5;
+	private int xAcc, yAcc, xPrev = Integer.MAX_VALUE,
+			yPrev = Integer.MAX_VALUE;
+	private long lastXUpdate = 0, lastYUpdate = 0;
+	private static final int X = 0, Y = 1;
 	private static final String TAG = "Accelerator";
-	private static final long MIN_TIME_NANO =1 /*1000000*/; // 1ms
-	private static final float alpha = 0.8f;
+	private static final long MIN_TIME_NANO = 1000000; // 1ms
 	private OutputStream stream = null;
 	public static final byte UP = 1, DOWN = 2, LEFT = 3, RIGHT = 4;
+	private TextView tx, ty, tz;
+
+	public AcceleratorListener(TextView tx, TextView ty, TextView tz) {
+		this.tx = tx;
+		this.ty = ty;
+		this.tz = tz;
+	}
 
 	public void setStream(OutputStream stream) {
 		this.stream = stream;
 	}
 
 	public void reset() {
-		lastX = 0;
-		lastZ = 0;
+		lastXUpdate = 0;
+		lastYUpdate = 0;
 		xPrev = Integer.MAX_VALUE;
-		zPrev = Integer.MAX_VALUE;
+		yPrev = Integer.MAX_VALUE;
 		Log.d(TAG, "reset");
 	}
 
@@ -39,7 +44,6 @@ public class AcceleratorListener implements SensorEventListener {
 	private void sendDirection(byte dir, int value) {
 		if (stream != null) {
 			try {
-				value = Math.abs(value);
 				stream.write(2);
 				stream.write(dir);
 				if (value > Byte.MAX_VALUE) {
@@ -47,6 +51,7 @@ public class AcceleratorListener implements SensorEventListener {
 				} else {
 					stream.write(value);
 				}
+				Log.d(TAG, "Sent dir: " + dir + " " + value);
 				stream.flush();
 			} catch (IOException e) {
 				Log.e(TAG,
@@ -55,43 +60,56 @@ public class AcceleratorListener implements SensorEventListener {
 		}
 	}
 
-	public void onSensorChanged(SensorEvent event) {
-		if (event.timestamp >= lastX + MIN_TIME_NANO) {
-			xGrav = alpha * xGrav + (1 - alpha) * event.values[X];
-			xAcc = Math.round(10 * (event.values[X] - xGrav));
-
-			if (Math.abs(xAcc) < SENSITIVITY) {
-				xAcc = 0;
+	public void sendStop() {
+		if (stream != null) {
+			try {
+				stream.write(2);
+				stream.write(LEFT);
+				stream.write(0);
+				stream.write(2);
+				stream.write(UP);
+				stream.write(0);
+				stream.write(4);
+				stream.write(10);
+				stream.flush();
+				stream.close();
+			} catch (IOException e) {
+				Log.e(TAG,
+						"Failed to write to stream: " + e.getLocalizedMessage());
 			}
+		}
+	}
+
+	public void onSensorChanged(SensorEvent event) {
+		xAcc = Math.round(event.values[X]);
+		yAcc = Math.round(event.values[Y]);
+
+		if (event.timestamp >= lastXUpdate + MIN_TIME_NANO) {
 			if (xAcc != xPrev) {
-				Log.d(TAG, "x axis changed: " + xAcc);
-				if (xAcc >= 0) {
-					sendDirection(LEFT, xAcc);
+				if (xAcc < 0) {
+					sendDirection(LEFT, -xAcc);
 				} else {
 					sendDirection(RIGHT, xAcc);
 				}
 				xPrev = xAcc;
-				lastX = event.timestamp;
+				lastXUpdate = event.timestamp;
 			}
 		}
 
-		if (event.timestamp >= lastZ + MIN_TIME_NANO) {
-			zGrav = alpha * zGrav + (1 - alpha) * event.values[Z];
-			zAcc = Math.round(10 * (event.values[Z] - zGrav));
-
-			if (Math.abs(zAcc) < SENSITIVITY) {
-				zAcc = 0;
-			}
-			if (zAcc != zPrev) {
-				Log.d(TAG, "z axis changed: " + zAcc);
-				if (zAcc >= 0) {
-					sendDirection(UP, zAcc);
+		if (event.timestamp >= lastYUpdate + MIN_TIME_NANO) {
+			if (yAcc != yPrev) {
+				if (yAcc < 0) {
+					sendDirection(DOWN, -yAcc);
 				} else {
-					sendDirection(DOWN, zAcc);
+					sendDirection(UP, yAcc);
 				}
-				zPrev = zAcc;
-				lastZ = event.timestamp;
+				yPrev = yAcc;
+				lastYUpdate = event.timestamp;
 			}
 		}
+
+		tx.setText(String.valueOf(xAcc));
+		ty.setText(String.valueOf(yAcc));
+		// tz.setText(String.valueOf(event.values[2]));
 	}
 }
