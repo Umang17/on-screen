@@ -34,7 +34,7 @@ public class Bluetooth {
 	
 	private boolean mConnected = false;
 	
-	private static final int BYTE_SIZE = 8192;
+	private static final int BYTE_SIZE = 1000;
 
 	private static final byte TYPE_PICTURE = 1;
 	private static final byte TYPE_MOUSE = 2;
@@ -89,7 +89,7 @@ public class Bluetooth {
 
 		byte[] buffer = new byte[BYTE_SIZE];
 		
-		while (buf.read(buffer) != -1) {
+		for (int i = 0; i <= length; i+= BYTE_SIZE) {
 			mConnectedThread.write(buffer);
 		}
 		
