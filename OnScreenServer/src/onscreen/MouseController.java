@@ -44,6 +44,9 @@ public class MouseController {
 		byte[] recivedBytes = new byte[2];
 		try {
 			int result = stream.read(recivedBytes, 0, 2);
+			if (result != 2) {
+				Notification.notify("Error!!! Didn't read :( " + result);
+			}
 		} catch (IOException ex) {
 			Notification.notify("Some error while reciving.");
 		}
@@ -52,14 +55,6 @@ public class MouseController {
 
 		byte type = recivedBytes[0];
 		int value = (int) recivedBytes[1];
-		if (value == 0) {
-			try {
-				value = stream.read();
-			} catch (IOException ex) {
-				Logger.getLogger(MouseController.class.getName()).log(
-						Level.SEVERE, null, ex);
-			}
-		}
 		switch (type) {
 		case UP:
 			mouseThread.setY(value);
