@@ -90,6 +90,7 @@ public class Bluetooth {
 		byte[] buffer = new byte[BYTE_SIZE];
 		
 		for (int i = 0; i <= length; i+= BYTE_SIZE) {
+			buf.read(buffer);
 			mConnectedThread.write(buffer);
 		}
 		
