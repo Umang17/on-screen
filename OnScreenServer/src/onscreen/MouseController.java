@@ -41,20 +41,16 @@ public class MouseController {
 	}
 
 	public void recive(InputStream stream) {
-		byte[] recivedBytes = new byte[2];
+		int type = 0, value = 0;
 		try {
-			int result = stream.read(recivedBytes, 0, 2);
-			if (result != 2) {
-				Notification.notify("Error!!! Didn't read :( " + result);
-			}
+			type = stream.read();
+			value = stream.read();
 		} catch (IOException ex) {
 			Notification.notify("Some error while reciving.");
 		}
 		int x = MouseInfo.getPointerInfo().getLocation().x;
 		int y = MouseInfo.getPointerInfo().getLocation().y;
 
-		byte type = recivedBytes[0];
-		int value = (int) recivedBytes[1];
 		switch (type) {
 		case UP:
 			mouseThread.setY(value);
