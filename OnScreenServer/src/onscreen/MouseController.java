@@ -32,7 +32,7 @@ public class MouseController {
 			Logger.getLogger(MouseController.class.getName()).log(Level.SEVERE,
 					null, ex);
 		}
-		robot.setAutoDelay(5);
+		robot.setAutoDelay(1);
 		mouseThread = new MouseThread(robot);
 		mouseThread.start();
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
