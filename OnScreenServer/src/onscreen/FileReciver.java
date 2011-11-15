@@ -1,25 +1,21 @@
 package onscreen;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Mattias
  */
-public class ImageReciver {
+public class FileReciver {
 
     private final int NUM_BYTES = 1000;
     private String fileLocation;
 
-    public ImageReciver(String fileLocation) {
-        this.fileLocation = fileLocation;
+    public FileReciver() {
+        String homeFolder = System.getProperty("user.home");
+        fileLocation = homeFolder + "\\OnScreen\\";
     }
 
     public static int byteArrayToInt(byte[] b, int offset) {
@@ -36,8 +32,8 @@ public class ImageReciver {
         return (int) b & 0xFF;
     }
 
-    public synchronized File reciveImage(InputStream stream) {
-        Notification.notify("Starting to recive image");
+    public synchronized String reciveFile(InputStream stream) {
+        Notification.notify("Starting to recive file");
         // Get the size of the packet
         byte[] sizeBytes = new byte[8];
         try {
@@ -81,7 +77,6 @@ public class ImageReciver {
             for (int a = 0; a < size + NUM_BYTES;) {
                 byte[] bytes = new byte[NUM_BYTES];
                 int read = stream.read(bytes);
-                Notification.notify("Read once read = " + read);
                 if (read < 0) break;
                 if (read == NUM_BYTES) fw.write(bytes);
                 if (read < NUM_BYTES) {
@@ -98,6 +93,6 @@ public class ImageReciver {
         fw.close();
         double t = (System.currentTimeMillis() - timeS) / 1000;
         Notification.notify("It took: " + t + "seconds");
-        return fileName;
+        return fileName.toString();
     }
 }

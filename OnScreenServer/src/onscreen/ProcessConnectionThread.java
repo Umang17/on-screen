@@ -13,15 +13,18 @@ import javax.microedition.io.StreamConnection;
 public class ProcessConnectionThread implements Runnable {
 
     private StreamConnection mConnection;
+    private FileReciver fileReciver;
     private static final int EXIT_CMD = 10;
-    private static final int IMAGES = 1;
+    private static final int FILE = 1;
     private static final int MOUSECONTROLLER = 2;
     private static final int REQUESTCONTROL = 3;
     private static final int RELEASECONTROL = 4;
+    private static final int KEYCONTROLLER = 5;
     private static ProcessConnectionThread lockOwner = null;
     
     ProcessConnectionThread(StreamConnection connection) {
         mConnection = connection;
+        fileReciver = new FileReciver();
     }
     
     private synchronized boolean lockControl() {
@@ -60,14 +63,23 @@ public class ProcessConnectionThread implements Runnable {
                     case EXIT_CMD:
                         mConnection.close();
                         return;
-                    case IMAGES:
-                        OnScreen.imageController.recive(bufferedInputStream);
+                    case FILE:
+                        String file = fileReciver.reciveFile(bufferedInputStream);
+                        Runtime rt = Runtime.getRuntime();
+                        Process pr = rt.exec(OnScreen.pdfReader + file);
                         break;
                     case MOUSECONTROLLER:
                         if (canControl()) {
                             OnScreen.mouseController.recive(bufferedInputStream);
                         } else {
                             bufferedInputStream.read();
+                            bufferedInputStream.read();
+                        }
+                        break;
+                    case KEYCONTROLLER:
+                        if (canControl()) {
+                            OnScreen.keyController.recive(bufferedInputStream.read());
+                        } else {
                             bufferedInputStream.read();
                         }
                         break;
@@ -90,7 +102,6 @@ public class ProcessConnectionThread implements Runnable {
             Notification.notify("Something went wrong " );
             e.printStackTrace();
         }
-        OnScreen.frame.setVisible(false);
     }
     
     

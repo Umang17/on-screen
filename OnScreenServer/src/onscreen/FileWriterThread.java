@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -14,7 +12,7 @@ import java.util.logging.Logger;
  */
 public class FileWriterThread extends Thread {
     
-    private File imageFile;
+    private File fileName;
     private BufferedOutputStream out = null;
     private boolean closed = false;
     
@@ -23,14 +21,14 @@ public class FileWriterThread extends Thread {
     }
     
     public synchronized void setFile(String path, String file) {
-        imageFile = new File(path + file);
+        fileName = new File(path + file);
 
-        for (int i = 0; imageFile.exists();) {
-            imageFile = new File(path + i++ + file);
+        for (int i = 0; fileName.exists();) {
+            fileName = new File(path + i++ + file);
         }
 
         try {
-            out = new BufferedOutputStream(new FileOutputStream(imageFile));
+            out = new BufferedOutputStream(new FileOutputStream(fileName));
         } catch (FileNotFoundException ex) {
             Notification.notify("Failed in open file");
         }
@@ -60,7 +58,7 @@ public class FileWriterThread extends Thread {
     }
     
     public synchronized File getFile() {
-        return imageFile;
+        return fileName;
     }
 
     void write(byte[] bytes, int read) {

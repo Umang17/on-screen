@@ -1,6 +1,6 @@
 package onscreen;
 
-import javax.swing.JFrame;
+import java.io.File;
 
 /**
  *
@@ -9,30 +9,30 @@ import javax.swing.JFrame;
  */
 public class OnScreen {
 
-    public static ImageController imageController;
     public static MouseController mouseController;
-    public static JFrame frame;
+    public static String pdfReader;
+    static KeyController keyController;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        frame = new JFrame("On Screen");
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setSize(800, 800);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setUndecorated(true);
-
-        frame.pack();
-        
+        // TODO SET READER FROM ARGUMENT     
         mouseController = new MouseController();
-        
-        String homeFolder = System.getProperty("user.home");
-        String fileLocation = homeFolder + "\\OnScreen\\";
-        ImageInterface imageInterface = new ImageInterface();
-        imageController = new ImageController(fileLocation, imageInterface); 
-        frame.getContentPane().add(imageInterface);
-        frame.setVisible(false);
+        keyController = new KeyController();
+
+        if (args.length > 0) {
+            pdfReader = args[0];
+            if (!(new File(pdfReader.split(" ")[0])).exists()) {
+                Notification.notify("Something wrong with custom pdf reader");
+            }
+        } else if ((new File(System.getenv("PROGRAMFILES(X86)") + "\\SumatraPDF\\SumatraPDF.exe")).exists()) {
+            pdfReader = System.getenv("PROGRAMFILES(X86)") + "\\SumatraPDF\\SumatraPDF.exe -esc-to-exit -presentation ";
+        } else if ((new File(System.getenv("PROGRAMFILES") + "\\SumatraPDF\\SumatraPDF.exe")).exists()) {
+            pdfReader = System.getenv("PROGRAMFILES)") + "\\SumatraPDF\\SumatraPDF.exe -esc-to-exit -presentation ";
+        } else {
+            Notification.notify("Could not find pdf reader!");
+        }
         
         // Create the bluetooth listner
         Thread waitThread = new Thread(new WaitThread());
