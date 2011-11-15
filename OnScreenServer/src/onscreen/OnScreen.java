@@ -35,7 +35,10 @@ public class OnScreen {
         }
         
         // Create the bluetooth listner
-        Thread waitThread = new Thread(new WaitThread());
-        waitThread.start();
+        Thread btWaitThread = new Thread(new BluetoothWaitThread());
+        btWaitThread.start();
+        
+        Thread lanWaitThread = new Thread(new LanWaitThread());
+        lanWaitThread.start();
     }
 }
