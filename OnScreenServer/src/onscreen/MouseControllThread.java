@@ -11,11 +11,12 @@ public class MouseControllThread extends Thread {
 	private Robot r;
 	private int xSpeed = 0, ySpeed = 0;
 	private static final MouseControllThread instance = new MouseControllThread();
+	private long lastX = Long.MIN_VALUE, lastY = Long.MIN_VALUE;
 
 	private MouseControllThread() {
 		try {
 			r = new Robot();
-			r.setAutoDelay(5);
+			// r.setAutoDelay(5);
 			start();
 		} catch (AWTException ex) {
 			Logger.getLogger(MouseController.class.getName()).log(Level.SEVERE,
@@ -49,22 +50,63 @@ public class MouseControllThread extends Thread {
 		r.mouseMove(x, y);
 	}
 
-	private synchronized int getX() {
-		return MouseInfo.getPointerInfo().getLocation().x + xSpeed;
+	private synchronized int getXSpeed() {
+		return xSpeed;
 	}
 
-	private synchronized int getY() {
-		return MouseInfo.getPointerInfo().getLocation().y + ySpeed;
+	private synchronized int getYSpeed() {
+		return ySpeed;
 	}
+
+	private synchronized int getXPos() {
+		return MouseInfo.getPointerInfo().getLocation().x;
+	}
+
+	private synchronized int getYPos() {
+		return MouseInfo.getPointerInfo().getLocation().y;
+	}
+
+	// One ns is 1000000 ms
+	private static final int MS_TO_NS = 1000000;
+	private static final int INVERT = MS_TO_NS * (10);
 
 	@Override
 	public void run() {
+		int x, y, xSpeed, ySpeed;
+		int xChange, yChange;
+		long currentTime;
 		while (true) {
-			int x, y;
-			synchronized (instance) {
-				x = getX();
-				y = getY();
+			xSpeed = getXSpeed();
+			ySpeed = getYSpeed();
+
+			currentTime = System.nanoTime();
+
+			xChange = 0;
+			if (xSpeed != 0) {
+				if (currentTime >= lastX + INVERT - MS_TO_NS * Math.abs(xSpeed)) {
+					xChange = (int) Math.signum(xSpeed);
+					lastX = currentTime;
+				}
+			}
+
+			yChange = 0;
+			if (ySpeed != 0) {
+				if (currentTime >= lastY + INVERT - MS_TO_NS * Math.abs(ySpeed)) {
+					yChange = (int) Math.signum(ySpeed);
+					lastY = currentTime;
+				}
+			}
+
+			if (xChange != 0 || yChange != 0) {
+				x = getXPos() + xChange;
+				y = getYPos() + yChange;
 				r.mouseMove(x, y);
+			}
+
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
