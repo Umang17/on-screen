@@ -14,7 +14,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -147,6 +150,38 @@ public class TestActivity extends Activity {
 						Log.e("NOOES", e.getLocalizedMessage());
 					}
 				}
+			}
+		});
+
+		final Button button3 = (Button) findViewById(R.id.button3);
+		button3.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				if (arg1.getAction() == MotionEvent.ACTION_DOWN) {
+					aList.sendLeftClick(false);
+					return true;
+				}
+				if (arg1.getAction() == MotionEvent.ACTION_UP) {
+					aList.sendLeftClick(true);
+					return true;
+				}
+				return false;
+			}
+		});
+
+		final Button button4 = (Button) findViewById(R.id.button4);
+		button4.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				if (arg1.getAction() == MotionEvent.ACTION_DOWN) {
+					aList.sendRightClick(false);
+					return true;
+				}
+				if (arg1.getAction() == MotionEvent.ACTION_UP) {
+					aList.sendRightClick(true);
+					return true;
+				}
+				return false;
 			}
 		});
 
