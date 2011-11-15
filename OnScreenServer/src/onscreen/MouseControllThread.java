@@ -4,19 +4,20 @@ import java.awt.AWTException;
 import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.awt.Toolkit;
+import java.awt.event.InputEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MouseControllThread extends Thread {
 	private Robot r;
-	private int xSpeed = 0, ySpeed = 0;
+	private float xSpeed = 0, ySpeed = 0;
 	private static final MouseControllThread instance = new MouseControllThread();
 	private long lastX = Long.MIN_VALUE, lastY = Long.MIN_VALUE;
+	private static final int MOUSE_UP = 1, MOUSE_DOWN = 2;
 
 	private MouseControllThread() {
 		try {
 			r = new Robot();
-			// r.setAutoDelay(5);
 			start();
 		} catch (AWTException ex) {
 			Logger.getLogger(MouseController.class.getName()).log(Level.SEVERE,
@@ -28,11 +29,11 @@ public class MouseControllThread extends Thread {
 		return instance;
 	}
 
-	public synchronized void setX(int x) {
+	public synchronized void setX(float x) {
 		xSpeed = x;
 	}
 
-	public synchronized void setY(int y) {
+	public synchronized void setY(float y) {
 		ySpeed = y;
 	}
 
@@ -50,11 +51,11 @@ public class MouseControllThread extends Thread {
 		r.mouseMove(x, y);
 	}
 
-	private synchronized int getXSpeed() {
+	private synchronized float getXSpeed() {
 		return xSpeed;
 	}
 
-	private synchronized int getYSpeed() {
+	private synchronized float getYSpeed() {
 		return ySpeed;
 	}
 
@@ -66,13 +67,31 @@ public class MouseControllThread extends Thread {
 		return MouseInfo.getPointerInfo().getLocation().y;
 	}
 
-	// One ns is 1000000 ms
+	public synchronized void leftClick(int value) {
+		if (value == MOUSE_DOWN) {
+			r.mousePress(InputEvent.BUTTON1_MASK);
+		} else {
+			r.mouseRelease(InputEvent.BUTTON1_MASK);
+		}
+	}
+
+	public synchronized void rightClick(int value) {
+		if (value == MOUSE_DOWN) {
+			r.mousePress(InputEvent.BUTTON3_MASK);
+		} else {
+			r.mouseRelease(InputEvent.BUTTON3_MASK);
+		}
+	}
+
+	// 1ns is 1000000ms
 	private static final int MS_TO_NS = 1000000;
-	private static final int INVERT = MS_TO_NS * (10);
+	// Use 10ms delay as the slowest update rate and 1ms as the fastest
+	private static final int INVERT = MS_TO_NS * 10;
 
 	@Override
 	public void run() {
-		int x, y, xSpeed, ySpeed;
+		int x, y;
+		float xSpeed, ySpeed;
 		int xChange, yChange;
 		long currentTime;
 		while (true) {
