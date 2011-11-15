@@ -19,6 +19,8 @@ public class AcceleratorListener implements SensorEventListener {
 	private OutputStream stream = null;
 	public static final byte UP = 1, DOWN = 2, LEFT = 3, RIGHT = 4;
 	private TextView tx, ty, tz;
+	private float sensitivity = 1.0f;
+	private int speed = 1;
 
 	public AcceleratorListener(TextView tx, TextView ty, TextView tz) {
 		this.tx = tx;
@@ -46,6 +48,9 @@ public class AcceleratorListener implements SensorEventListener {
 			try {
 				stream.write(2);
 				stream.write(dir);
+				if (value != 0) {
+					value = value * speed - speed;
+				}
 				if (value > Byte.MAX_VALUE) {
 					stream.write(Byte.MAX_VALUE);
 				} else {
@@ -81,8 +86,8 @@ public class AcceleratorListener implements SensorEventListener {
 	}
 
 	public void onSensorChanged(SensorEvent event) {
-		xAcc = Math.round(event.values[X]);
-		yAcc = Math.round(event.values[Y]);
+		xAcc = Math.round(sensitivity * event.values[X]);
+		yAcc = Math.round(sensitivity * event.values[Y]);
 
 		if (event.timestamp >= lastXUpdate + MIN_TIME_NANO) {
 			if (xAcc != xPrev) {
@@ -111,5 +116,21 @@ public class AcceleratorListener implements SensorEventListener {
 		tx.setText(String.valueOf(xAcc));
 		ty.setText(String.valueOf(yAcc));
 		// tz.setText(String.valueOf(event.values[2]));
+	}
+
+	public void setSpeed(int progress) {
+		if (progress == 0) {
+			progress = 1;
+		}
+		speed = progress / 10;
+		Log.d(TAG, "Speed: " + speed);
+	}
+
+	public void setSensitivity(int progress) {
+		if (progress == 0) {
+			progress = 1;
+		}
+		sensitivity = progress / 100f;
+		Log.d(TAG, "Sense: " + sensitivity);
 	}
 }
