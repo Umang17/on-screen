@@ -1,6 +1,7 @@
 package onscreen.presentator;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothClass;
@@ -8,7 +9,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.stickynotes.ReadNfcTag;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,7 +38,11 @@ public class PresentatorActivity extends Activity {
 
 			case MESSAGE_CONNECTED:
 				if (state == STATE_LOAD) {
-					// mBluetooth.sendPresentation(file);
+					try {
+						mBluetooth.sendPresentation(mPresentationFile);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				} else if (state == STATE_TAKE_OVER) {
 					mBluetooth.requestControl();
 				}
@@ -58,10 +62,10 @@ public class PresentatorActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.start);
-		
-		readNfcTag=new ReadNfcTag();
-		readNfcTag.onCreate(this, getClass());
 
+		readNfcTag = new ReadNfcTag();
+		readNfcTag.onCreate(this, getClass());
+		
 		mBluetooth = new Bluetooth(mHandler);
 
 		Button load = (Button) findViewById(R.id.load);
@@ -69,8 +73,7 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				// some action
-
-				state = STATE_LOAD;
+				// startActivityForResult(intent, STATE_LOAD);
 			}
 		});
 
@@ -102,7 +105,7 @@ public class PresentatorActivity extends Activity {
 		});
 
 	}
-	
+
 	@Override
     protected void onResume() {
         super.onResume();
@@ -113,5 +116,29 @@ public class PresentatorActivity extends Activity {
 	@Override
     protected void onNewIntent(Intent intent) {
     	readNfcTag.onNewIntent(intent);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		switch (requestCode) {
+		case STATE_LOAD:
+			if (resultCode != RESULT_OK) {
+				break;
+			}
+			String file = data.getStringExtra("File");
+			File f = new File(file);
+			mPresentationFile = f;
+			state = STATE_LOAD;
+			if (mBluetooth.isConnected()) {
+				try {
+					mBluetooth.sendPresentation(mPresentationFile);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			break;
+		}
 	}
 }
