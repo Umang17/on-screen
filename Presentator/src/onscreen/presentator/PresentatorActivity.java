@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothClass;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -73,7 +72,8 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				// some action
-				// startActivityForResult(intent, STATE_LOAD);
+				Intent loadIntent = new Intent(PresentatorActivity.this, SelectPDFActivity.class);
+				startActivityForResult(loadIntent, STATE_LOAD);
 			}
 		});
 
@@ -110,7 +110,7 @@ public class PresentatorActivity extends Activity {
     protected void onResume() {
         super.onResume();
         
-        readNfcTag.onResume(getIntent());
+       // readNfcTag.onResume(getIntent());
 	}
 	
 	@Override
@@ -128,6 +128,7 @@ public class PresentatorActivity extends Activity {
 				break;
 			}
 			String file = data.getStringExtra("File");
+			Log.d("debug", file);
 			File f = new File(file);
 			mPresentationFile = f;
 			state = STATE_LOAD;
