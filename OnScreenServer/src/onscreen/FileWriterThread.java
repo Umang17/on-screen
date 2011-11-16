@@ -37,9 +37,7 @@ public class FileWriterThread extends Thread {
 
     @Override
     public void run() {
-        while(!closed) {
-            
-        }
+        while(!closed) {}
     }
     
     public synchronized void write(byte[] bytes) {

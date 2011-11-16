@@ -5,8 +5,8 @@ package onscreen;
  * @author Mattias
  */
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-
 import java.io.OutputStream;
 import javax.microedition.io.StreamConnection;
 
@@ -20,7 +20,10 @@ public class ProcessConnectionThread implements Runnable {
     private static final int REQUESTCONTROL = 3;
     private static final int RELEASECONTROL = 4;
     private static final int KEYCONTROLLER = 5;
+    private static final int RELEASE = 6;
     private static ProcessConnectionThread lockOwner = null;
+    private InputStream inputStream;
+    private OutputStream outputStream;
     
     ProcessConnectionThread(StreamConnection connection) {
         mConnection = connection;
@@ -39,6 +42,7 @@ public class ProcessConnectionThread implements Runnable {
         if (lockOwner == this) {
             return true;
         }
+        lockOwner.sendReleaseRequest();
         return false;
     }
     
@@ -48,12 +52,19 @@ public class ProcessConnectionThread implements Runnable {
         }
     }
     
+    public void sendReleaseRequest() {
+        try {
+            outputStream.write(RELEASE);
+            outputStream.flush();
+        } catch (IOException ex) {}
+    }
+    
     @Override
     public void run() {
         try {
             // prepare to receive data
-            InputStream inputStream = mConnection.openInputStream();
-            OutputStream out = mConnection.openOutputStream();
+            inputStream = mConnection.openInputStream();
+            outputStream = mConnection.openOutputStream();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
             
             while (true) {
@@ -85,9 +96,9 @@ public class ProcessConnectionThread implements Runnable {
                         break;
                     case REQUESTCONTROL:
                         if(lockControl()){
-                            out.write(1);
+                            outputStream.write(1);
                         } else {
-                            out.write(0);
+                            outputStream.write(0);
                         }
                         break;
                     case RELEASECONTROL:

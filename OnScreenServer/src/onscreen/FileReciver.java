@@ -15,7 +15,8 @@ public class FileReciver {
 
     public FileReciver() {
         String homeFolder = System.getProperty("user.home");
-        fileLocation = homeFolder + "\\OnScreen\\";
+        String separator = System.getProperty("file.separator");
+        fileLocation = homeFolder + separator + "OnScreen" + separator;
     }
 
     public static int byteArrayToInt(byte[] b, int offset) {
