@@ -38,12 +38,18 @@ public class Bluetooth {
 	private static final byte TYPE_MOUSE = 2;
 	private static final byte TYPE_REQ_CONTROL = 3;
 	private static final byte TYPE_REL_CONTROL = 4;
+	private static final byte TYPE_COMMANDS = 5;
+	
+	private static final byte COMMAND_EXIT = 0;
+	private static final byte COMMAND_NEXT = 1;
+	private static final byte COMMAND_PREV = 2;
+	private static final byte COMMAND_BLANK = 3;
 	
 	public Bluetooth(Handler handler) {
 		mHandler = handler;
 	}
 		
-	public void init(String deviceAddr) throws IOException {
+	public void connect(String deviceAddr) throws IOException {
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddr);
 		connect(device);
@@ -53,14 +59,38 @@ public class Bluetooth {
 		return sendFile(file, TYPE_PRESENTATION);
 	}
 	
-	public boolean getControl() {
-		
-		return false;
+	public boolean requestControl() {
+		mConnectedThread.write(TYPE_REQ_CONTROL);
+		return true;
 	}
 	
 	public boolean releaseControl() {
-		
-		return false;
+		mConnectedThread.write(TYPE_REL_CONTROL);
+		return true;
+	}
+	
+	public boolean sendExit() {
+		mConnectedThread.write(TYPE_COMMANDS);
+		mConnectedThread.write(COMMAND_EXIT);
+		return true;
+	}
+	
+	public boolean sendNext() {
+		mConnectedThread.write(TYPE_COMMANDS);
+		mConnectedThread.write(COMMAND_NEXT);
+		return true;
+	}
+	
+	public boolean sendPrev() {
+		mConnectedThread.write(TYPE_COMMANDS);
+		mConnectedThread.write(COMMAND_PREV);
+		return true;
+	}
+	
+	public boolean sendBlank() {
+		mConnectedThread.write(TYPE_COMMANDS);
+		mConnectedThread.write(COMMAND_BLANK);
+		return true;
 	}
 
 	private boolean sendFile(File file, byte type) throws IOException {

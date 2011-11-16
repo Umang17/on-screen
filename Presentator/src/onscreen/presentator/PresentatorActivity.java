@@ -1,5 +1,7 @@
 package onscreen.presentator;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothClass;
 import android.os.Bundle;
@@ -11,13 +13,19 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class PresentatorActivity extends Activity {
-	
+
 	private Bluetooth mBluetooth;
-	
+	private File mPresentationFile = null;
+
 	public static final int MESSAGE_CONNECTED = 1;
-    public static final int MESSAGE_READ = 2;
-    public static final int MESSAGE_WRITE = 3;
-    public static final int MESSAGE_TOAST = 5;
+	public static final int MESSAGE_READ = 2;
+	public static final int MESSAGE_WRITE = 3;
+	public static final int MESSAGE_TOAST = 5;
+
+	public static final int STATE_TAKE_OVER = 1;
+	public static final int STATE_LOAD = 2;
+
+	public int state = 0;
 
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -25,15 +33,19 @@ public class PresentatorActivity extends Activity {
 			switch (msg.what) {
 
 			case MESSAGE_CONNECTED:
-				// Start sending file...
+				if (state == STATE_LOAD) {
+					// mBluetooth.sendPresentation(file);
+				} else if (state == STATE_TAKE_OVER) {
+					mBluetooth.requestControl();
+				}
 				break;
-			
+
 			case MESSAGE_READ:
 				byte[] readBuf = (byte[]) msg.obj;
 				// take care of the input from computer
 				break;
 			}
-			
+
 		}
 	};
 
@@ -42,7 +54,7 @@ public class PresentatorActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.start);
-		
+
 		mBluetooth = new Bluetooth(mHandler);
 
 		Button load = (Button) findViewById(R.id.load);
@@ -50,6 +62,8 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				// some action
+
+				state = STATE_LOAD;
 			}
 		});
 
@@ -58,6 +72,8 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				// some action
+
+				state = STATE_TAKE_OVER;
 			}
 		});
 
@@ -73,7 +89,8 @@ public class PresentatorActivity extends Activity {
 		exit.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// some action
+				// closes the program
+				finish();
 			}
 		});
 
