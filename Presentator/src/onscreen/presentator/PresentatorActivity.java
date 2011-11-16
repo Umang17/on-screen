@@ -4,9 +4,11 @@ import java.io.File;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothClass;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.stickynotes.ReadNfcTag;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +28,8 @@ public class PresentatorActivity extends Activity {
 	public static final int STATE_LOAD = 2;
 
 	public int state = 0;
+	
+	private ReadNfcTag readNfcTag;
 
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -54,6 +58,9 @@ public class PresentatorActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.start);
+		
+		readNfcTag=new ReadNfcTag();
+		readNfcTag.onCreate(this, getClass());
 
 		mBluetooth = new Bluetooth(mHandler);
 
@@ -94,5 +101,17 @@ public class PresentatorActivity extends Activity {
 			}
 		});
 
+	}
+	
+	@Override
+    protected void onResume() {
+        super.onResume();
+        
+        readNfcTag.onResume(getIntent());
+	}
+	
+	@Override
+    protected void onNewIntent(Intent intent) {
+    	readNfcTag.onNewIntent(intent);
 	}
 }
