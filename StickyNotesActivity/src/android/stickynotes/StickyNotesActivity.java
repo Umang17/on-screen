@@ -88,124 +88,39 @@ public class StickyNotesActivity extends Activity implements OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        /*
-        mResumed = true;
-        // Sticky notes received from Android
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            NdefMessage[] messages = getNdefMessages(getIntent());
-            byte[] payload = messages[0].getRecords()[0].getPayload();
-            setNoteBody(new String(payload));
-            setIntent(new Intent()); // Consume this intent.
-        }
-        if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(getIntent().getAction())){
-        	Log.d(TAG, "Visar ID...");        	
-        	showID();
-        }      
+        
         enableNdefExchangeMode();
-        enableTagWriteMode();   */      
+        enableTagWriteMode();   
+        
+        Log.d(TAG,"onResume: "+getIntent().getAction());         
+        
+        if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(getIntent().getAction())){
+        	onNewIntent(getIntent());
+        }     
+              
     }
 
     @Override
     protected void onPause() {
+    	disableNdefExchangeMode();
         super.onPause();
-        mResumed = false;
-        mNfcAdapter.disableForegroundNdefPush(this);
+        //mResumed = false;
+        //mNfcAdapter.disableForegroundNdefPush(this);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        // NDEF exchange mode
-    	if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-    		showID();
-        }
-
-    	/*
-        if (!mWriteMode && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-            NdefMessage[] msgs = getNdefMessages(intent);
-            
-            byte[] byte_id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
-    	    String text = byte_id.toString();
-    	    text="IDFORPHONE "+text;
-        	setNoteBody(text);
-        	
-        	Log.d(TAG,text);
-            
-            //promptForContent(msgs[0]);
-        }
-
-        
-        // Tag writing mode
-        if (mWriteMode && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-            Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            writeTag(getNoteAsNdef(), detectedTag);
-        }*/
-        
-    }
-/*
-    private TextWatcher mTextWatcher = new TextWatcher() {
-
-        public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-
-        }
-
-        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-
-        }
-
-
-        public void afterTextChanged(Editable arg0) {
-            if (mResumed) {
-                mNfcAdapter.enableForegroundNdefPush(StickyNotesActivity.this, getNoteAsNdef());
-            }
-        }
-    };*/
-
-    /*
-    private View.OnClickListener mTagWriter = new View.OnClickListener() {
-
-        public void onClick(View arg0) {
-            // Write to a tag for as long as the dialog is shown.
-            disableNdefExchangeMode();
-            enableTagWriteMode();
-
-            new AlertDialog.Builder(StickyNotesActivity.this).setTitle("Touch tag to write")
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-
-                        public void onCancel(DialogInterface dialog) {
-                            disableTagWriteMode();
-                            enableNdefExchangeMode();
-                        }
-                    }).create().show();
-        }
-    };*/
-
-    /*
-    private void promptForContent(final NdefMessage msg) {
     	
-        new AlertDialog.Builder(this).setTitle("Replace current content?")
-            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-
-                public void onClick(DialogInterface arg0, int arg1) {
-                    String body = new String(msg.getRecords()[0].getPayload());
-                    setNoteBody(body);
-                }
-            })
-            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-
-                public void onClick(DialogInterface arg0, int arg1) {
-                    
-                }
-            }).show();
-    }*/
-
-    private void setNoteBody(String body) {
-        Editable text = mNote.getText();
-        text.clear();
-        text.append(body);
+    	Log.d(TAG,"new Intent "+intent.getAction());
+        // NDEF exchange mode
+    	if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
+    		showID(intent);
+        }
+        
     }
 
     private NdefMessage getNoteAsNdef() {
-        byte[] textBytes = mNote.getText().toString().getBytes();
+        byte[] textBytes = "".getBytes();//mNote.getText().toString().getBytes();
         NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA, "text/plain".getBytes(),
                 new byte[] {}, textBytes);
         return new NdefMessage(new NdefRecord[] {
@@ -320,10 +235,10 @@ public class StickyNotesActivity extends Activity implements OnClickListener {
      * 
      * @return the NFC tag id, if no id discovered return empty string.
      */
-    private String getNFCTagID(){
-    	Tag tagFromIntent = getIntent().getParcelableExtra(NfcAdapter.EXTRA_TAG);
+    private String getNFCTagID(Intent intent){
+    	Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
     	if(tagFromIntent == null){
-    		tagFromIntent = getIntent().getParcelableExtra(NfcAdapter.EXTRA_ID);
+    		tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_ID);
     		if(tagFromIntent == null)
     		return "";
     	} 
@@ -331,9 +246,8 @@ public class StickyNotesActivity extends Activity implements OnClickListener {
     	return (tagID.length==0)? "" : ByteArrayToHexString(tagID);
     }
 
-    private void showID() {		
-    	String text="tag ID: " + getNFCTagID() +"\n";    	
-    	setNoteBody(text);
+    private void showID(Intent intent) {		
+    	String text="tag ID: " + getNFCTagID(intent) +"\n";    	    	    	
     	Log.d(TAG,text);
     }
     	
