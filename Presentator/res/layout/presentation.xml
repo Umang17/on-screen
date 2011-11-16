@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.02"
+        
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="14pt" 
+        android:text="Presentation1" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/prev"
+            android:layout_width="wrap_content"
+            android:layout_height="66dp"
+            android:layout_weight="0.50"
+            android:text="Prev" />
+
+        <Button
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="66dp"
+            android:layout_weight="0.50"
+            android:text="Next" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.23"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="2:00"
+        android:textSize="40pt" />
+    
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+	    <Button
+	        android:id="@+id/start"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="0.33"
+	        android:text="Start" />
+	
+	    <Button
+	        android:id="@+id/pause"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="0.33"
+	        android:text="Pause" />
+	
+	    <Button
+	        android:id="@+id/reset"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="0.34"
+	        android:text="Reset" />
+	</LinearLayout>
+	
+    <Button
+        android:id="@+id/blankscreen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Blankscreen" />
+
+</LinearLayout>

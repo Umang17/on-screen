@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/app"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="App"
+        android:textSize="12pt" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+    <Button
+        android:id="@+id/load"
+        android:layout_width="234dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.00"
+        android:text="Load presentation" />
+
+    <Button
+        android:id="@+id/take_over"
+ 		android:layout_width="234dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.00"
+        android:text="Take over presentation" />
+
+    <Button
+        android:id="@+id/preferences"
+ 		android:layout_width="234dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.00"
+        android:text="Preferences" />
+
+    <Button
+        android:id="@+id/exit"
+      	android:layout_width="234dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.00"
+        android:text="Exit" />
+
+</LinearLayout>
