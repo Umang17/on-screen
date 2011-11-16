@@ -1,4 +1,4 @@
-package android.stickynotes;
+package onscreen.presentator;
 
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -11,17 +11,17 @@ import android.util.Log;
 
 public class ReadNfcTag {
 	
-	//TODO
-	private static final String TAG = "stickynotes - change this";
+	//TODO CHANGE TAG!
+	private static final String TAG = "stickynotes";
 	
 	PendingIntent mNfcPendingIntent;
     IntentFilter[] mWriteTagFilters;
     IntentFilter[] mNdefExchangeFilters;
     
-    private StickyNotesActivity mainClass;
+    private PresentatorActivity mainClass;
     NfcAdapter mNfcAdapter;
 
-	public void onCreate(StickyNotesActivity mainClass, Class<? extends StickyNotesActivity> class1) {
+	public void onCreate(PresentatorActivity mainClass, Class<? extends PresentatorActivity> class1) {
         
 		this.mainClass = mainClass;
 		
