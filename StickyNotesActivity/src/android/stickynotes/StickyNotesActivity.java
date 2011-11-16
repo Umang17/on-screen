@@ -19,7 +19,6 @@ package android.stickynotes;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
@@ -32,15 +31,16 @@ import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.IOException;
 
-public class StickyNotesActivity extends Activity {
+public class StickyNotesActivity extends Activity implements OnClickListener {
     private static final String TAG = "stickynotes";
     private boolean mResumed = false;
     private boolean mWriteMode = false;
@@ -59,10 +59,10 @@ public class StickyNotesActivity extends Activity {
 
         Log.d(TAG,"start");
         
-        setContentView(R.layout.main);
-        findViewById(R.id.write_tag).setOnClickListener(mTagWriter);
-        mNote = ((EditText) findViewById(R.id.note));
-        mNote.addTextChangedListener(mTextWatcher);
+        setContentView(R.layout.start);
+        //findViewById(R.id.write_tag).setOnClickListener(mTagWriter);
+        //mNote = ((EditText) findViewById(R.id.note));
+        //mNote.addTextChangedListener(mTextWatcher);
 
         // Handle all of our received NFC intents in this activity.
         mNfcPendingIntent = PendingIntent.getActivity(this, 0,
@@ -81,15 +81,14 @@ public class StickyNotesActivity extends Activity {
         IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         mWriteTagFilters = new IntentFilter[] { tagDetected };
         
-        //disableNdefExchangeMode();
-        //enableTagWriteMode();
-        
+       Button b = (Button) findViewById(R.id.button1);
+       b.setOnClickListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        
+        /*
         mResumed = true;
         // Sticky notes received from Android
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
@@ -98,12 +97,12 @@ public class StickyNotesActivity extends Activity {
             setNoteBody(new String(payload));
             setIntent(new Intent()); // Consume this intent.
         }
+        if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(getIntent().getAction())){
+        	Log.d(TAG, "Visar ID...");        	
+        	showID();
+        }      
         enableNdefExchangeMode();
-        
-        
-        //disableNdefExchangeMode();
-        enableTagWriteMode();
-       
+        enableTagWriteMode();   */      
     }
 
     @Override
@@ -117,20 +116,10 @@ public class StickyNotesActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         // NDEF exchange mode
     	if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-            
-    		String text="";
-        	Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        	
-        	byte[] tagID = tagFromIntent.getId();
-        	String ID=ByteArrayToHexString(tagID);
-        	text="tag ID: " + ID +"\n";
-        	
-        	setNoteBody(text);
-        	Log.d(TAG,text);
+    		showID();
         }
-    	
-    	
-    	
+
+    	/*
         if (!mWriteMode && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             NdefMessage[] msgs = getNdefMessages(intent);
             
@@ -141,7 +130,7 @@ public class StickyNotesActivity extends Activity {
         	
         	Log.d(TAG,text);
             
-            promptForContent(msgs[0]);
+            //promptForContent(msgs[0]);
         }
 
         
@@ -149,10 +138,10 @@ public class StickyNotesActivity extends Activity {
         if (mWriteMode && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
             Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             writeTag(getNoteAsNdef(), detectedTag);
-        }
+        }*/
         
     }
-
+/*
     private TextWatcher mTextWatcher = new TextWatcher() {
 
         public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
@@ -169,8 +158,9 @@ public class StickyNotesActivity extends Activity {
                 mNfcAdapter.enableForegroundNdefPush(StickyNotesActivity.this, getNoteAsNdef());
             }
         }
-    };
+    };*/
 
+    /*
     private View.OnClickListener mTagWriter = new View.OnClickListener() {
 
         public void onClick(View arg0) {
@@ -187,8 +177,9 @@ public class StickyNotesActivity extends Activity {
                         }
                     }).create().show();
         }
-    };
+    };*/
 
+    /*
     private void promptForContent(final NdefMessage msg) {
     	
         new AlertDialog.Builder(this).setTitle("Replace current content?")
@@ -205,7 +196,7 @@ public class StickyNotesActivity extends Activity {
                     
                 }
             }).show();
-    }
+    }*/
 
     private void setNoteBody(String body) {
         Editable text = mNote.getText();
@@ -324,6 +315,27 @@ public class StickyNotesActivity extends Activity {
     private void toast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
+    
+    /**
+     * 
+     * @return the NFC tag id, if no id discovered return empty string.
+     */
+    private String getNFCTagID(){
+    	Tag tagFromIntent = getIntent().getParcelableExtra(NfcAdapter.EXTRA_TAG);
+    	if(tagFromIntent == null){
+    		tagFromIntent = getIntent().getParcelableExtra(NfcAdapter.EXTRA_ID);
+    		if(tagFromIntent == null)
+    		return "";
+    	} 
+    	byte[] tagID = tagFromIntent.getId();
+    	return (tagID.length==0)? "" : ByteArrayToHexString(tagID);
+    }
+
+    private void showID() {		
+    	String text="tag ID: " + getNFCTagID() +"\n";    	
+    	setNoteBody(text);
+    	Log.d(TAG,text);
+    }
     	
 	String ByteArrayToHexString(byte [] inarray){
 	    int i, j, in;
@@ -339,5 +351,9 @@ public class StickyNotesActivity extends Activity {
 	        out += hex[i];
 	        }
 	    return out;
-	}    
+	}
+
+	public void onClick(View arg0) {
+		setContentView(R.layout.main);		
+	}	
 }
