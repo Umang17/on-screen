@@ -107,15 +107,14 @@ public class PresentatorActivity extends Activity {
 	}
 
 	@Override
-    protected void onResume() {
-        super.onResume();
-        
-       // readNfcTag.onResume(getIntent());
+	protected void onResume() {
+		super.onResume();        
+		readNfcTag.onResume(getIntent());
 	}
 	
 	@Override
-    protected void onNewIntent(Intent intent) {
-    	readNfcTag.onNewIntent(intent);
+	protected void onNewIntent(Intent intent) {
+		readNfcTag.onNewIntent(intent);
 	}
 	
 	@Override

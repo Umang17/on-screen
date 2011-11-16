@@ -11,30 +11,32 @@ import android.util.Log;
 
 public class ReadNfcTag {
 	
-	//TODO CHANGE TAG!
-	private static final String TAG = "stickynotes";
+	private static final String TAG = "ReadNfcTag";
 	
-	PendingIntent mNfcPendingIntent;
-    IntentFilter[] mWriteTagFilters;
-    IntentFilter[] mNdefExchangeFilters;
+	private PendingIntent mNfcPendingIntent;
+	private IntentFilter[] mWriteTagFilters;
+    //private IntentFilter[] mNdefExchangeFilters;
     
     private PresentatorActivity mainClass;
-    NfcAdapter mNfcAdapter;
+    private NfcAdapter mNfcAdapter;
 
 	public void onCreate(PresentatorActivity mainClass, Class<? extends PresentatorActivity> class1) {
         
 		this.mainClass = mainClass;
 		
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(mainClass);
+		if(mNfcAdapter == null) {return;}
+		
 		// Handle all of our received NFC intents in this activity.
         mNfcPendingIntent = PendingIntent.getActivity(mainClass, 0,
                 new Intent(mainClass, class1).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
-        IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        mNdefExchangeFilters = new IntentFilter[] { ndefDetected };        		
+        //IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        //mNdefExchangeFilters = new IntentFilter[] { ndefDetected };        		
 	}
 	
 	public void onResume(Intent intent){
+		if(mNfcAdapter == null) {return;}
 		enableNFC();  
         
         Log.d(TAG,"onResume: "+intent.getAction());         
@@ -54,16 +56,20 @@ public class ReadNfcTag {
     }
 	
     private void enableNFC(){
-    	//enableNdefExchangeMode
-    	mNfcAdapter.enableForegroundNdefPush(mainClass, getNoteAsNdef());
-        //mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent, mNdefExchangeFilters, null);
     	
-        //enableTagWriteMode
+    	mNfcAdapter.enableForegroundNdefPush(mainClass, getNoteAsNdef());
+
+        
     	IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         mWriteTagFilters = new IntentFilter[] {
             tagDetected
         };
         mNfcAdapter.enableForegroundDispatch(mainClass, mNfcPendingIntent, mWriteTagFilters, null);
+    }
+    
+    public void onPause(){
+    	if(mNfcAdapter == null) {return;}
+    	mNfcAdapter.disableForegroundDispatch(mainClass);
     }
 	
 	/**
@@ -77,11 +83,6 @@ public class ReadNfcTag {
     	} 
     	byte[] tagID = tagFromIntent.getId();
     	return (tagID.length==0)? "" : ByteArrayToHexString(tagID);
-    }
-
-    private void showID(Intent intent) {		
-    	String text="tag ID: " + getNFCTagID(intent) +"\n";    	    	    	
-    	Log.d(TAG,text);
     }
     	
 	private String ByteArrayToHexString(byte [] inarray){
@@ -103,7 +104,9 @@ public class ReadNfcTag {
 	public void onNewIntent(Intent intent) {
     	if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction()) ||
     			NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-    		showID(intent);
+    		
+        	String text="tag ID: " + getNFCTagID(intent) +"\n";    	    	    	
+        	Log.d(TAG,text);
         }		
 	}
 
