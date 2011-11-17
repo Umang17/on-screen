@@ -14,6 +14,8 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PresentatorActivity extends Activity {
 
@@ -68,6 +70,11 @@ public class PresentatorActivity extends Activity {
 		readNfcTag.onCreate(this, getClass());
 		
 		mBluetooth = new Bluetooth(mHandler);
+        try {
+            mBluetooth.connect("00:1F:E1:EB:3B:DE");
+        } catch (IOException ex) {
+            Logger.getLogger(PresentatorActivity.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
 		Button prev = (Button) findViewById(R.id.prev);
 		prev.setOnClickListener(new OnClickListener() {
@@ -86,6 +93,16 @@ public class PresentatorActivity extends Activity {
 			public void onClick(View v) {
 				// some action
 				mBluetooth.sendNext();
+//				state = STATE_TAKE_OVER;
+			}
+		});
+                
+                Button blank = (Button) findViewById(R.id.blankscreen);
+		blank.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				// some action
+				mBluetooth.sendBlank();
 //				state = STATE_TAKE_OVER;
 			}
 		});
