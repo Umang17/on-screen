@@ -93,6 +93,7 @@ public class PresentatorActivity extends Activity {
 	private boolean resume=false;
 	private String currentTime="";	
 	private Long currentTimeLastStop;
+	private long elapsedTime=0;
 
 	private void setClock() {
 		chrono = (Chronometer) findViewById(R.id.chrono);
@@ -104,8 +105,27 @@ public class PresentatorActivity extends Activity {
 
 			public void onChronometerTick(Chronometer arg0) {
 				
-			//if(!resume){	
-					long seconds = (SystemClock.elapsedRealtime() - chrono.getBase())/1000;
+				//if(!resume){	
+						long seconds = (SystemClock.elapsedRealtime() - chrono.getBase())/1000;
+						
+						long hour = seconds/3600;
+						if(hour>=10) {
+							chrono.setBase(chrono.getBase() - seconds*3600*1000);
+							seconds -= hour*3600;
+							hour = 0;
+						}
+						seconds -= hour*3600;
+						long minutes = seconds/60;
+						seconds -= minutes*60;
+						
+						currentTime = hour+":"
+										+(minutes<10?"0"+minutes:minutes)+":"
+										+(seconds<10?"0"+seconds:seconds);
+						Log.d(TAG, currentTime);
+						arg0.setText(currentTime);
+				/*		elapsedTime=SystemClock.elapsedRealtime();
+				} else {
+					long seconds = (elapsedTime - chrono.getBase())/1000;
 					
 					long hour = seconds/3600;
 					if(hour>=10) {
@@ -122,10 +142,11 @@ public class PresentatorActivity extends Activity {
 									+(seconds<10?"0"+seconds:seconds);
 					Log.d(TAG, currentTime);
 					arg0.setText(currentTime);
-				//}
+					
+					elapsedTime=elapsedTime+1000;
+				}*/
 			}
 		});
-		//Start time
 		chrono.setText("0:00:00");
 	}
 
@@ -185,9 +206,6 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				mBluetooth.sendPrev();
-				// Intent loadIntent = new Intent(PresentatorActivity.this,
-				// SelectPDFActivity.class);
-				// startActivityForResult(loadIntent, STATE_LOAD);
 			}
 		});
 
@@ -196,7 +214,6 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				mBluetooth.sendNext();
-				// state = STATE_TAKE_OVER;
 			}
 		});
 
@@ -212,7 +229,6 @@ public class PresentatorActivity extends Activity {
 		start.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// some action
 				handleButtonClick(v);
 			}
 		});
