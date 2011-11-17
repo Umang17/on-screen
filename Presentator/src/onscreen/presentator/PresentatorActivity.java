@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,16 +24,15 @@ public class PresentatorActivity extends Activity {
 	private Bluetooth mBluetooth;
 	private File mPresentationFile = null;
 
-	public static final int MESSAGE_CONNECTED = 1;
-	public static final int MESSAGE_READ = 2;
-	public static final int MESSAGE_WRITE = 3;
-	public static final int MESSAGE_TOAST = 5;
+	public static final int MESSAGE_FILE_REC = 0;
+	public static final int MESSAGE_TAKE_OVER = 1;
+	public static final int MESSAGE_NO_PRES = 2;
 
 	public static final int STATE_TAKE_OVER = 1;
 	public static final int STATE_LOAD = 2;
 
 	public int state = 0;
-	
+
 	private ReadNfcTag readNfcTag;
 
 	private final Handler mHandler = new Handler() {
@@ -40,21 +40,23 @@ public class PresentatorActivity extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 
-			case MESSAGE_CONNECTED:
-				if (state == STATE_LOAD) {
-					try {
-						mBluetooth.sendPresentation(mPresentationFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				} else if (state == STATE_TAKE_OVER) {
-					mBluetooth.requestControl();
-				}
+			case MESSAGE_NO_PRES:
+				Log.d("Handler", "no pres!");
+//				try {
+//					mBluetooth.sendPresentation(mPresentationFile);
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
 				break;
 
-			case MESSAGE_READ:
+			case MESSAGE_TAKE_OVER:
+				Log.d("Handler", "taking over");
 				byte[] readBuf = (byte[]) msg.obj;
 				// take care of the input from computer
+				break;
+
+			case MESSAGE_FILE_REC:
+				Log.d("Handler", "file rec...");
 				break;
 			}
 
@@ -69,13 +71,14 @@ public class PresentatorActivity extends Activity {
 
 		readNfcTag = new ReadNfcTag();
 		readNfcTag.onCreate(this, getClass());
-		
+
 		mBluetooth = new Bluetooth(mHandler);
-        try {
-            mBluetooth.connect("00:1F:E1:EB:3B:DE");
-        } catch (IOException ex) {
-            Logger.getLogger(PresentatorActivity.class.getName()).log(Level.SEVERE, null, ex);
-        }
+		try {
+			mBluetooth.connect("00:1F:E1:EB:3B:DE");
+		} catch (IOException ex) {
+			Logger.getLogger(PresentatorActivity.class.getName()).log(
+					Level.SEVERE, null, ex);
+		}
 
 		Button prev = (Button) findViewById(R.id.prev);
 		prev.setOnClickListener(new OnClickListener() {
@@ -83,8 +86,9 @@ public class PresentatorActivity extends Activity {
 			public void onClick(View v) {
 				// some action
 				mBluetooth.sendPrev();
-//				Intent loadIntent = new Intent(PresentatorActivity.this, SelectPDFActivity.class);
-//				startActivityForResult(loadIntent, STATE_LOAD);
+				// Intent loadIntent = new Intent(PresentatorActivity.this,
+				// SelectPDFActivity.class);
+				// startActivityForResult(loadIntent, STATE_LOAD);
 			}
 		});
 
@@ -94,17 +98,17 @@ public class PresentatorActivity extends Activity {
 			public void onClick(View v) {
 				// some action
 				mBluetooth.sendNext();
-//				state = STATE_TAKE_OVER;
+				// state = STATE_TAKE_OVER;
 			}
 		});
-                
-                Button blank = (Button) findViewById(R.id.blankscreen);
+
+		Button blank = (Button) findViewById(R.id.blankscreen);
 		blank.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				// some action
 				mBluetooth.sendBlank();
-//				state = STATE_TAKE_OVER;
+				// state = STATE_TAKE_OVER;
 			}
 		});
 
@@ -124,7 +128,7 @@ public class PresentatorActivity extends Activity {
 				finish();
 			}
 		});
-		
+
 		Button reset = (Button) findViewById(R.id.reset);
 		reset.setOnClickListener(new OnClickListener() {
 
@@ -135,20 +139,21 @@ public class PresentatorActivity extends Activity {
 		});
 
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.main_menu, menu);
-	    return true;
+		inflater.inflate(R.menu.main_menu, menu);
+		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()) {
+		switch (item.getItemId()) {
 		case R.id.open_presentation:
 			// Start the PDF selector
-			Intent loadIntent = new Intent(PresentatorActivity.this, SelectPDFActivity.class);
+			Intent loadIntent = new Intent(PresentatorActivity.this,
+					SelectPDFActivity.class);
 			startActivityForResult(loadIntent, STATE_LOAD);
 			return true;
 		case R.id.open_settings:
@@ -161,15 +166,15 @@ public class PresentatorActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		super.onResume();        
+		super.onResume();
 		readNfcTag.onResume(getIntent());
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		readNfcTag.onNewIntent(intent);
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);

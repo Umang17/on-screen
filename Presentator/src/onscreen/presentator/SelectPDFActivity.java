@@ -25,7 +25,8 @@ public class SelectPDFActivity extends ListActivity {
 		addPDFsInside(fileDir, allPDFs);
 		Collections.sort(allPDFs);
 		
-		Log.d("SD", fileDir.toString());
+		// TODO 
+//		Log.d("SD", fileDir.toString());
 		
 		if(allPDFs.isEmpty()) {
 			Log.d("SelectPDF", "Empty");
@@ -78,7 +79,6 @@ public class SelectPDFActivity extends ListActivity {
 	 */
 	private void addPDFsInside(File fileDir, ArrayList<PdfFile> result) {
 		if (fileDir.canRead()) {
-			Log.d("da", fileDir.toString());
 			for (File currentFile : fileDir.listFiles()) {
 				if (currentFile.isDirectory()) {
 					addPDFsInside(currentFile, result);
