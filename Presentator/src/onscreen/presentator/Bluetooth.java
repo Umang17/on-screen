@@ -110,6 +110,7 @@ public class Bluetooth {
 			return false;
 		if (D)
 			Log.d(TAG, "sendFile");
+		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_PROGRESS_START);
 		mConnectedThread.write(type);
 		if (D)
 			Log.d(TAG, "sent type");
@@ -136,7 +137,8 @@ public class Bluetooth {
 			Log.d(TAG, "sent all but file...");
 
 		byte[] buffer = new byte[BYTE_SIZE];
-
+		long num_of_int = length / BYTE_SIZE; // somehow just send incr message
+												// at the right moments
 		for (int i = 0; i <= length; i += BYTE_SIZE) {
 			buf.read(buffer);
 			mConnectedThread.write(buffer);
@@ -228,6 +230,7 @@ public class Bluetooth {
 	public synchronized void stop() {
 		if (D)
 			Log.d(TAG, "stop");
+			mConnected = false;
 
 		if (mConnectThread != null) {
 			mConnectThread.cancel();

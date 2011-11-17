@@ -31,7 +31,7 @@ public class PresentatorActivity extends Activity {
 	public static final int MESSAGE_NO_PRES = 2;
 	public static final int MESSAGE_PROGRESS_INC = 3;
 	public static final int MESSAGE_PROGRESS_START = 4;
-	
+
 	public static final int STATE_TAKE_OVER = 1;
 	public static final int STATE_LOAD = 2;
 
@@ -39,7 +39,7 @@ public class PresentatorActivity extends Activity {
 
 	private ReadNfcTag readNfcTag;
 	private ProgressDialog mProgressDialog;
-	
+
 	private final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -47,29 +47,34 @@ public class PresentatorActivity extends Activity {
 
 			case MESSAGE_NO_PRES:
 				Log.d("Handler", "no pres!");
-				// try {
-				// mBluetooth.sendPresentation(mPresentationFile);
-				// } catch (IOException e) {
-				// e.printStackTrace();
-				// }
+				try {
+					mBluetooth.sendPresentation(mPresentationFile);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				break;
 
 			case MESSAGE_TAKE_OVER:
 				Log.d("Handler", "taking over");
-				byte[] readBuf = (byte[]) msg.obj;
+				byte[] readBuf = (byte[]) msg.obj; // shuld maybe not be bytes...
 				// take care of the input from computer
+				// should output a dialog asking if user want to take over or
+				// send a new presentation. But only if a presentation already
+				// is loaded.
 				break;
 
 			case MESSAGE_FILE_REC:
 				Log.d("Handler", "file rec...");
 				mProgressDialog.cancel();
 				break;
-				
+
 			case MESSAGE_PROGRESS_START:
 				mProgressDialog.setProgress(0);
+				// maybe use setMax...
 				mProgressDialog.show();
-				
+
 			case MESSAGE_PROGRESS_INC:
+				// maybe incr with the size of the BYTE_SIZE
 				mProgressDialog.incrementProgressBy(1);
 			}
 		}
@@ -135,7 +140,7 @@ public class PresentatorActivity extends Activity {
 				finish();
 			}
 		});
-		
+
 		mProgressDialog = new ProgressDialog(this);
 		mProgressDialog.setTitle("File transfering....");
 		mProgressDialog.setCancelable(false); // can't cancel with back button
