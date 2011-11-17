@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,14 +29,17 @@ public class PresentatorActivity extends Activity {
 	public static final int MESSAGE_FILE_REC = 0;
 	public static final int MESSAGE_TAKE_OVER = 1;
 	public static final int MESSAGE_NO_PRES = 2;
-
+	public static final int MESSAGE_PROGRESS_INC = 3;
+	public static final int MESSAGE_PROGRESS_START = 4;
+	
 	public static final int STATE_TAKE_OVER = 1;
 	public static final int STATE_LOAD = 2;
 
 	public int state = 0;
 
 	private ReadNfcTag readNfcTag;
-
+	private ProgressDialog mProgressDialog;
+	
 	private final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -58,9 +62,16 @@ public class PresentatorActivity extends Activity {
 
 			case MESSAGE_FILE_REC:
 				Log.d("Handler", "file rec...");
+				mProgressDialog.cancel();
 				break;
+				
+			case MESSAGE_PROGRESS_START:
+				mProgressDialog.setProgress(0);
+				mProgressDialog.show();
+				
+			case MESSAGE_PROGRESS_INC:
+				mProgressDialog.incrementProgressBy(1);
 			}
-
 		}
 	};
 
@@ -124,6 +135,11 @@ public class PresentatorActivity extends Activity {
 				finish();
 			}
 		});
+		
+		mProgressDialog = new ProgressDialog(this);
+		mProgressDialog.setTitle("File transfering....");
+		mProgressDialog.setCancelable(false); // can't cancel with back button
+		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
 	}
 
