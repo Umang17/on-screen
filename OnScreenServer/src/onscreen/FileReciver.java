@@ -33,7 +33,7 @@ public class FileReciver {
         return (int) b & 0xFF;
     }
 
-    public synchronized String reciveFile(InputStream stream) {
+    public synchronized FilePresented reciveFile(InputStream stream) {
         Notification.notify("Starting to recive file");
         // Get the size of the packet
         byte[] sizeBytes = new byte[8];
@@ -67,9 +67,9 @@ public class FileReciver {
         for (int i = 0; i < imageNameByte.length; i++) {
             chars[i] = (char) imageNameByte[i];
         }
-        String imageName = String.copyValueOf(chars);
+        String fileName = String.copyValueOf(chars);
         
-        FileWriterThread fw = new FileWriterThread(fileLocation, imageName);
+        FileWriterThread fw = new FileWriterThread(fileLocation, fileName);
         fw.start();
 
         long timeS = System.currentTimeMillis();
@@ -90,10 +90,10 @@ public class FileReciver {
         } catch (IOException ex) {
             Notification.notify("Failed in reciving or writing data");
         }
-        File fileName = fw.getFile();
+        FilePresented file = new FilePresented(fileLocation, fileName);
         fw.close();
         double t = (System.currentTimeMillis() - timeS) / 1000;
         Notification.notify("It took: " + t + "seconds");
-        return fileName.toString();
+        return file;
     }
 }

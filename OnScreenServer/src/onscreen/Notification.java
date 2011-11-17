@@ -1,7 +1,7 @@
 package onscreen;
 
 public class Notification {   
-    private static boolean debug = false;
+    private static boolean debug = true;
     
     public static void notify(String notification) {
         if (debug) {
