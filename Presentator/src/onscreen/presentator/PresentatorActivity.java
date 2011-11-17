@@ -59,7 +59,7 @@ public class PresentatorActivity extends Activity {
 				// send a new presentation. But only if a presentation already
 				// is loaded.
 				if (mPresentationFile != null) {
-					// ask user what to do
+					// give user options...
 				} else {
 					mBluetooth.requestControl();
 				}
