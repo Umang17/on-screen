@@ -31,7 +31,7 @@ public class KeyController {
             case EXIT:
                 rob.keyPress(KeyEvent.VK_ESCAPE);
                 rob.keyPress(KeyEvent.VK_ESCAPE);
-                return false;
+                return true;
             case NEXT:
                 rob.keyPress(KeyEvent.VK_LEFT);
                 file.nextSlide();
@@ -45,7 +45,7 @@ public class KeyController {
                 file.toggleBlank();
                 break;
         }
-        return true;
+        return false;
     }
     
 }

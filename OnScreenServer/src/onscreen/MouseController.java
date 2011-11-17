@@ -22,16 +22,8 @@ public class MouseController {
 		mouseThread = MouseControllThread.getInstance();
 	}
 
-	public void recive(InputStream stream) {
-		int type = 0;
-		float value = 0;
-		try {
-			type = stream.read();
-			// Divide by 10 to restore the decimal place
-			value = ((float) stream.read()) / 10;
-		} catch (IOException ex) {
-			Notification.notify("Some error while reciving.");
-		}
+	public void recive(int type, int value) {
+                value = value/10;
 
 		switch (type) {
 		case UP:

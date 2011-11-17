@@ -14,24 +14,19 @@ public class ProcessConnectionThread implements Runnable {
 
     private StreamConnection mConnection;
     private FileReciver fileReciver;
-    private static final int EXIT_CMD = 10;
-    private static final int FILE = 1;
-    private static final int MOUSECONTROLLER = 2;
-    private static final int REQUESTCONTROL = 3;
-    private static final int RELEASECONTROL = 4;
-    private static final int KEYCONTROLLER = 5;
-    private static final int RELEASE = 6;
-    private static final int TIMECONTROLL = 7;
-    private static final int RESET = 8;
-    private static final int PAUSE = 9;
-    private static final int MESSAGE_PRESENTING = 3;
-    private static final int STARTPRESENTATION = 4;
-    private static ProcessConnectionThread lockOwner = null;
     private InputStream inputStream;
     private OutputStream outputStream;
-    private FilePresented filePresented;
-    private boolean PRESENTING = false;
-    private PresentationTimer presentationTimer;
+    private BufferedInputStream bufferedInputStream;
+    private static ProcessConnectionThread lockOwner = null;
+    private static FilePresented filePresented = null;
+    private static PresentationTimer presentationTimer;
+    private static final int EXIT_CMD = -1;
+    private static final int FILE = 1;
+    private static final int MOUSECONTROLLER = 2;
+    private static final int KEYCONTROLLER = 5;
+    private static final int TIMECONTROLL = 7;
+    private static final int STARTPRESENTATION = 4;
+
 
     ProcessConnectionThread(StreamConnection connection) {
         mConnection = connection;
@@ -46,21 +41,8 @@ public class ProcessConnectionThread implements Runnable {
     private synchronized boolean canControl() {
         if (lockOwner == this) {
             return true;
-        }
-        return false;
-    }
-
-    private synchronized void releaseControl() {
-        if (canControl()) {
-            lockOwner = null;
-        }
-    }
-
-    public void sendReleaseRequest() {
-        try {
-            outputStream.write(RELEASE);
-            outputStream.flush();
-        } catch (IOException ex) {
+        } else {
+            return lockControl();
         }
     }
 
@@ -71,71 +53,42 @@ public class ProcessConnectionThread implements Runnable {
             // prepare to receive data
             inputStream = mConnection.openInputStream();
             outputStream = mConnection.openOutputStream();
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+            bufferedInputStream = new BufferedInputStream(inputStream);
 
-            //outputStream.write(MESSAGE_PRESENTING);
-            if (PRESENTING) {
-                outputStream.write(1);
-                outputStream.write(filePresented.getLengthofName());
-                outputStream.write(filePresented.getNameAsByte());
-                outputStream.write(filePresented.getCurrentSlide());
-                outputStream.write(filePresented.getTotalSlides());
-                outputStream.write(presentationTimer.getTime());
-            } else {
-                outputStream.write(0);
-            }
-            outputStream.flush();
+            sendStartMessage();
 
             while (true) {
                 int command = bufferedInputStream.read();
-
+                
                 switch (command) {
                     case EXIT_CMD:
+                        Notification.notify("Killing connection.");
                         mConnection.close();
                         return;
                     case FILE:
-                        startPresenting(bufferedInputStream, outputStream);
-
+                        startPresenting();
                         break;
                     case MOUSECONTROLLER:
                         if (canControl()) {
-                            OnScreen.mouseController.recive(bufferedInputStream);
-                        } else {
-                            bufferedInputStream.read();
-                            bufferedInputStream.read();
+                            OnScreen.mouseController.recive(
+                                    bufferedInputStream.read(), bufferedInputStream.read());
                         }
                         break;
                     case KEYCONTROLLER:
+                        int read = bufferedInputStream.read();
                         if (canControl()) {
-                            PRESENTING = OnScreen.keyController.recive(bufferedInputStream.read(), filePresented);
-                        } else {
-                            bufferedInputStream.read();
+                            boolean exit = OnScreen.keyController.recive(read, filePresented);
+                            if (exit) filePresented = null;
                         }
                         break;
                     case TIMECONTROLL:
-                        int read = bufferedInputStream.read();
-                        if (read == RESET) {
-                            presentationTimer.reset();
-                        } else if (read == PAUSE ) {
-                            presentationTimer.pause();
-                        } else { //START
-                            presentationTimer.start();
-                        }
-                        break;
-                    case REQUESTCONTROL:
-                        if (lockControl()) {
-                            outputStream.write(1);
-                        } else {
-                            outputStream.write(0);
-                        }
-                        break;
-                    case RELEASECONTROL:
-                        releaseControl();
+                        presentationTimer.control(bufferedInputStream.read());
                         break;
                     default:
                         Notification.notify("Unknown control sequence " + command);
                         break;
                 }
+
             }
         } catch (Exception e) {
             Notification.notify("Something went wrong ");
@@ -143,12 +96,25 @@ public class ProcessConnectionThread implements Runnable {
         }
     }
 
-    private void startPresenting(BufferedInputStream bufferedInputStream, OutputStream outputStream) throws IOException {
+    private void sendStartMessage() throws IOException {
+        if (filePresented != null) {
+            outputStream.write(1);
+            outputStream.write(filePresented.getLengthofName());
+            outputStream.write(filePresented.getNameAsByte());
+            outputStream.write(filePresented.getCurrentSlide());
+            outputStream.write(filePresented.getTotalSlides());
+            outputStream.write(presentationTimer.getTime());
+        } else {
+            outputStream.write(0);
+        }
+        outputStream.flush();
+    }
+
+    private void startPresenting() throws IOException {
         filePresented = fileReciver.reciveFile(bufferedInputStream);
         Runtime rt = Runtime.getRuntime();
-        Process pr = rt.exec(OnScreen.pdfReader + filePresented);
+        Process pr = rt.exec(OnScreen.pdfReader + filePresented.getFullName());
         outputStream.write(STARTPRESENTATION);
-        PRESENTING = true;
         presentationTimer = new PresentationTimer();
     }
 }
