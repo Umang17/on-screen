@@ -16,15 +16,32 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class SelectPDFActivity extends ListActivity {
+	private final ArrayList<PdfFile> allPDFs = new ArrayList<PdfFile>();
+
+	private void listPDFs() {
+		allPDFs.clear();
+		File fileDir = Environment.getExternalStorageDirectory();
+
+		addPDFsInside(fileDir, allPDFs);
+		Collections.sort(allPDFs);
+		
+		Log.d("SD", fileDir.toString());
+		
+		if(allPDFs.isEmpty()) {
+			Log.d("SelectPDF", "Empty");
+		}
+
+		// allPDFs.add(0, new PdfFile("Refresh"));
+
+		setListAdapter(new ArrayAdapter<PdfFile>(this, R.layout.pdf_list_item,
+				allPDFs));
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final ArrayList<PdfFile> allPDFs = getPDFs();
-
-		setListAdapter(new ArrayAdapter<PdfFile>(this, R.layout.pdf_list_item,
-				allPDFs));
+		listPDFs();
 
 		ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
@@ -33,12 +50,19 @@ public class SelectPDFActivity extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				PdfFile file = allPDFs.get(position);
-				Log.d("SelectPDF", "Selected: " + file.getPath());
 
-				Intent data = new Intent();
-				data.putExtra("File", file.getPath());
-				setResult(RESULT_OK, data);
-				finish();
+				try {
+					String path = file.getPath();
+					Log.d("SelectPDF", "Selected: " + path);
+					Intent data = new Intent();
+					data.putExtra("File", file.getPath());
+					setResult(RESULT_OK, data);
+					finish();
+				} catch (IllegalArgumentException e) {
+					listPDFs();
+					Log.d("SelectPDF", "Refresh");
+				}
+
 			}
 		});
 	}
@@ -54,6 +78,7 @@ public class SelectPDFActivity extends ListActivity {
 	 */
 	private void addPDFsInside(File fileDir, ArrayList<PdfFile> result) {
 		if (fileDir.canRead()) {
+			Log.d("da", fileDir.toString());
 			for (File currentFile : fileDir.listFiles()) {
 				if (currentFile.isDirectory()) {
 					addPDFsInside(currentFile, result);
@@ -68,38 +93,34 @@ public class SelectPDFActivity extends ListActivity {
 	}
 
 	/**
-	 * Scans the phone for PDF files. Also sorts the PDFs by name.
-	 * 
-	 * @return An array list with all the PDFs.
-	 */
-	private ArrayList<PdfFile> getPDFs() {
-		File fileDir = Environment.getExternalStorageDirectory();
-		ArrayList<PdfFile> result = new ArrayList<PdfFile>();
-
-		addPDFsInside(fileDir, result);
-		Collections.sort(result);
-
-		return result;
-	}
-
-	/**
 	 * A class that wraps the File class to provide customized toString and also
 	 * to make it comparable for sorting.
 	 */
 	private class PdfFile implements Comparable<PdfFile> {
 		private File file;
+		private String name;
 
 		public PdfFile(File file) {
 			this.file = file;
+			this.name = file.getName();
 		}
 
-		public String getPath() {
-			return file.getAbsolutePath();
+		public PdfFile(String name) {
+			this.file = null;
+			this.name = name;
+		}
+
+		public String getPath() throws IllegalArgumentException {
+			if (file == null) {
+				throw new IllegalArgumentException("Refresh");
+			} else {
+				return file.getAbsolutePath();
+			}
 		}
 
 		@Override
 		public String toString() {
-			return file.getName();
+			return name;
 		}
 
 		public int compareTo(PdfFile another) {
