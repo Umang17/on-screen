@@ -43,11 +43,11 @@ public class PresentatorActivity extends Activity {
 
 			case MESSAGE_NO_PRES:
 				Log.d("Handler", "no pres!");
-//				try {
-//					mBluetooth.sendPresentation(mPresentationFile);
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
+				// try {
+				// mBluetooth.sendPresentation(mPresentationFile);
+				// } catch (IOException e) {
+				// e.printStackTrace();
+				// }
 				break;
 
 			case MESSAGE_TAKE_OVER:
@@ -74,12 +74,6 @@ public class PresentatorActivity extends Activity {
 		readNfcTag.onCreate(this, getClass());
 
 		mBluetooth = new Bluetooth(mHandler);
-		try {
-			mBluetooth.connect("00:1F:E1:EB:3B:DE");
-		} catch (IOException ex) {
-			Logger.getLogger(PresentatorActivity.class.getName()).log(
-					Level.SEVERE, null, ex);
-		}
 
 		Button prev = (Button) findViewById(R.id.prev);
 		prev.setOnClickListener(new OnClickListener() {
@@ -132,15 +126,16 @@ public class PresentatorActivity extends Activity {
 		});
 
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP
+				|| keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
@@ -171,6 +166,17 @@ public class PresentatorActivity extends Activity {
 			return true;
 		case R.id.open_settings:
 			// TODO
+			return true;
+		case R.id.connect:
+			try {
+				mBluetooth.connect("00:1F:E1:EB:3B:DE");
+			} catch (IOException ex) {
+				Logger.getLogger(PresentatorActivity.class.getName()).log(
+						Level.SEVERE, null, ex);
+			}
+			return true;
+		case R.id.disconnect:
+			mBluetooth.stop();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

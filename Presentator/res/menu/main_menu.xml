@@ -8,5 +8,13 @@
     <item
         android:id="@+id/open_settings"
         android:title="@string/open_settings"/>
+    
+    <item
+        android:id="@+id/connect"
+        android:title="@string/connect"/>
+    
+    <item
+        android:id="@+id/disconnect"
+        android:title="@string/disconnect"/>
 
 </menu>
