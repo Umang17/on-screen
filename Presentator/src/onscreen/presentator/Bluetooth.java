@@ -3,6 +3,7 @@ package onscreen.presentator;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,7 +56,7 @@ public class Bluetooth {
 		connect(device);
 	}
 
-	public boolean sendPresentation(File file) throws IOException {
+	public boolean sendPresentation(File file) {
 		return sendFile(file, TYPE_PRESENTATION);
 	}
 
@@ -105,7 +106,7 @@ public class Bluetooth {
 		return true;
 	}
 
-	private boolean sendFile(File file, byte type) throws IOException {
+	private boolean sendFile(File file, byte type) {
 		if (!mConnected)
 			return false;
 		if (D)
@@ -114,8 +115,13 @@ public class Bluetooth {
 		mConnectedThread.write(type);
 		if (D)
 			Log.d(TAG, "sent type");
-		BufferedInputStream buf = new BufferedInputStream(new FileInputStream(
-				file));
+		BufferedInputStream buf;
+		try {
+			buf = new BufferedInputStream(new FileInputStream(
+					file));
+		} catch (FileNotFoundException e) {
+			return false;
+		}
 
 		long length = file.length();
 		mConnectedThread.write(longToBytes(length)); // send the size of the
@@ -140,7 +146,11 @@ public class Bluetooth {
 		long num_of_int = length / BYTE_SIZE; // somehow just send incr message
 												// at the right moments
 		for (int i = 0; i <= length; i += BYTE_SIZE) {
-			buf.read(buffer);
+			try {
+				buf.read(buffer);
+			} catch (IOException e) {
+				return false;
+			}
 			mConnectedThread.write(buffer);
 		}
 

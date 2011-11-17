@@ -47,20 +47,22 @@ public class PresentatorActivity extends Activity {
 
 			case MESSAGE_NO_PRES:
 				Log.d("Handler", "no pres!");
-				try {
-					mBluetooth.sendPresentation(mPresentationFile);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				mBluetooth.sendPresentation(mPresentationFile);
 				break;
 
 			case MESSAGE_TAKE_OVER:
 				Log.d("Handler", "taking over");
-				byte[] readBuf = (byte[]) msg.obj; // shuld maybe not be bytes...
+				byte[] readBuf = (byte[]) msg.obj; // shuld maybe not be
+													// bytes...
 				// take care of the input from computer
 				// should output a dialog asking if user want to take over or
 				// send a new presentation. But only if a presentation already
 				// is loaded.
+				if (mPresentationFile != null) {
+					// ask user what to do
+				} else {
+					mBluetooth.requestControl();
+				}
 				break;
 
 			case MESSAGE_FILE_REC:
@@ -230,13 +232,7 @@ public class PresentatorActivity extends Activity {
 			File f = new File(file);
 			mPresentationFile = f;
 			state = STATE_LOAD;
-			if (mBluetooth.isConnected()) {
-				try {
-					mBluetooth.sendPresentation(mPresentationFile);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			mBluetooth.sendPresentation(mPresentationFile);
 			break;
 		}
 	}
