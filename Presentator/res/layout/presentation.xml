@@ -35,13 +35,13 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView1"
+    <Chronometer
+        android:id="@+id/chrono"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.23"
         android:gravity="center_vertical|center_horizontal"
-        android:text="2:00"
+        android:text="0:00:00"
         android:textSize="40pt" />
     
     <LinearLayout
