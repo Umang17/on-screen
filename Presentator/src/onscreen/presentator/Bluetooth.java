@@ -60,40 +60,47 @@ public class Bluetooth {
 	}
 	
 	public boolean requestControl() {
+		if (!mConnected) return false;
 		mConnectedThread.write(TYPE_REQ_CONTROL);
 		return true;
 	}
 	
 	public boolean releaseControl() {
+		if (!mConnected) return false;
 		mConnectedThread.write(TYPE_REL_CONTROL);
 		return true;
 	}
 	
 	public boolean sendExit() {
+		if (!mConnected) return false;
 		mConnectedThread.write(TYPE_COMMANDS);
 		mConnectedThread.write(COMMAND_EXIT);
 		return true;
 	}
 	
 	public boolean sendNext() {
+		if (!mConnected) return false;
 		mConnectedThread.write(TYPE_COMMANDS);
 		mConnectedThread.write(COMMAND_NEXT);
 		return true;
 	}
 	
 	public boolean sendPrev() {
+		if (!mConnected) return false;
 		mConnectedThread.write(TYPE_COMMANDS);
 		mConnectedThread.write(COMMAND_PREV);
 		return true;
 	}
 	
 	public boolean sendBlank() {
+		if (!mConnected) return false;
 		mConnectedThread.write(TYPE_COMMANDS);
 		mConnectedThread.write(COMMAND_BLANK);
 		return true;
 	}
 
 	private boolean sendFile(File file, byte type) throws IOException {
+		if (!mConnected) return false;
 		if (D) Log.d(TAG, "sendFile");
 		mConnectedThread.write(type);
 		if (D) Log.d(TAG, "sent type");
@@ -219,7 +226,7 @@ public class Bluetooth {
      */
     private void connectionFailed() {
         if (D) Log.d(TAG, "in connectionFailed");
-
+        mConnected = false;
         // Send a failure message back to the Activity
 //        Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
 //        Bundle bundle = new Bundle();
@@ -236,6 +243,7 @@ public class Bluetooth {
      */
     private void connectionLost() {
     	if (D) Log.d(TAG, "in connectionLost");
+    	mConnected = false;
         // Send a failure message back to the Activity
 //        Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
 //        Bundle bundle = new Bundle();

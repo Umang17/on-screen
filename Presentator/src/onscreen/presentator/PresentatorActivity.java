@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -60,43 +62,53 @@ public class PresentatorActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.start);
+		setContentView(R.layout.presentation);
 
 		readNfcTag = new ReadNfcTag();
 		readNfcTag.onCreate(this, getClass());
 		
 		mBluetooth = new Bluetooth(mHandler);
 
-		Button load = (Button) findViewById(R.id.load);
-		load.setOnClickListener(new OnClickListener() {
+		Button prev = (Button) findViewById(R.id.prev);
+		prev.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				// some action
-				Intent loadIntent = new Intent(PresentatorActivity.this, SelectPDFActivity.class);
-				startActivityForResult(loadIntent, STATE_LOAD);
+				mBluetooth.sendPrev();
+//				Intent loadIntent = new Intent(PresentatorActivity.this, SelectPDFActivity.class);
+//				startActivityForResult(loadIntent, STATE_LOAD);
 			}
 		});
 
-		Button take_over = (Button) findViewById(R.id.take_over);
-		take_over.setOnClickListener(new OnClickListener() {
+		Button next = (Button) findViewById(R.id.next);
+		next.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				// some action
-
-				state = STATE_TAKE_OVER;
+				mBluetooth.sendNext();
+//				state = STATE_TAKE_OVER;
 			}
 		});
 
-		Button pref = (Button) findViewById(R.id.preferences);
-		pref.setOnClickListener(new OnClickListener() {
+		Button start = (Button) findViewById(R.id.start);
+		start.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				// some action
 			}
 		});
 
-		Button exit = (Button) findViewById(R.id.exit);
-		exit.setOnClickListener(new OnClickListener() {
+		Button pause = (Button) findViewById(R.id.pause);
+		pause.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				// closes the program
+				finish();
+			}
+		});
+		
+		Button reset = (Button) findViewById(R.id.reset);
+		reset.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				// closes the program
