@@ -9,14 +9,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.Chronometer.OnChronometerTickListener;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +37,8 @@ public class PresentatorActivity extends Activity {
 	public static final int STATE_LOAD = 2;
 
 	public int state = 0;
+
+	private final String TAG = "PresentatorActivity";
 
 	private ReadNfcTag readNfcTag;
 	private ProgressDialog mProgressDialog;
@@ -82,6 +85,86 @@ public class PresentatorActivity extends Activity {
 		}
 	};
 
+	private Chronometer chrono;
+	private Button btnStart;
+	private Button btnPause;
+	private boolean resume=false;
+	private String currentTime="";	
+	private Long currentTimeLastStop;
+
+	private void setClock() {
+		chrono = (Chronometer) findViewById(R.id.chrono);
+		btnStart = (Button) findViewById(R.id.start);
+		btnPause = (Button) findViewById(R.id.pause);
+		btnPause.setEnabled(false);
+		
+		chrono.setOnChronometerTickListener(new OnChronometerTickListener() {
+
+			public void onChronometerTick(Chronometer arg0) {
+				
+			//if(!resume){	
+					long seconds = (SystemClock.elapsedRealtime() - chrono.getBase())/1000;
+					
+					long hour = seconds/3600;
+					if(hour>=10) {
+						chrono.setBase(chrono.getBase() - seconds*3600*1000);
+						seconds -= hour*3600;
+						hour = 0;
+					}
+					seconds -= hour*3600;
+					long minutes = seconds/60;
+					seconds -= minutes*60;
+					
+					currentTime = hour+":"
+									+(minutes<10?"0"+minutes:minutes)+":"
+									+(seconds<10?"0"+seconds:seconds);
+					Log.d(TAG, currentTime);
+					arg0.setText(currentTime);
+				//}
+			}
+		});
+		//Start time
+		chrono.setText("0:00:00");
+	}
+
+	private void handleButtonClick(View v) {
+		switch (v.getId()) {
+			case R.id.start:
+				
+				btnPause.setEnabled(true);
+				btnStart.setEnabled(false);
+				if (!resume) {
+					Log.d(TAG, "Starting");
+					chrono.setBase(SystemClock.elapsedRealtime());
+					chrono.start();
+				} else {
+					Log.d(TAG, "Resuming");
+					long time=chrono.getBase()+SystemClock.elapsedRealtime()-currentTimeLastStop;
+					chrono.setBase(time);
+					chrono.start();
+				}
+				
+				break;
+			case R.id.pause:
+				btnStart.setEnabled(true);
+				btnPause.setEnabled(false);
+				chrono.stop();
+				resume = true;
+				btnStart.setText("Resume");
+				currentTimeLastStop=SystemClock.elapsedRealtime();
+				break;
+			case R.id.reset:
+				chrono.stop();
+				chrono.setText("0:00:00");
+				btnStart.setText("Start");
+				resume = false;
+				currentTimeLastStop=SystemClock.elapsedRealtime();
+				btnStart.setEnabled(true);				
+				btnPause.setEnabled(false);
+				break;
+		}
+	}
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -91,6 +174,8 @@ public class PresentatorActivity extends Activity {
 		readNfcTag = new ReadNfcTag();
 		readNfcTag.onCreate(this, getClass());
 
+		setClock();
+
 		mBluetooth = new Bluetooth(mHandler);
 
 		Button prev = (Button) findViewById(R.id.prev);
@@ -98,6 +183,9 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				mBluetooth.sendPrev();
+				// Intent loadIntent = new Intent(PresentatorActivity.this,
+				// SelectPDFActivity.class);
+				// startActivityForResult(loadIntent, STATE_LOAD);
 			}
 		});
 
@@ -106,6 +194,7 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				mBluetooth.sendNext();
+				// state = STATE_TAKE_OVER;
 			}
 		});
 
@@ -122,6 +211,7 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				// some action
+				handleButtonClick(v);
 			}
 		});
 
@@ -129,8 +219,7 @@ public class PresentatorActivity extends Activity {
 		pause.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// closes the program
-				finish();
+				handleButtonClick(v);
 			}
 		});
 
@@ -138,8 +227,7 @@ public class PresentatorActivity extends Activity {
 		reset.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// closes the program
-				finish();
+				handleButtonClick(v);
 			}
 		});
 
