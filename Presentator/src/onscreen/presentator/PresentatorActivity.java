@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -84,11 +85,7 @@ public class PresentatorActivity extends Activity {
 		prev.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// some action
 				mBluetooth.sendPrev();
-				// Intent loadIntent = new Intent(PresentatorActivity.this,
-				// SelectPDFActivity.class);
-				// startActivityForResult(loadIntent, STATE_LOAD);
 			}
 		});
 
@@ -96,9 +93,7 @@ public class PresentatorActivity extends Activity {
 		next.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// some action
 				mBluetooth.sendNext();
-				// state = STATE_TAKE_OVER;
 			}
 		});
 
@@ -106,9 +101,7 @@ public class PresentatorActivity extends Activity {
 		blank.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// some action
 				mBluetooth.sendBlank();
-				// state = STATE_TAKE_OVER;
 			}
 		});
 
@@ -138,6 +131,26 @@ public class PresentatorActivity extends Activity {
 			}
 		});
 
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+			mBluetooth.sendNext();
+			return true;
+		} else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+			mBluetooth.sendPrev();
+			return true;
+		}
+		return super.onKeyUp(keyCode, event);
 	}
 
 	@Override

@@ -383,6 +383,7 @@ public class Bluetooth {
 						mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_NO_PRES);
 						break;
 					case 1: // presentation available...
+						// TODO: read all bytes!
 						bytes = mmInStream.read(buffer);
 						mHandler.obtainMessage(
 								PresentatorActivity.MESSAGE_TAKE_OVER, bytes,
