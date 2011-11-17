@@ -11,6 +11,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -134,6 +135,29 @@ public class PresentatorActivity extends Activity {
 		});
 
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main_menu, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case R.id.open_presentation:
+			// Start the PDF selector
+			Intent loadIntent = new Intent(PresentatorActivity.this, SelectPDFActivity.class);
+			startActivityForResult(loadIntent, STATE_LOAD);
+			return true;
+		case R.id.open_settings:
+			// TODO
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
 
 	@Override
 	protected void onResume() {
@@ -153,6 +177,7 @@ public class PresentatorActivity extends Activity {
 		switch (requestCode) {
 		case STATE_LOAD:
 			if (resultCode != RESULT_OK) {
+				Log.d("SelectPDFReturn", "Not ok");
 				break;
 			}
 			String file = data.getStringExtra("File");
