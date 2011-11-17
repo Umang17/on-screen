@@ -14,10 +14,8 @@ public class ProcessConnectionThread implements Runnable {
 
     private StreamConnection mConnection;
     private FileReciver fileReciver;
-    private InputStream inputStream;
     private OutputStream outputStream;
     private BufferedInputStream bufferedInputStream;
-    private static ProcessConnectionThread lockOwner = null;
     private static FilePresented filePresented = null;
     private static PresentationTimer presentationTimer;
     private static final int EXIT_CMD = -1;
@@ -27,23 +25,9 @@ public class ProcessConnectionThread implements Runnable {
     private static final int TIMECONTROLL = 7;
     private static final int STARTPRESENTATION = 4;
 
-
     ProcessConnectionThread(StreamConnection connection) {
         mConnection = connection;
         fileReciver = new FileReciver();
-    }
-
-    private synchronized boolean lockControl() {
-        lockOwner = this;
-        return true;
-    }
-
-    private synchronized boolean canControl() {
-        if (lockOwner == this) {
-            return true;
-        } else {
-            return lockControl();
-        }
     }
 
     @Override
@@ -51,15 +35,15 @@ public class ProcessConnectionThread implements Runnable {
         try {
             Notification.notify("Have recived connection");
             // prepare to receive data
-            inputStream = mConnection.openInputStream();
             outputStream = mConnection.openOutputStream();
-            bufferedInputStream = new BufferedInputStream(inputStream);
+            bufferedInputStream = 
+                    new BufferedInputStream(mConnection.openInputStream());
 
             sendStartMessage();
 
             while (true) {
                 int command = bufferedInputStream.read();
-                
+
                 switch (command) {
                     case EXIT_CMD:
                         Notification.notify("Killing connection.");
@@ -69,16 +53,14 @@ public class ProcessConnectionThread implements Runnable {
                         startPresenting();
                         break;
                     case MOUSECONTROLLER:
-                        if (canControl()) {
-                            OnScreen.mouseController.recive(
-                                    bufferedInputStream.read(), bufferedInputStream.read());
-                        }
+                        OnScreen.mouseController.recive(
+                                bufferedInputStream.read(), bufferedInputStream.read());
                         break;
                     case KEYCONTROLLER:
                         int read = bufferedInputStream.read();
-                        if (canControl()) {
-                            boolean exit = OnScreen.keyController.recive(read, filePresented);
-                            if (exit) filePresented = null;
+                        boolean exit = OnScreen.keyController.recive(read, filePresented);
+                        if (exit) {
+                            filePresented = null;
                         }
                         break;
                     case TIMECONTROLL:
