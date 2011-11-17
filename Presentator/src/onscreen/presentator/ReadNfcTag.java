@@ -3,8 +3,6 @@ package onscreen.presentator;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.util.Log;
@@ -15,7 +13,6 @@ public class ReadNfcTag {
 	
 	private PendingIntent mNfcPendingIntent;
 	private IntentFilter[] mWriteTagFilters;
-    //private IntentFilter[] mNdefExchangeFilters;
     
     private PresentatorActivity mainClass;
     private NfcAdapter mNfcAdapter;
@@ -29,37 +26,20 @@ public class ReadNfcTag {
 		
 		// Handle all of our received NFC intents in this activity.
         mNfcPendingIntent = PendingIntent.getActivity(mainClass, 0,
-                new Intent(mainClass, class1).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-
-        //IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        //mNdefExchangeFilters = new IntentFilter[] { ndefDetected };        		
+                new Intent(mainClass, class1).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);    		
 	}
 	
 	public void onResume(Intent intent){
 		if(mNfcAdapter == null) {return;}
 		enableNFC();  
-        
-        Log.d(TAG,"onResume: "+intent.getAction());         
-        
+                
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())){
-        	mainClass.onNewIntent(intent);
+        	showID(intent);
         } 
 	}
 	
-    private NdefMessage getNoteAsNdef() {
-        byte[] textBytes = "text".getBytes();
-        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA, "text/plain".getBytes(),
-                new byte[] {}, textBytes);
-        return new NdefMessage(new NdefRecord[] {
-            textRecord
-        });
-    }
-	
     private void enableNFC(){
     	
-    	mNfcAdapter.enableForegroundNdefPush(mainClass, getNoteAsNdef());
-
-        
     	IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         mWriteTagFilters = new IntentFilter[] {
             tagDetected
@@ -100,13 +80,15 @@ public class ReadNfcTag {
 	        }
 	    return out;
 	}
+	private void showID(Intent intent){
+    	String text="tag ID: " + getNFCTagID(intent) +"\n";    	    	    	
+    	Log.d(TAG,text);
+	}
 
 	public void onNewIntent(Intent intent) {
-    	if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction()) ||
-    			NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-    		
-        	String text="tag ID: " + getNFCTagID(intent) +"\n";    	    	    	
-        	Log.d(TAG,text);
+		Log.d(TAG,"onNewIntent "+intent.getAction());
+    	if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+    		showID(intent);
         }		
 	}
 
