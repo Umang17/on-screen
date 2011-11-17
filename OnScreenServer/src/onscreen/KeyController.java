@@ -15,8 +15,8 @@ import java.awt.event.KeyEvent;
 public class KeyController {
     
     private static final int EXIT = 0;   
-    private static final int NEXT = 1;
-    private static final int PREVIOUS = 2;
+    private static final int NEXT = 2;
+    private static final int PREVIOUS = 1;
     private static final int BLANK = 3;
     private Robot rob;
     

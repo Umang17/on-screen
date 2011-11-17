@@ -41,8 +41,14 @@ public class ProcessConnectionThread implements Runnable {
     private synchronized boolean canControl() {
         if (lockOwner == this) {
             return true;
+        } else if (lockOwner == null) {
+            return lockControl();
+        } else {
+            try {
+                lockOwner.sendReleaseRequest();
+            } catch(NullPointerException e) {}
         }
-        lockOwner.sendReleaseRequest();
+       
         return false;
     }
     

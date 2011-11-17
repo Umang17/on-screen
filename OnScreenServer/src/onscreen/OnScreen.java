@@ -28,14 +28,19 @@ public class OnScreen {
             }
         } else if ((new File(System.getenv("PROGRAMFILES") // 32bit windows
                 + "\\SumatraPDF\\SumatraPDF.exe")).exists()) {
-            pdfReader = System.getenv("PROGRAMFILES)") 
+            pdfReader = System.getenv("PROGRAMFILES") 
                     + "\\SumatraPDF\\SumatraPDF.exe -esc-to-exit -presentation ";
             
         } else if ((new File(System.getenv("PROGRAMFILES(X86)") // 64bit windows
                 + "\\SumatraPDF\\SumatraPDF.exe")).exists()) {
             pdfReader = System.getenv("PROGRAMFILES(X86)") 
                     + "\\SumatraPDF\\SumatraPDF.exe -esc-to-exit -presentation ";
-        } else {
+        } else if ((new File(System.getenv("PROGRAMFILES") // 32bit windows
+                + "\\OnScreen\\SumatraPDF.exe")).exists()) {
+            pdfReader = System.getenv("PROGRAMFILES)") 
+                    + "\\OnScreen\\SumatraPDF.exe -esc-to-exit -presentation ";
+            
+        }  else {
             Notification.notify("Could not find pdf reader!");
         }
         
