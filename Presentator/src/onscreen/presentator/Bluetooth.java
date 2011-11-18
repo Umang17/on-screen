@@ -14,7 +14,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 public class Bluetooth {
@@ -36,9 +35,6 @@ public class Bluetooth {
 	private static final int BYTE_SIZE = 1000;
 
 	private static final byte TYPE_PRESENTATION = 1;
-	private static final byte TYPE_MOUSE = 2;
-	private static final byte TYPE_REQ_CONTROL = 3;
-	private static final byte TYPE_REL_CONTROL = 4;
 	private static final byte TYPE_COMMANDS = 5;
 
 	private static final byte COMMAND_EXIT = 0;
@@ -58,20 +54,6 @@ public class Bluetooth {
 
 	public boolean sendPresentation(File file) {
 		return sendFile(file, TYPE_PRESENTATION);
-	}
-
-	public boolean requestControl() {
-		if (!mConnected)
-			return false;
-		mConnectedThread.write(TYPE_REQ_CONTROL);
-		return true;
-	}
-
-	public boolean releaseControl() {
-		if (!mConnected)
-			return false;
-		mConnectedThread.write(TYPE_REL_CONTROL);
-		return true;
 	}
 
 	public boolean sendExit() {
