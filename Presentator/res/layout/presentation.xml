@@ -42,7 +42,7 @@
         android:layout_weight="0.23"
         android:gravity="center_vertical|center_horizontal"
         android:text="0:00:00"
-        android:textSize="40pt" />
+        android:textSize="80sp" />
     
     <LinearLayout
         android:id="@+id/linearLayout2"
