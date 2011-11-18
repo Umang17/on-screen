@@ -44,6 +44,11 @@ public class Bluetooth {
 	private static final byte COMMAND_NEXT = 1;
 	private static final byte COMMAND_PREV = 2;
 	private static final byte COMMAND_BLANK = 3;
+	private static final byte COMMAND_TIME = 7;
+	
+	private static final byte TYPE_START = 7;
+	private static final byte TYPE_PAUSE = 8;
+	private static final byte TYPE_RESET = 9;
 
 	public Bluetooth(Handler handler,StopWatch stopWatch) {
 		this.stopWatch = stopWatch;
@@ -440,16 +445,13 @@ public class Bluetooth {
 
 						bytes = mmInStream.read(buffer, 0, 4); // read time
 						int time = bytesToInt(buffer);
+						//TODO ELIAS:FIX REFERENCE FOR stopWatch
 						stopWatch.setBaseTime(time);
 						Log.d(TAG, "time = " + time);
 						bytes = mmInStream.read(buffer, 0, 1); // read running
 						int running = bytesToInt(buffer);
 						
-						if(running==1 && !stopWatch.isRunningNow()){
-							stopWatch.startClock();
-						}else if (running==0 && stopWatch.isRunningNow()) {
-							stopWatch.pauseClock();
-						}
+						handleIfClockRunning(running);
 						
 						Bundle bundle = new Bundle();
 						bundle.putString(PresentatorActivity.BUNDLE_NAME,
@@ -473,11 +475,7 @@ public class Bluetooth {
 						//1 if reset else 0
 						int runningClock=mmInStream.read();
 						int reset=mmInStream.read();
-						if(runningClock==1 && !stopWatch.isRunningNow()){
-							stopWatch.startClock();
-						}else if (runningClock==0 && stopWatch.isRunningNow()) {
-							stopWatch.pauseClock();
-						}
+						handleIfClockRunning(runningClock);
 						if(reset==1){
 							stopWatch.resetClock();
 						} 
@@ -492,6 +490,15 @@ public class Bluetooth {
 					break;
 				}
 			}
+		}
+
+		private void handleIfClockRunning(int running) {
+			if(running==1 && !stopWatch.isRunningNow()){
+				stopWatch.startClock();
+			}else if (running==0 && stopWatch.isRunningNow()) {
+				stopWatch.pauseClock();
+			}
+			
 		}
 
 		/* Call this from the main Activity to send data to the remote device */
@@ -524,28 +531,24 @@ public class Bluetooth {
 		}
 
 	}
+	
+	private void sendClockSetting(byte type) {
+		if (isConnected()){
+			mConnectedThread.write(COMMAND_TIME); //Time
+			mConnectedThread.write(type); //Type: Start,Pause,Reset
+		}		
+	}
 
 	public void sendStartClock() {
-		if (isConnected()){
-			mConnectedThread.write((byte)7); //Time
-			mConnectedThread.write((byte)7); //Start
-		}
-		
+		sendClockSetting(TYPE_START); //Start	
 	}
 
 	public void sendPauseClock() {
-		if (isConnected()){
-			mConnectedThread.write((byte)7); //Time
-			mConnectedThread.write((byte)8); //Pause
-		}
-		
+		sendClockSetting(TYPE_PAUSE); //Pause		
 	}
 
 	public void sendResetClock() {
-		if (isConnected()){
-			mConnectedThread.write((byte)7); //Time
-			mConnectedThread.write((byte)9); //Reset
-		}		
+		sendClockSetting(TYPE_RESET); //Reset
 	}
 
 }
