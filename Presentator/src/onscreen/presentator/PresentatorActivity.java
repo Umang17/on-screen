@@ -78,6 +78,9 @@ public class PresentatorActivity extends Activity {
 				// is loaded.
 				if (mPresentationFile != null) {
 					// give user options...
+					Log.d("Handler", "Before sending");
+					mBluetooth.sendPresentation(mPresentationFile);
+					Log.d("Handler", "After sending");
 				} else {
 					// set time
 					TextView view = (TextView) findViewById(R.id.presentationName);
@@ -102,7 +105,7 @@ public class PresentatorActivity extends Activity {
 			case MESSAGE_PROGRESS_INC:
 				Log.d("Handler", "progress inc...");
 				// maybe incr with the size of the BYTE_SIZE
-				mProgressDialog.incrementProgressBy(1);
+				mProgressDialog.setProgress(msg.arg1);
 			}
 		}
 	};

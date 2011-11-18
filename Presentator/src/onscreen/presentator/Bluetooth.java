@@ -12,6 +12,7 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -29,7 +30,7 @@ public class Bluetooth {
 	private final Handler mHandler;
 	private ConnectThread mConnectThread;
 	private ConnectedThread mConnectedThread;
-
+	
 	private boolean mConnected = false;
 
 	private static final int BYTE_SIZE = 1000;
@@ -53,7 +54,9 @@ public class Bluetooth {
 	}
 
 	public boolean sendPresentation(File file) {
-		return sendFile(file, TYPE_PRESENTATION);
+		if (!mConnected) return false;
+		new SendFile().execute(file);
+		return true;
 	}
 
 	public boolean sendExit() {
@@ -85,58 +88,6 @@ public class Bluetooth {
 			return false;
 		mConnectedThread.write(TYPE_COMMANDS);
 		mConnectedThread.write(COMMAND_BLANK);
-		return true;
-	}
-
-	private boolean sendFile(File file, byte type) {
-		if (!mConnected)
-			return false;
-		if (D)
-			Log.d(TAG, "sendFile");
-		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_PROGRESS_START);
-		mConnectedThread.write(type);
-		if (D)
-			Log.d(TAG, "sent type");
-		BufferedInputStream buf;
-		try {
-			buf = new BufferedInputStream(new FileInputStream(file));
-		} catch (FileNotFoundException e) {
-			return false;
-		}
-
-		long length = file.length();
-		mConnectedThread.write(longToBytes(length)); // send the size of the
-														// byte stream.
-		if (D)
-			Log.d(TAG, "sent length");
-
-		String name = file.getName();
-		char[] nameChar = name.toCharArray();
-		int nameSize = nameChar.length;
-		mConnectedThread.write(intToBytes(nameSize)); // send the size of the
-														// name
-		if (D)
-			Log.d(TAG, "sent name size");
-
-		mConnectedThread.write(charArrayToBytes(nameChar)); // send the name of
-															// the file
-		if (D)
-			Log.d(TAG, "sent all but file...");
-
-		byte[] buffer = new byte[BYTE_SIZE];
-		long num_of_int = length / BYTE_SIZE; // somehow just send incr message
-												// at the right moments
-		for (int i = 0; i <= length; i += BYTE_SIZE) {
-			try {
-				buf.read(buffer);
-			} catch (IOException e) {
-				return false;
-			}
-			mConnectedThread.write(buffer);
-		}
-
-		mConnectedThread.write(intToBytes(10));
-
 		return true;
 	}
 
@@ -283,6 +234,72 @@ public class Bluetooth {
 
 		// Start the service over to restart listening mode
 		// BluetoothChatService.this.start();
+	}
+
+	private class SendFile extends AsyncTask<File, Integer, Void> {
+
+		@Override
+		protected Void doInBackground(File... params) {
+			if (D)
+				Log.d(TAG, "sendFile");
+			File file = params[0];
+			mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_PROGRESS_START);
+			mConnectedThread.write(TYPE_PRESENTATION);
+			if (D)
+				Log.d(TAG, "sent type");
+			BufferedInputStream buf;
+			try {
+				buf = new BufferedInputStream(new FileInputStream(file));
+			} catch (FileNotFoundException e) {
+				return null;
+			}
+
+			long length = file.length();
+			mConnectedThread.write(longToBytes(length)); // send the size of the
+															// byte stream.
+			if (D)
+				Log.d(TAG, "sent length");
+
+			String name = file.getName();
+			char[] nameChar = name.toCharArray();
+			int nameSize = nameChar.length;
+			mConnectedThread.write(intToBytes(nameSize)); // send the size of
+															// the
+															// name
+			if (D)
+				Log.d(TAG, "sent name size");
+
+			mConnectedThread.write(charArrayToBytes(nameChar)); // send the name
+																// of
+																// the file
+			if (D)
+				Log.d(TAG, "sent all but file...");
+
+			byte[] buffer = new byte[BYTE_SIZE];
+			long num_of_int = length / BYTE_SIZE; // somehow just send incr
+													// message
+													// at the right moments
+			int currentProgress = 0, prevProgress = 0;
+			for (int i = 0; i <= length; i += BYTE_SIZE) {
+				try {
+					buf.read(buffer);
+				} catch (IOException e) {
+					return null;
+				}
+				mConnectedThread.write(buffer);
+				currentProgress = (int)(100*i/length);
+				if (prevProgress != currentProgress) {
+					mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC, currentProgress, 0).sendToTarget();
+					prevProgress = currentProgress;
+				}
+			}
+
+			mConnectedThread.write(intToBytes(10));
+			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC, 100, 0).sendToTarget();
+			
+			return null;
+		}
+
 	}
 
 	private class ConnectThread extends Thread {
