@@ -27,7 +27,7 @@ public class LanWaitThread implements Runnable {
                 Notification.notify("got connection...\n");
 
                 Thread processThread = new Thread(
-                        new ProcessConnectionThread(connection));
+                        new ConnectedThread(connection));
                 processThread.start();
             }
         } catch (IOException e) {

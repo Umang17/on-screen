@@ -52,7 +52,7 @@ public class BluetoothWaitThread implements Runnable {
             try {
                 connection = notifier.acceptAndOpen();
                 Thread processThread = new Thread(
-                        new ProcessConnectionThread(connection));
+                        new ConnectedThread(connection));
                 processThread.start();
             } catch (Exception e) {
                 e.printStackTrace();

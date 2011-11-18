@@ -9,10 +9,19 @@ import java.io.File;
  */
 public class OnScreen {
 
+    static final String nativeSumatra = "\\SumatraPDF\\SumatraPDF.exe";
+    static final String onScreenSumatra = "\\OnScreen\\SumatraPDF.exe";
+    static final String sumatraSettings = " -esc-to-exit -page 0 -presentation ";
+    static final String env32 = System.getenv("PROGRAMFILES");
+    static final String env64 = System.getenv("PROGRAMFILES(X86)");
+                    static final String BTOFFSETTING = "nobt";
+                static final String LANOFFSETTING = "nolan";
+    static boolean BT = true;
+    static boolean LAN = true;
     public static MouseController mouseController;
     public static String pdfReader;
     static KeyController keyController;
-    
+
     /**
      * @param args the command line arguments
      */
@@ -20,44 +29,39 @@ public class OnScreen {
         mouseController = new MouseController();
         keyController = new KeyController();
 
-        // Set up pdf reader
         if (args.length > 0) {
-            pdfReader = args[0];
-            if (!(new File(pdfReader.split(" ")[0])).exists()) {
-                Notification.notify("Something wrong with custom pdf reader");
+            pdfReader = "";
+            for (int i = 0; i < args.length; i++) {
+                final String DEBUGSETTING = "debug";
+
+                if (args[i].equals(DEBUGSETTING)) {
+                    Notification.setDebug(true);
+                } else if (args[i].equals(BTOFFSETTING)) {
+                    BT = false;
+                } else if (args[i].equals(LANOFFSETTING)) {
+                    LAN = false;
+                } else {
+                    pdfReader += args[i];
+                } 
             }
-        } else if ((new File(System.getenv("PROGRAMFILES") // 32bit windows
-                + "\\SumatraPDF\\SumatraPDF.exe")).exists()) {
-            pdfReader = System.getenv("PROGRAMFILES") 
-                    + "\\SumatraPDF\\SumatraPDF.exe -esc-to-exit -presentation ";
-            
-        } else if ((new File(System.getenv("PROGRAMFILES(X86)") // 64bit windows
-                + "\\SumatraPDF\\SumatraPDF.exe")).exists()) {
-            pdfReader = System.getenv("PROGRAMFILES(X86)") 
-                    + "\\SumatraPDF\\SumatraPDF.exe -esc-to-exit -presentation ";
-        } else if ((new File(System.getenv("PROGRAMFILES") // 32bit windows
-                + "\\OnScreen\\SumatraPDF.exe")).exists()) {
-            pdfReader = System.getenv("PROGRAMFILES)") 
-                    + "\\OnScreen\\SumatraPDF.exe -esc-to-exit -presentation ";
-            
-        }  else {
+        } else if ((new File(env32 + nativeSumatra)).exists()) {
+            pdfReader = env32 + nativeSumatra + sumatraSettings;
+        } else if ((new File(env64 + nativeSumatra)).exists()) {
+            pdfReader = env64 + nativeSumatra + sumatraSettings;
+        } else if ((new File(env32 + onScreenSumatra)).exists()) {
+            pdfReader = env32 + onScreenSumatra + sumatraSettings;
+        } else {
             Notification.notify("Could not find pdf reader!");
         }
-        
-        //Set up debug
-        if (args.length > 1) {
-            if (args[1].equals("true")) {
-                Notification.setDebug(true);
-            } else if (args[1].equals("false")) {
-                Notification.setDebug(false);
-            }
+
+        if (BT) {
+            Thread btWaitThread = new Thread(new BluetoothWaitThread());
+            btWaitThread.start();
         }
-        
-        // Create the bluetooth listner
-        Thread btWaitThread = new Thread(new BluetoothWaitThread());
-        btWaitThread.start();
-        
-        Thread lanWaitThread = new Thread(new LanWaitThread());
-        lanWaitThread.start();
+
+        if (LAN) {
+            Thread lanWaitThread = new Thread(new LanWaitThread());
+            lanWaitThread.start();
+        }
     }
 }

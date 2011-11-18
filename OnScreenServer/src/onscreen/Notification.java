@@ -12,4 +12,12 @@ public class Notification {
     public static void setDebug(boolean debug) {
         Notification.debug = debug;
     }
+
+    static void setDebug(String debug) {
+        if (debug.equals("true")) {
+            setDebug(true);
+        } else {
+            setDebug(false);
+        }
+    }
  }

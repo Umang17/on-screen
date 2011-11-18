@@ -6,11 +6,10 @@ package onscreen;
  */
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import javax.microedition.io.StreamConnection;
 
-public class ProcessConnectionThread implements Runnable {
+public class ConnectedThread implements Runnable {
 
     private StreamConnection mConnection;
     private FileReciver fileReciver;
@@ -25,7 +24,7 @@ public class ProcessConnectionThread implements Runnable {
     private static final int TIMECONTROLL = 7;
     private static final int STARTPRESENTATION = 4;
 
-    ProcessConnectionThread(StreamConnection connection) {
+    ConnectedThread(StreamConnection connection) {
         mConnection = connection;
         fileReciver = new FileReciver();
     }

@@ -27,8 +27,8 @@ public class PresentationTimer {
         collectedTime = 0;
     }
 
-    public synchronized int getTime() {
-        return getCurrentTime() - startTime + collectedTime;
+    public synchronized byte[] getTime() {
+        return intToByte(getCurrentTime() - startTime + collectedTime);
     }
 
     private int getCurrentTime() {
@@ -43,5 +43,15 @@ public class PresentationTimer {
         } else { //START
             start();
         }
+    }
+
+    private byte[] intToByte(int input) {
+        byte[] writeBuffer = new byte[4];
+        writeBuffer[0] = (byte) (input >> 24);
+        writeBuffer[1] = (byte) (input >> 16);
+        writeBuffer[2] = (byte) (input >> 8);
+        writeBuffer[3] = (byte) (input);
+
+        return writeBuffer;
     }
 }

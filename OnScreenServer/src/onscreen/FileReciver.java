@@ -1,5 +1,6 @@
 package onscreen;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +20,54 @@ public class FileReciver {
         fileLocation = homeFolder + separator + "OnScreen" + separator;
     }
 
-    public static int byteArrayToInt(byte[] b, int offset) {
+    public synchronized FilePresented reciveFile(BufferedInputStream stream) {
+        Notification.notify("Starting to recive file");
+
+        int size = read(stream, 8, 4);
+
+        int nameSize = read(stream, 4);
+
+        String fileName = readString(stream, nameSize);
+
+        return reciveFile(stream, size, fileName);
+    }
+
+    private FilePresented reciveFile(InputStream stream, int size, String fileName) {
+        FileWriterThread fw = new FileWriterThread(fileLocation, fileName);
+        fw.start();
+        try {
+            for (int a = 0; a < size + NUM_BYTES;) {
+                byte[] bytes = new byte[NUM_BYTES];
+                int read = stream.read(bytes);
+                if (read < 0) {
+                    break;
+                }
+                if (read == NUM_BYTES) {
+                    fw.write(bytes);
+                }
+                if (read < NUM_BYTES) {
+                    fw.write(bytes, read);
+                    break;
+                }
+                a += read;
+            }
+        } catch (IOException ex) {
+            Notification.notify("Failed in reciving or writing data");
+        }
+        FilePresented file = new FilePresented(fileLocation, fileName);
+        fw.close();
+        return file;
+    }
+
+    private String byteToString(byte[] imageNameByte) {
+        char[] chars = new char[imageNameByte.length];
+        for (int i = 0; i < imageNameByte.length; i++) {
+            chars[i] = (char) imageNameByte[i];
+        }
+        return String.copyValueOf(chars);
+    }    
+    
+    private static int byteArrayToInt(byte[] b, int offset) {
         int i = 0;
         int pos = offset;
         i += unsignedByteToInt(b[pos++]) << 24;
@@ -33,67 +81,29 @@ public class FileReciver {
         return (int) b & 0xFF;
     }
 
-    public synchronized FilePresented reciveFile(InputStream stream) {
-        Notification.notify("Starting to recive file");
-        // Get the size of the packet
-        byte[] sizeBytes = new byte[8];
+    private int read(BufferedInputStream stream, int i) {
+        return read(stream, i, 0);
+    }
+
+    private int read(BufferedInputStream stream, int i, int offset) {
+        byte[] sizeBytes = new byte[i];
         try {
-            stream.read(sizeBytes, 0, 8);
+            stream.read(sizeBytes, 0, i);
         } catch (IOException ex) {
-            Notification.notify("Failed in reciving name");
+            Notification.notify("Failed in reciving " + ex.getLocalizedMessage());
         }
 
-        int size = byteArrayToInt(sizeBytes, 4);
+        return byteArrayToInt(sizeBytes, offset);
+    }
 
-        //Get the length of the name
-        byte[] imageNameLength = new byte[4];
-        try {
-            stream.read(imageNameLength, 0, 4);
-        } catch (IOException ex) {
-            Notification.notify("Failed in reciving name length");
-        }
-        int nameSize = byteArrayToInt(imageNameLength, 0);
-
-        // Get the image name
+    private String readString(BufferedInputStream stream, int nameSize) {
         byte[] imageNameByte = new byte[nameSize];
 
         try {
             stream.read(imageNameByte, 0, nameSize);
         } catch (IOException ex) {
-            Notification.notify("Failed in reciving name");
+            Notification.notify("Failed in reciving " + ex.getLocalizedMessage());
         }
-
-        char[] chars = new char[imageNameByte.length];
-        for (int i = 0; i < imageNameByte.length; i++) {
-            chars[i] = (char) imageNameByte[i];
-        }
-        String fileName = String.copyValueOf(chars);
-        
-        FileWriterThread fw = new FileWriterThread(fileLocation, fileName);
-        fw.start();
-
-        long timeS = System.currentTimeMillis();
-        
-        try {
-            for (int a = 0; a < size + NUM_BYTES;) {
-                byte[] bytes = new byte[NUM_BYTES];
-                int read = stream.read(bytes);
-                if (read < 0) break;
-                if (read == NUM_BYTES) fw.write(bytes);
-                if (read < NUM_BYTES) {
-                    fw.write(bytes, read);
-                    break;
-                }
-                a += read;
-            }
-            
-        } catch (IOException ex) {
-            Notification.notify("Failed in reciving or writing data");
-        }
-        FilePresented file = new FilePresented(fileLocation, fileName);
-        fw.close();
-        double t = (System.currentTimeMillis() - timeS) / 1000;
-        Notification.notify("It took: " + t + "seconds");
-        return file;
+        return byteToString(imageNameByte);
     }
 }
