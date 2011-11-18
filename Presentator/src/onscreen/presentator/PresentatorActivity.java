@@ -2,6 +2,8 @@ package onscreen.presentator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -9,7 +11,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -20,10 +21,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
-import android.widget.Chronometer.OnChronometerTickListener;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PresentatorActivity extends Activity {
 
@@ -49,6 +46,7 @@ public class PresentatorActivity extends Activity {
 	private final String TAG = "PresentatorActivity";
 
 	private ReadNfcTag readNfcTag;
+	private StopWatch stopWatch;	
 	private ProgressDialog mProgressDialog;
 
 	private final Handler mHandler = new Handler() {
@@ -110,130 +108,6 @@ public class PresentatorActivity extends Activity {
 		}
 	};
 
-	private stopWatch stopWatch;
-
-	private class stopWatch{
-		private Chronometer chrono;
-		private Button btnStart;
-		private Button btnPause;
-		private boolean resume=false;
-		private String currentTime="";	
-		private Long currentTimeLastStop;
-		private boolean clockSetByComputer=false;
-		
-		public stopWatch(final Chronometer chrono, Button btnStart, Button btnPause){
-			this.chrono=chrono;
-			this.btnStart=btnStart;
-			this.btnPause=btnPause;
-			
-			btnPause.setEnabled(false);
-			
-			chrono.setOnChronometerTickListener(new OnChronometerTickListener() {
-
-				public void onChronometerTick(Chronometer arg0) {
-					
-						long seconds = (SystemClock.elapsedRealtime() - chrono.getBase()) / 1000;
-						
-						int hour = (int) (seconds/3600);
-						if(hour>=10) {
-							chrono.setBase(chrono.getBase() - seconds*3600*1000);
-							seconds -= hour*3600;
-							hour = 0;
-						}
-						seconds -= hour*3600;
-						int minutes = (int) (seconds/60);
-						seconds -= minutes*60;
-						
-						currentTime = hour+":"
-										+(minutes<10?"0"+minutes:minutes)+":"
-										+(seconds<10?"0"+seconds:seconds);
-						arg0.setText(currentTime);
-				}
-			});
-			chrono.setText("0:00:00");			
-		}
-		
-		/**
-		 * @return the displayed time in seconds
-		 */
-		public Long getStopWatchTime() {
-			if (resume) {
-				return (chrono.getBase() + SystemClock.elapsedRealtime() - currentTimeLastStop) / 1000;
-			} else {
-				return (SystemClock.elapsedRealtime() - chrono.getBase()) / 1000;
-			}
-		}
-		
-		/**
-		 * 
-		 * @param time the stopwatch is displayed
-		 */
-		public void setBaseTime(int time){
-			chrono.setBase(SystemClock.elapsedRealtime()-time);
-			clockSetByComputer=true;
-		}
-
-		/**
-		 * Start the clock to tick
-		 */
-		public void startClock(){
-			btnPause.setEnabled(true);
-			btnStart.setEnabled(false);
-			if (!resume) {
-				chrono.setBase(SystemClock.elapsedRealtime());
-				chrono.start();
-			} else {
-				if (clockSetByComputer){
-					clockSetByComputer=false;
-				} else {
-					long time=chrono.getBase()+SystemClock.elapsedRealtime()-currentTimeLastStop;
-					chrono.setBase(time);
-				}
-				chrono.start();
-			}
-		}
-		
-		public void pauseClock(){
-			btnStart.setEnabled(true);
-			btnPause.setEnabled(false);
-			chrono.stop();
-			resume = true;
-			btnStart.setText("Resume");
-			currentTimeLastStop=SystemClock.elapsedRealtime();
-		}
-		
-		public void resetClock(){
-			chrono.stop();
-			chrono.setText("0:00:00");
-			btnStart.setText("Start");
-			resume = false;
-			currentTimeLastStop=SystemClock.elapsedRealtime();
-			btnStart.setEnabled(true);				
-			btnPause.setEnabled(false);
-		}
-		
-		public void handleButtonClick(View v) {
-			switch (v.getId()) {
-				case R.id.start:
-					//mBluetooth.sendStartClock();
-					startClock();
-					break;
-					
-				case R.id.pause:
-					//mBluetooth.sendPauseClock();
-					pauseClock();
-					break;
-
-				case R.id.reset:
-					//mBluetooth.sendResetClock();
-					resetClock();
-					break;
-			}		
-		}
-	}
-
-	
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -247,7 +121,8 @@ public class PresentatorActivity extends Activity {
 		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
 		Button btnStart = (Button) findViewById(R.id.start);
 		Button btnPause = (Button) findViewById(R.id.pause);
-		stopWatch = new stopWatch(chrono,btnStart,btnPause);
+		Button btnReset = (Button) findViewById(R.id.reset);
+		stopWatch = new StopWatch(chrono,btnStart,btnPause,btnReset);
 
 		mBluetooth = new Bluetooth(mHandler);
 
@@ -274,30 +149,30 @@ public class PresentatorActivity extends Activity {
 				mBluetooth.sendBlank();
 			}
 		});
-
-		Button start = (Button) findViewById(R.id.start);
-		start.setOnClickListener(new OnClickListener() {
+		
+		btnStart.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				stopWatch.handleButtonClick(v);
+				//mBluetooth.sendStartClock();
+				stopWatch.startClock();
 			}
 		});
 
-		Button pause = (Button) findViewById(R.id.pause);
-		pause.setOnClickListener(new OnClickListener() {
+		btnPause.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				stopWatch.handleButtonClick(v);
+				//mBluetooth.sendPauseClock();
+				stopWatch.pauseClock();
 			}
 		});
 
-		Button reset = (Button) findViewById(R.id.reset);
-		reset.setOnClickListener(new OnClickListener() {
+		btnReset.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				stopWatch.handleButtonClick(v);
+				//mBluetooth.sendResetClock();
+				stopWatch.resetClock();
 			}
-		});
+		});	
 
 		mProgressDialog = new ProgressDialog(this);
 		mProgressDialog.setTitle("File transfering....");
