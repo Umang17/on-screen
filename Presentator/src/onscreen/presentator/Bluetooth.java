@@ -117,8 +117,7 @@ public class Bluetooth {
 			Log.d(TAG, "sent type");
 		BufferedInputStream buf;
 		try {
-			buf = new BufferedInputStream(new FileInputStream(
-					file));
+			buf = new BufferedInputStream(new FileInputStream(file));
 		} catch (FileNotFoundException e) {
 			return false;
 		}
@@ -185,6 +184,20 @@ public class Bluetooth {
 		return writeBuffer;
 	}
 
+	private final int bytesToInt(byte[] b) {
+		int i = 0;
+
+		i += unsignedByteToInt(b[0]) << 24;
+		i += unsignedByteToInt(b[1]) << 16;
+		i += unsignedByteToInt(b[2]) << 8;
+		i += unsignedByteToInt(b[3]);
+		return i;
+	}
+
+	private static int unsignedByteToInt(byte b) {
+		return (int) b & 0xFF;
+	}
+
 	private final byte[] charArrayToBytes(char[] array) {
 		byte[] bytes = new byte[array.length];
 		for (int i = 0; i < array.length; i++) {
@@ -240,7 +253,7 @@ public class Bluetooth {
 	public synchronized void stop() {
 		if (D)
 			Log.d(TAG, "stop");
-			mConnected = false;
+		mConnected = false;
 
 		if (mConnectThread != null) {
 			mConnectThread.cancel();
@@ -397,10 +410,49 @@ public class Bluetooth {
 						break;
 					case 1: // presentation available...
 						// TODO: read all bytes!
-						bytes = mmInStream.read(buffer);
+						bytes = mmInStream.read(buffer, 0, 4); // read length of
+																// name
+						int size = bytesToInt(buffer);
+						if (D)
+							Log.d(TAG, "length = " + size);
+						bytes = mmInStream.read(buffer, 0, size); // read name
+						char[] chars = new char[size];
+						for (int i = 0; i < size; i++) {
+							chars[i] = (char) buffer[i];
+						}
+						String fileName = String.copyValueOf(chars);
+						if (D)
+							Log.d(TAG, "name = " + fileName);
+
+						bytes = mmInStream.read(buffer, 0, 4); // read current
+																// slide
+						int currentSlide = bytesToInt(buffer);
+						if (D)
+							Log.d(TAG, "current slide = " + currentSlide);
+
+						bytes = mmInStream.read(buffer, 0, 4); // read total
+																// number of
+																// slides
+						int totalNr = bytesToInt(buffer);
+
+						if (D)
+							Log.d(TAG, "total slides = " + totalNr);
+
+						bytes = mmInStream.read(buffer, 0, 4); // read time
+						int time = bytesToInt(buffer);
+						Log.d(TAG, "time = " + time);
+						Bundle bundle = new Bundle();
+						bundle.putString(PresentatorActivity.BUNDLE_NAME,
+								fileName);
+						bundle.putInt(PresentatorActivity.BUNDLE_TIME, time);
+						bundle.putInt(PresentatorActivity.BUNDLE_TOTAL_SLIDE,
+								totalNr);
+						bundle.putInt(PresentatorActivity.BUNDLE_CURRENT_SLIDE,
+								currentSlide);
 						mHandler.obtainMessage(
-								PresentatorActivity.MESSAGE_TAKE_OVER, bytes,
-								-1, buffer).sendToTarget();
+								PresentatorActivity.MESSAGE_TAKE_OVER, 4, -1,
+								bundle).sendToTarget(); // 4 is just a
+														// number....
 						break;
 					case 4: // file rec...
 						mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_FILE_REC);

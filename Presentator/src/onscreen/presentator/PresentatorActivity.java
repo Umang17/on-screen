@@ -34,6 +34,11 @@ public class PresentatorActivity extends Activity {
 	public static final int MESSAGE_NO_PRES = 2;
 	public static final int MESSAGE_PROGRESS_INC = 3;
 	public static final int MESSAGE_PROGRESS_START = 4;
+	
+	public static final String BUNDLE_NAME = "Name";
+	public static final String BUNDLE_TIME = "Time";
+	public static final String BUNDLE_CURRENT_SLIDE = "CSlide";
+	public static final String BUNDLE_TOTAL_SLIDE = "TSlide";
 
 	public static final int STATE_TAKE_OVER = 1;
 	public static final int STATE_LOAD = 2;
@@ -57,9 +62,13 @@ public class PresentatorActivity extends Activity {
 
 			case MESSAGE_TAKE_OVER:
 				Log.d("Handler", "taking over");
-				byte[] readBuf = (byte[]) msg.obj; // shuld maybe not be
-													// bytes...
-				// take care of the input from computer
+				Bundle bundle = (Bundle) msg.obj;
+				String name = bundle.getString(BUNDLE_NAME);
+				int time = bundle.getInt(BUNDLE_TIME);
+				int currentSlide = bundle.getInt(BUNDLE_CURRENT_SLIDE);
+				int totalNrOfSlides = bundle.getInt(BUNDLE_TOTAL_SLIDE);
+				
+				
 				// should output a dialog asking if user want to take over or
 				// send a new presentation. But only if a presentation already
 				// is loaded.
@@ -76,11 +85,13 @@ public class PresentatorActivity extends Activity {
 				break;
 
 			case MESSAGE_PROGRESS_START:
+				Log.d("Handler", "progress start...");
 				mProgressDialog.setProgress(0);
 				// maybe use setMax...
 				mProgressDialog.show();
 
 			case MESSAGE_PROGRESS_INC:
+				Log.d("Handler", "progress inc...");
 				// maybe incr with the size of the BYTE_SIZE
 				mProgressDialog.incrementProgressBy(1);
 			}
