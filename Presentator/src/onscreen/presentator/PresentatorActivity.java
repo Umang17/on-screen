@@ -87,25 +87,27 @@ public class PresentatorActivity extends Activity {
 		}
 	};
 
-	private Chronometer chrono;
-	private Button btnStart;
-	private Button btnPause;
-	private boolean resume=false;
-	private String currentTime="";	
-	private Long currentTimeLastStop;
-	private long elapsedTime=0;
+	private stopWatch stopWatch;
 
-	private void setClock() {
-		chrono = (Chronometer) findViewById(R.id.chrono);
-		btnStart = (Button) findViewById(R.id.start);
-		btnPause = (Button) findViewById(R.id.pause);
-		btnPause.setEnabled(false);
+	private class stopWatch{
+		private Chronometer chrono;
+		private Button btnStart;
+		private Button btnPause;
+		private boolean resume=false;
+		private String currentTime="";	
+		private Long currentTimeLastStop;
 		
-		chrono.setOnChronometerTickListener(new OnChronometerTickListener() {
+		public stopWatch(final Chronometer chrono, Button btnStart, Button btnPause){
+			this.chrono=chrono;
+			this.btnStart=btnStart;
+			this.btnPause=btnPause;
+			
+			btnPause.setEnabled(false);
+			
+			chrono.setOnChronometerTickListener(new OnChronometerTickListener() {
 
-			public void onChronometerTick(Chronometer arg0) {
-				
-				//if(!resume){	
+				public void onChronometerTick(Chronometer arg0) {
+					
 						long seconds = (SystemClock.elapsedRealtime() - chrono.getBase())/1000;
 						
 						long hour = seconds/3600;
@@ -121,72 +123,50 @@ public class PresentatorActivity extends Activity {
 						currentTime = hour+":"
 										+(minutes<10?"0"+minutes:minutes)+":"
 										+(seconds<10?"0"+seconds:seconds);
-						Log.d(TAG, currentTime);
 						arg0.setText(currentTime);
-				/*		elapsedTime=SystemClock.elapsedRealtime();
-				} else {
-					long seconds = (elapsedTime - chrono.getBase())/1000;
-					
-					long hour = seconds/3600;
-					if(hour>=10) {
-						chrono.setBase(chrono.getBase() - seconds*3600*1000);
-						seconds -= hour*3600;
-						hour = 0;
-					}
-					seconds -= hour*3600;
-					long minutes = seconds/60;
-					seconds -= minutes*60;
-					
-					currentTime = hour+":"
-									+(minutes<10?"0"+minutes:minutes)+":"
-									+(seconds<10?"0"+seconds:seconds);
-					Log.d(TAG, currentTime);
-					arg0.setText(currentTime);
-					
-					elapsedTime=elapsedTime+1000;
-				}*/
-			}
-		});
-		chrono.setText("0:00:00");
-	}
-
-	private void handleButtonClick(View v) {
-		switch (v.getId()) {
-			case R.id.start:
-				
-				btnPause.setEnabled(true);
-				btnStart.setEnabled(false);
-				if (!resume) {
-					Log.d(TAG, "Starting");
-					chrono.setBase(SystemClock.elapsedRealtime());
-					chrono.start();
-				} else {
-					Log.d(TAG, "Resuming");
-					long time=chrono.getBase()+SystemClock.elapsedRealtime()-currentTimeLastStop;
-					chrono.setBase(time);
-					chrono.start();
 				}
-				
-				break;
-			case R.id.pause:
-				btnStart.setEnabled(true);
-				btnPause.setEnabled(false);
-				chrono.stop();
-				resume = true;
-				btnStart.setText("Resume");
-				currentTimeLastStop=SystemClock.elapsedRealtime();
-				break;
-			case R.id.reset:
-				chrono.stop();
-				chrono.setText("0:00:00");
-				btnStart.setText("Start");
-				resume = false;
-				currentTimeLastStop=SystemClock.elapsedRealtime();
-				btnStart.setEnabled(true);				
-				btnPause.setEnabled(false);
-				break;
+			});
+			chrono.setText("0:00:00");			
+		}
+		
+		public void handleButtonClick(View v) {
+			switch (v.getId()) {
+				case R.id.start:
+					btnPause.setEnabled(true);
+					btnStart.setEnabled(false);
+					if (!resume) {
+						chrono.setBase(SystemClock.elapsedRealtime());
+						chrono.start();
+					} else {
+						long time=chrono.getBase()+SystemClock.elapsedRealtime()-currentTimeLastStop;
+						chrono.setBase(time);
+						chrono.start();
+					}				
+					break;
+					
+				case R.id.pause:				
+					btnStart.setEnabled(true);
+					btnPause.setEnabled(false);
+					chrono.stop();
+					resume = true;
+					btnStart.setText("Resume");
+					currentTimeLastStop=SystemClock.elapsedRealtime();
+					break;
+					
+				case R.id.reset:
+					chrono.stop();
+					chrono.setText("0:00:00");
+					btnStart.setText("Start");
+					resume = false;
+					currentTimeLastStop=SystemClock.elapsedRealtime();
+					btnStart.setEnabled(true);				
+					btnPause.setEnabled(false);
+					break;
+			}
 		}
 	}
+
+	
 
 	/** Called when the activity is first created. */
 	@Override
@@ -197,7 +177,11 @@ public class PresentatorActivity extends Activity {
 		readNfcTag = new ReadNfcTag();
 		readNfcTag.onCreate(this, getClass());
 
-		setClock();
+		//Setting up clock
+		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
+		Button btnStart = (Button) findViewById(R.id.start);
+		Button btnPause = (Button) findViewById(R.id.pause);
+		stopWatch = new stopWatch(chrono,btnStart,btnPause);
 
 		mBluetooth = new Bluetooth(mHandler);
 
@@ -229,7 +213,7 @@ public class PresentatorActivity extends Activity {
 		start.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				handleButtonClick(v);
+				stopWatch.handleButtonClick(v);
 			}
 		});
 
@@ -237,7 +221,7 @@ public class PresentatorActivity extends Activity {
 		pause.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				handleButtonClick(v);
+				stopWatch.handleButtonClick(v);
 			}
 		});
 
@@ -245,7 +229,7 @@ public class PresentatorActivity extends Activity {
 		reset.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				handleButtonClick(v);
+				stopWatch.handleButtonClick(v);
 			}
 		});
 
