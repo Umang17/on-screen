@@ -79,14 +79,18 @@ public class PresentatorActivity extends Activity {
 				if (mPresentationFile != null) {
 					// give user options...
 				} else {
-					mBluetooth.requestControl();
+					// set time
+					TextView view = (TextView) findViewById(R.id.presentationName);
+					view.setText(name);
 				}
 				break;
 
 			case MESSAGE_FILE_REC:
 				Log.d("Handler", "file rec...");
 				mProgressDialog.cancel();
-				
+				TextView view = (TextView) findViewById(R.id.presentationName);
+				view.setText(mPresentationFile.getName());
+				// start clock
 				break;
 
 			case MESSAGE_PROGRESS_START:
