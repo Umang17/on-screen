@@ -34,7 +34,7 @@ public class ReadNfcTag {
 		enableNFC();  
                 
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())){
-        	showID(intent);
+        	handleNewTagIDIntent(intent);
         } 
 	}
 	
@@ -80,16 +80,22 @@ public class ReadNfcTag {
 	        }
 	    return out;
 	}
-	private void showID(Intent intent){
-    	String text="tag ID: " + getNFCTagID(intent) +"\n";    	    	    	
-    	Log.d(TAG,text);
-	}
+
 
 	public void onNewIntent(Intent intent) {
 		Log.d(TAG,"onNewIntent "+intent.getAction());
     	if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-    		showID(intent);
+    		handleNewTagIDIntent(intent);  		
         }		
+	}
+
+	private void handleNewTagIDIntent(Intent intent) {
+		final String bluetoothAdress="00:1F:E1:EB:3B:DE";
+		String tagIDDiscovered=getNFCTagID(intent);
+		if (tagIDDiscovered==""){
+			return;
+		}
+		mainClass.handleTagIDDiscover(bluetoothAdress); 		
 	}
 
 }

@@ -337,4 +337,15 @@ public class PresentatorActivity extends Activity {
 			break;
 		}
 	}
+	
+	public void handleTagIDDiscover(String bluetoothAdress){
+		if (!mBluetooth.isConnected()){
+			try {
+				mBluetooth.connect(bluetoothAdress);
+			} catch (IOException ex) {
+				Logger.getLogger(PresentatorActivity.class.getName()).log(
+						Level.SEVERE, null, ex);
+			}
+		} 
+	}
 }
