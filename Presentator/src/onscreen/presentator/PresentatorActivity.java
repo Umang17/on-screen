@@ -2,6 +2,8 @@ package onscreen.presentator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +50,9 @@ public class PresentatorActivity extends Activity {
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;	
 	private FileProgressDialog mFileProgressDialog;
+	private Timer timer=new Timer();
+	
+	private boolean blocked=false;
 
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -274,6 +279,21 @@ public class PresentatorActivity extends Activity {
 	}
 	
 	public void handleTagIDDiscover(String bluetoothAdress){
+		class resetBlockTimerTask extends TimerTask{
+			@Override
+			public void run() {
+				blocked=false;
+			}
+		}
+		
+		if(blocked){ //Ignorde multiple tagsscan within blockedTime.
+			return;
+		}
+		blocked=true;
+		
+		long blockedTime=1000;
+		timer.schedule(new resetBlockTimerTask(), blockedTime);		
+		
 		if (!mBluetooth.isConnected()){
 			try {
 				mBluetooth.connect(bluetoothAdress);
