@@ -15,6 +15,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 public class Bluetooth {
@@ -243,22 +244,24 @@ public class Bluetooth {
 			if (D)
 				Log.d(TAG, "sendFile");
 			File file = params[0];
-			mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_PROGRESS_START);
-			mConnectedThread.write(TYPE_PRESENTATION);
-			if (D)
-				Log.d(TAG, "sent type");
+			
 			BufferedInputStream buf;
 			try {
 				buf = new BufferedInputStream(new FileInputStream(file));
 			} catch (FileNotFoundException e) {
 				return null;
 			}
-
 			long length = file.length();
+			Message m = new Message();
+			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_START, length).sendToTarget();
+			mConnectedThread.write(TYPE_PRESENTATION);
+			if (D)
+				Log.d(TAG, "sent type");
+
 			mConnectedThread.write(longToBytes(length)); // send the size of the
 															// byte stream.
 			if (D)
-				Log.d(TAG, "sent length");
+				Log.d(TAG, "sent length"+length);
 
 			String name = file.getName();
 			char[] nameChar = name.toCharArray();
@@ -279,23 +282,18 @@ public class Bluetooth {
 			long num_of_int = length / BYTE_SIZE; // somehow just send incr
 													// message
 													// at the right moments
-			int currentProgress = 0, prevProgress = 0;
-			for (int i = 0; i <= length; i += BYTE_SIZE) {
+			for (long i = 0; i <= length; i += BYTE_SIZE) {
 				try {
 					buf.read(buffer);
 				} catch (IOException e) {
 					return null;
 				}
 				mConnectedThread.write(buffer);
-				currentProgress = (int)(100*i/length);
-				if (prevProgress != currentProgress) {
-					mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC, currentProgress, 0).sendToTarget();
-					prevProgress = currentProgress;
-				}
+					mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC, i).sendToTarget();
 			}
 
 			mConnectedThread.write(intToBytes(10));
-			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC, 100, 0).sendToTarget();
+			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC, length).sendToTarget();
 			
 			return null;
 		}

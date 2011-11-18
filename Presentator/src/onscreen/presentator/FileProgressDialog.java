@@ -12,7 +12,6 @@ public class FileProgressDialog extends Dialog {
 
 	public FileProgressDialog(Context context, long fileSize) {
 		super(context);
-		this.fileSize = fileSize;
 
 		setContentView(R.layout.file_progress_dialog);
 		setTitle(R.string.file_progress_dialog);
@@ -21,6 +20,11 @@ public class FileProgressDialog extends Dialog {
 		textRight = (TextView) findViewById(R.id.textRight);
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
+		setFileSize(fileSize);
+	}
+
+	public void setFileSize(long fileSize) {
+		this.fileSize = fileSize;
 		setProgress(0);
 	}
 
