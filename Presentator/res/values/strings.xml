@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, AndroidApplicationActivity!</string>
-    <string name="app_name">AndroidApplication</string>
+    <string name="app_name">Presentator</string>
     <string name="open_presentation">Open presentation</string>
     <string name="open_settings">Settings</string>
     <string name="connect">Connect</string>
