@@ -62,7 +62,7 @@ class StopWatch{
 	 * @param time the stopwatch is displayed
 	 */
 	public void setBaseTime(int time){
-		chrono.setBase(SystemClock.elapsedRealtime()-time);
+		chrono.setBase(SystemClock.elapsedRealtime()-time*1000);
 		clockSetByComputer=true;
 	}
 
@@ -103,5 +103,9 @@ class StopWatch{
 		currentTimeLastStop=SystemClock.elapsedRealtime();
 		btnStart.setEnabled(true);				
 		btnPause.setEnabled(false);
+	}
+	
+	public boolean isRunningNow(){
+		return resume;
 	}
 }

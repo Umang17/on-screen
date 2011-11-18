@@ -33,6 +33,7 @@ public class Bluetooth {
 	private ConnectedThread mConnectedThread;
 	
 	private boolean mConnected = false;
+	private StopWatch stopWatch;
 
 	private static final int BYTE_SIZE = 1000;
 
@@ -44,7 +45,8 @@ public class Bluetooth {
 	private static final byte COMMAND_PREV = 2;
 	private static final byte COMMAND_BLANK = 3;
 
-	public Bluetooth(Handler handler) {
+	public Bluetooth(Handler handler,StopWatch stopWatch) {
+		this.stopWatch = stopWatch;
 		mHandler = handler;
 	}
 
@@ -438,7 +440,17 @@ public class Bluetooth {
 
 						bytes = mmInStream.read(buffer, 0, 4); // read time
 						int time = bytesToInt(buffer);
+						stopWatch.setBaseTime(time);
 						Log.d(TAG, "time = " + time);
+						bytes = mmInStream.read(buffer, 0, 1); // read running
+						int running = bytesToInt(buffer);
+						
+						if(running==1 && !stopWatch.isRunningNow()){
+							stopWatch.startClock();
+						}else if (running==0 && stopWatch.isRunningNow()) {
+							stopWatch.pauseClock();
+						}
+						
 						Bundle bundle = new Bundle();
 						bundle.putString(PresentatorActivity.BUNDLE_NAME,
 								fileName);
@@ -455,6 +467,21 @@ public class Bluetooth {
 					case 4: // file rec...
 						mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_FILE_REC);
 						break;
+					case 7:
+						//Coded as:
+						//1 if running else 0
+						//1 if reset else 0
+						int running2=mmInStream.read();
+						int reset=mmInStream.read();
+						if(running2==1 && !stopWatch.isRunningNow()){
+							stopWatch.startClock();
+						}else if (running2==0 && stopWatch.isRunningNow()) {
+							stopWatch.pauseClock();
+						}
+						if(reset==1){
+							stopWatch.resetClock();
+						} 
+						
 					}
 					if (D)
 						Log.d(TAG, "after read");
@@ -496,6 +523,29 @@ public class Bluetooth {
 			}
 		}
 
+	}
+
+	public void sendStartClock() {
+		if (isConnected()){
+			mConnectedThread.write((byte)7); //Time
+			mConnectedThread.write((byte)7); //Start
+		}
+		
+	}
+
+	public void sendPauseClock() {
+		if (isConnected()){
+			mConnectedThread.write((byte)7); //Time
+			mConnectedThread.write((byte)8); //Pause
+		}
+		
+	}
+
+	public void sendResetClock() {
+		if (isConnected()){
+			mConnectedThread.write((byte)7); //Time
+			mConnectedThread.write((byte)9); //Reset
+		}		
 	}
 
 }
