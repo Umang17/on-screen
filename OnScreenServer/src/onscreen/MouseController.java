@@ -1,8 +1,5 @@
 package onscreen;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * 
  * @author Mattias
@@ -22,8 +19,8 @@ public class MouseController {
 		mouseThread = MouseControllThread.getInstance();
 	}
 
-	public void recive(int type, int value) {
-                value = value/10;
+	public void recive(int type, float value) {
+		value = value / 10;
 
 		switch (type) {
 		case UP:
