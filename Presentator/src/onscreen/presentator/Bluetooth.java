@@ -471,11 +471,11 @@ public class Bluetooth {
 						//Coded as:
 						//1 if running else 0
 						//1 if reset else 0
-						int running2=mmInStream.read();
+						int runningClock=mmInStream.read();
 						int reset=mmInStream.read();
-						if(running2==1 && !stopWatch.isRunningNow()){
+						if(runningClock==1 && !stopWatch.isRunningNow()){
 							stopWatch.startClock();
-						}else if (running2==0 && stopWatch.isRunningNow()) {
+						}else if (runningClock==0 && stopWatch.isRunningNow()) {
 							stopWatch.pauseClock();
 						}
 						if(reset==1){

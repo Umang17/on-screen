@@ -13,6 +13,7 @@ class StopWatch{
 	private String currentTime="";	
 	private Long currentTimeLastStop;
 	private boolean clockSetByComputer=false;
+	private boolean isRunning=false;
 	
 	public StopWatch(final Chronometer chrono, Button btnStart, Button btnPause, Button btnReset){
 		this.chrono=chrono;
@@ -84,6 +85,7 @@ class StopWatch{
 			}
 			chrono.start();
 		}
+		isRunning=true;
 	}
 	
 	public void pauseClock(){
@@ -93,6 +95,7 @@ class StopWatch{
 		resume = true;
 		btnStart.setText("Resume");
 		currentTimeLastStop=SystemClock.elapsedRealtime();
+		isRunning=false;
 	}
 	
 	public void resetClock(){
@@ -103,9 +106,10 @@ class StopWatch{
 		currentTimeLastStop=SystemClock.elapsedRealtime();
 		btnStart.setEnabled(true);				
 		btnPause.setEnabled(false);
+		isRunning=false;
 	}
 	
 	public boolean isRunningNow(){
-		return resume;
+		return isRunning;
 	}
 }
