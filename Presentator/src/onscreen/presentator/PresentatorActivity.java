@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.TextView;
 import android.widget.Chronometer.OnChronometerTickListener;
 
 import java.util.logging.Level;
@@ -57,6 +58,9 @@ public class PresentatorActivity extends Activity {
 
 			case MESSAGE_NO_PRES:
 				Log.d("Handler", "no pres!");
+				if (mPresentationFile == null) {
+					break;
+				}
 				mBluetooth.sendPresentation(mPresentationFile);
 				break;
 
@@ -82,6 +86,7 @@ public class PresentatorActivity extends Activity {
 			case MESSAGE_FILE_REC:
 				Log.d("Handler", "file rec...");
 				mProgressDialog.cancel();
+				
 				break;
 
 			case MESSAGE_PROGRESS_START:
