@@ -407,8 +407,9 @@ public class Bluetooth {
 						break;
 					case 1: // presentation available...
 						// TODO: read all bytes!
+						// FIXME: ELIAS!!!
 						bytes = mmInStream.read(buffer, 0, 4); // read length of
-																// name
+							Log.d(TAG, "read " + bytes);									// name
 						int size = bytesToInt(buffer);
 						if (D)
 							Log.d(TAG, "length = " + size);
