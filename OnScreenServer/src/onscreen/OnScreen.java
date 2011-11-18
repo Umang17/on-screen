@@ -14,8 +14,8 @@ public class OnScreen {
     static final String sumatraSettings = " -esc-to-exit -page 0 -presentation ";
     static final String env32 = System.getenv("PROGRAMFILES");
     static final String env64 = System.getenv("PROGRAMFILES(X86)");
-                    static final String BTOFFSETTING = "nobt";
-                static final String LANOFFSETTING = "nolan";
+    static final String BTOFFSETTING = "nobt";
+    static final String LANOFFSETTING = "nolan";
     static boolean BT = true;
     static boolean LAN = true;
     public static MouseController mouseController;
@@ -42,7 +42,7 @@ public class OnScreen {
                     LAN = false;
                 } else {
                     pdfReader += args[i];
-                } 
+                }
             }
         } else if ((new File(env32 + nativeSumatra)).exists()) {
             pdfReader = env32 + nativeSumatra + sumatraSettings;

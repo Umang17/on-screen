@@ -85,8 +85,10 @@ public class ConnectedThread implements Runnable {
             outputStream.write(filePresented.getCurrentSlide());
             outputStream.write(filePresented.getTotalSlides());
             outputStream.write(presentationTimer.getTime());
+            Notification.notify("Sent presenting...");
         } else {
             outputStream.write(0);
+            Notification.notify("Sent a 0...");
         }
         outputStream.flush();
     }
@@ -94,7 +96,7 @@ public class ConnectedThread implements Runnable {
     private void startPresenting() throws IOException {
         filePresented = fileReciver.reciveFile(bufferedInputStream);
         Runtime rt = Runtime.getRuntime();
-        Process pr = rt.exec(OnScreen.pdfReader + filePresented.getFullName());
+        Process pr = rt.exec(OnScreen.pdfReader + "\"" + filePresented.getFullName() + "\"");
         outputStream.write(STARTPRESENTATION);
         presentationTimer = new PresentationTimer();
     }

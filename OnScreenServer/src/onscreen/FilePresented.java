@@ -28,6 +28,7 @@ public class FilePresented {
     }
     public synchronized String getFullName() {
         return path + name;
+       
     }
 
     public synchronized byte[] getLengthofName() {

@@ -26,6 +26,7 @@ public class FileReciver {
         int size = read(stream, 8, 4);
 
         int nameSize = read(stream, 4);
+        Notification.notify("name size " + nameSize);
 
         String fileName = readString(stream, nameSize);
 
@@ -54,7 +55,7 @@ public class FileReciver {
         } catch (IOException ex) {
             Notification.notify("Failed in reciving or writing data");
         }
-        FilePresented file = new FilePresented(fileLocation, fileName);
+        FilePresented file = new FilePresented(fileLocation, fw.getFile().getName());
         fw.close();
         return file;
     }
