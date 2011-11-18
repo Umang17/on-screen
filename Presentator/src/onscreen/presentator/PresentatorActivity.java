@@ -119,7 +119,7 @@ public class PresentatorActivity extends Activity {
 
 				public void onChronometerTick(Chronometer arg0) {
 					
-						long seconds = (SystemClock.elapsedRealtime() - chrono.getBase())/1000;
+						long seconds = (SystemClock.elapsedRealtime() - chrono.getBase()) / 1000;
 						
 						long hour = seconds/3600;
 						if(hour>=10) {
@@ -173,6 +173,19 @@ public class PresentatorActivity extends Activity {
 					btnStart.setEnabled(true);				
 					btnPause.setEnabled(false);
 					break;
+			}
+		
+		
+		}
+		/**
+		 * 
+		 * @return the displayed time in seconds
+		 */
+		public Long getStopWatchTime() {
+			if (resume) {
+				return (chrono.getBase() + SystemClock.elapsedRealtime() - currentTimeLastStop) / 1000;
+			} else {
+				return (SystemClock.elapsedRealtime() - chrono.getBase()) / 1000;
 			}
 		}
 	}
