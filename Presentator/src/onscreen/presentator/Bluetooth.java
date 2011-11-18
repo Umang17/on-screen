@@ -44,11 +44,12 @@ public class Bluetooth {
 	private static final byte COMMAND_NEXT = 1;
 	private static final byte COMMAND_PREV = 2;
 	private static final byte COMMAND_BLANK = 3;
-	private static final byte COMMAND_TIME = 7;
 	
-	private static final byte TYPE_START = 7;
-	private static final byte TYPE_PAUSE = 8;
-	private static final byte TYPE_RESET = 9;
+	private static final byte TYPE_TIME = 7;
+	
+	private static final byte COMMAND_START = 7;
+	private static final byte COMMAND_PAUSE = 8;
+	private static final byte COMMAND_RESET = 9;
 
 	public Bluetooth(Handler handler,StopWatch stopWatch) {
 		this.stopWatch = stopWatch;
@@ -532,23 +533,23 @@ public class Bluetooth {
 
 	}
 	
-	private void sendClockSetting(byte type) {
+	private void sendClockSetting(byte command) {
 		if (isConnected()){
-			mConnectedThread.write(COMMAND_TIME); //Time
-			mConnectedThread.write(type); //Type: Start,Pause,Reset
+			mConnectedThread.write(TYPE_TIME); //Time
+			mConnectedThread.write(command); //Type: Start,Pause,Reset
 		}		
 	}
 
 	public void sendStartClock() {
-		sendClockSetting(TYPE_START); //Start	
+		sendClockSetting(COMMAND_START); //Start	
 	}
 
 	public void sendPauseClock() {
-		sendClockSetting(TYPE_PAUSE); //Pause		
+		sendClockSetting(COMMAND_PAUSE); //Pause		
 	}
 
 	public void sendResetClock() {
-		sendClockSetting(TYPE_RESET); //Reset
+		sendClockSetting(COMMAND_RESET); //Reset
 	}
 
 }
