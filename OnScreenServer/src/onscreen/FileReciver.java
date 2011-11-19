@@ -3,7 +3,6 @@ package onscreen;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  *
@@ -13,10 +12,11 @@ public class FileReciver {
 
     private final int NUM_BYTES = 1000;
     private String fileLocation;
+    private String separator;
 
     public FileReciver() {
         String homeFolder = System.getProperty("user.home");
-        String separator = System.getProperty("file.separator");
+        separator = System.getProperty("file.separator");
         fileLocation = homeFolder + separator + "OnScreen" + separator;
     }
 
@@ -34,7 +34,17 @@ public class FileReciver {
     }
 
     private FilePresented reciveFile(BufferedInputStream stream, int size, String fileName) {
-        FileWriterThread fw = new FileWriterThread(fileLocation, fileName);
+        WriteBuffer wb = new WriteBuffer();
+
+        File file = new File(fileLocation + fileName);
+        System.out.println(fileName);
+        for (int i = 0; file.exists();) {
+            String fName = fileName.split("\\.")[0];
+            String type = fileName.split("\\.")[1];
+            file = new File(fileLocation + fName + i++ + "." + type);
+        }
+
+        FileWriterThread fw = new FileWriterThread(wb, file);
         fw.start();
         try {
             for (int a = 0; a < size + NUM_BYTES;) {
@@ -44,10 +54,10 @@ public class FileReciver {
                     break;
                 }
                 if (read == NUM_BYTES) {
-                    fw.write(bytes);
+                    wb.put(bytes);
                 }
                 if (read < NUM_BYTES) {
-                    fw.write(bytes, read);
+                    wb.put(subArray(bytes, 0, read));
                     break;
                 }
                 a += read;
@@ -55,9 +65,9 @@ public class FileReciver {
         } catch (IOException ex) {
             Notification.notify("Failed in reciving or writing data");
         }
-        FilePresented file = new FilePresented(fileLocation, fw.getFile().getName());
         fw.close();
-        return file;
+        FilePresented filePres = new FilePresented(fileLocation, file.getName());
+        return filePres;
     }
 
     private String byteToString(byte[] imageNameByte) {
@@ -66,8 +76,8 @@ public class FileReciver {
             chars[i] = (char) imageNameByte[i];
         }
         return String.copyValueOf(chars);
-    }    
-    
+    }
+
     private static int byteArrayToInt(byte[] b, int offset) {
         int i = 0;
         int pos = offset;
@@ -106,5 +116,13 @@ public class FileReciver {
             Notification.notify("Failed in reciving " + ex.getLocalizedMessage());
         }
         return byteToString(imageNameByte);
+    }
+
+    private byte[] subArray(byte[] bytes, int first, int last) {
+        byte[] stripped = new byte[last - first];
+        for (int i = first; i < last; i++) {
+            stripped[i - first] = bytes[i];
+        }
+        return stripped;
     }
 }

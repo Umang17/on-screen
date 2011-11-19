@@ -9,11 +9,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.microedition.io.StreamConnection;
 
-public class ConnectedThread implements Runnable, Observer  {
+public class ConnectedThread implements Runnable, Observer {
 
     private StreamConnection mConnection;
     private FileReciver fileReciver;
@@ -42,7 +40,7 @@ public class ConnectedThread implements Runnable, Observer  {
             Notification.notify("Have recived connection");
             // prepare to receive data
             outputStream = mConnection.openOutputStream();
-            bufferedInputStream = 
+            bufferedInputStream =
                     new BufferedInputStream(mConnection.openInputStream());
 
             sendStartMessage();
@@ -117,12 +115,15 @@ public class ConnectedThread implements Runnable, Observer  {
     public void update(Observable o, Object arg) {
         Notification.notify("Notifying about update!");
         try {
-            NotifyThread nt = (NotifyThread)arg;
-            if (nt.getCaller().equals(this)) return;
+            NotifyThread nt = (NotifyThread) arg;
+            if (nt.getCaller().equals(this)) {
+                return;
+            }
             outputStream.write(TIMECONTROLL);
             outputStream.write(nt.getRunning());
             outputStream.write(nt.getReset());
-            
-        } catch (IOException ex) {}
+
+        } catch (IOException ex) {
+        }
     }
 }

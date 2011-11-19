@@ -14,30 +14,24 @@ public class FileWriterThread extends Thread {
 
     private File fileName;
     private BufferedOutputStream out = null;
-    private boolean closed = false;
+    private WriteBuffer wb;
+    private boolean running = true;
 
-    public FileWriterThread(String path, String file) {
-        setFile(path, file);
-    }
-
-    public synchronized void setFile(String path, String file) {
-        fileName = new File(path + file);
-
-        for (int i = 0; fileName.exists();) {
-            fileName = new File(path + i++ + file);
-        }
+    public FileWriterThread(WriteBuffer wb, File file) {
+        this.wb = wb;
+        fileName = file;
 
         try {
             out = new BufferedOutputStream(new FileOutputStream(fileName));
         } catch (FileNotFoundException ex) {
             Notification.notify("Failed in open file");
         }
-
     }
 
     @Override
     public void run() {
-        while (!closed) {
+        while (running) {
+            write(wb.get());
         }
     }
 
@@ -51,21 +45,10 @@ public class FileWriterThread extends Thread {
     public synchronized void close() {
         try {
             out.flush();
+            running = false;
+            interrupt();
             out.close();
         } catch (IOException ex) {
-        }
-        closed = true;
-    }
-
-    public synchronized File getFile() {
-        return fileName;
-    }
-
-    public void write(byte[] bytes, int read) {
-        for (int i = 0; i < read; i++) {
-            byte[] toW = new byte[1];
-            toW[0] = bytes[i];
-            write(toW);
         }
     }
 }
