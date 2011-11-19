@@ -8,5 +8,7 @@
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
     <string name="file_progress_dialog">Transferring file...</string>
+    <string name="startButton">Start</string>
+    <string name="resumeButton">Resume</string>
 
 </resources>

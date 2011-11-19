@@ -93,7 +93,7 @@ class StopWatch{
 		btnPause.setEnabled(false);
 		chrono.stop();
 		resume = true;
-		btnStart.setText("Resume");
+		btnStart.setText(R.string.resumeButton);
 		currentTimeLastStop=SystemClock.elapsedRealtime();
 		isRunning=false;
 		clockSetByComputer=false;
@@ -102,7 +102,7 @@ class StopWatch{
 	public void resetClock(){
 		chrono.stop();
 		chrono.setText("0:00:00");
-		btnStart.setText("Start");
+		btnStart.setText(R.string.startButton);
 		resume = false;
 		currentTimeLastStop=SystemClock.elapsedRealtime();
 		btnStart.setEnabled(true);				
