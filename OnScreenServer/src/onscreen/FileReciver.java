@@ -33,7 +33,7 @@ public class FileReciver {
         return reciveFile(stream, size, fileName);
     }
 
-    private FilePresented reciveFile(InputStream stream, int size, String fileName) {
+    private FilePresented reciveFile(BufferedInputStream stream, int size, String fileName) {
         FileWriterThread fw = new FileWriterThread(fileLocation, fileName);
         fw.start();
         try {
