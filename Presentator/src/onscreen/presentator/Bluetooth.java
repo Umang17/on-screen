@@ -452,7 +452,7 @@ public class Bluetooth {
 						bytes = mmInStream.read(buffer, 0, 1); // read running
 						int running = bytesToInt(buffer);
 						
-						handleIfClockRunning(running);
+						handleIfClockRunning(running,true);
 						
 						Bundle bundle = new Bundle();
 						bundle.putString(PresentatorActivity.BUNDLE_NAME,
@@ -476,7 +476,7 @@ public class Bluetooth {
 						//1 if reset else 0
 						int runningClock=mmInStream.read();
 						int reset=mmInStream.read();
-						handleIfClockRunning(runningClock);
+						handleIfClockRunning(runningClock,false);
 						if(reset==1){
 							stopWatch.resetClock();
 						} 
@@ -493,10 +493,10 @@ public class Bluetooth {
 			}
 		}
 
-		private void handleIfClockRunning(int running) {
-			if(running==1 && !stopWatch.isRunningNow()){
+		private void handleIfClockRunning(int running,boolean forced) {
+			if(running==1 && (!stopWatch.isRunningNow() || forced)){
 				stopWatch.startClock();
-			}else if (running==0 && stopWatch.isRunningNow()) {
+			}else if (running==0 && (stopWatch.isRunningNow() || forced)) {
 				stopWatch.pauseClock();
 			}
 			

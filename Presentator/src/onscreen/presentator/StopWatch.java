@@ -96,6 +96,7 @@ class StopWatch{
 		btnStart.setText("Resume");
 		currentTimeLastStop=SystemClock.elapsedRealtime();
 		isRunning=false;
+		clockSetByComputer=false;
 	}
 	
 	public void resetClock(){
@@ -107,6 +108,7 @@ class StopWatch{
 		btnStart.setEnabled(true);				
 		btnPause.setEnabled(false);
 		isRunning=false;
+		clockSetByComputer=false;
 	}
 	
 	public boolean isRunningNow(){
