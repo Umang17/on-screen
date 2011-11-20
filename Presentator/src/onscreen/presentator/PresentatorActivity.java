@@ -50,9 +50,7 @@ public class PresentatorActivity extends Activity {
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;	
 	private FileProgressDialog mFileProgressDialog;
-	private Timer timer=new Timer();
 	
-	private boolean blocked=false;
 
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -113,15 +111,14 @@ public class PresentatorActivity extends Activity {
 			}
 		}
 	};
+	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.presentation);
-
-		readNfcTag = new ReadNfcTag();
-		readNfcTag.onCreate(this, getClass());
+		setContentView(R.layout.presentation);		
+		
 
 		//Setting up clock
 		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
@@ -131,6 +128,12 @@ public class PresentatorActivity extends Activity {
 		stopWatch = new StopWatch(chrono,btnStart,btnPause,btnReset);
 
 		mBluetooth = new Bluetooth(mHandler,stopWatch);
+		
+		handleTagIDDiscoverWithBlock = new HandleTagIDDiscoverWithBlock(
+				new ConcreteHandleTagIDDiscover(mBluetooth));
+
+		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
+		readNfcTag.onCreate(this);
 
 		Button prev = (Button) findViewById(R.id.prev);
 		prev.setOnClickListener(new OnClickListener() {
@@ -244,6 +247,7 @@ public class PresentatorActivity extends Activity {
 	@Override
 	protected void onPause() {
 		mFileProgressDialog.cancel();
+		readNfcTag.onPause();
 		super.onPause();
 	}
 
@@ -276,31 +280,5 @@ public class PresentatorActivity extends Activity {
 			mBluetooth.sendPresentation(mPresentationFile);
 			break;
 		}
-	}
-	
-	public void handleTagIDDiscover(String bluetoothAdress){
-		class resetBlockTimerTask extends TimerTask{
-			@Override
-			public void run() {
-				blocked=false;
-			}
-		}
-		
-		if(blocked){ //Ignorde multiple tagsscan within blockedTime.
-			return;
-		}
-		blocked=true;
-		
-		long blockedTime=1000;
-		timer.schedule(new resetBlockTimerTask(), blockedTime);		
-		
-		if (!mBluetooth.isConnected()){
-			try {
-				mBluetooth.connect(bluetoothAdress);
-			} catch (IOException ex) {
-				Logger.getLogger(PresentatorActivity.class.getName()).log(
-						Level.SEVERE, null, ex);
-			}
-		} 
 	}
 }
