@@ -22,14 +22,14 @@ public class HandleTagIDDiscoverWithBlock implements HandleTagIDDiscover {
 		}
 	}
 
-	public void handleTagIDDiscover(String bluetoothAdress) {		
+	public void handleTagIDDiscover(String tagID) {		
 		if(blocked){ //Ignorde multiple tagsscan within blockedTime.
 			return;
 		}
 		blocked=true;		
 		timer.schedule(new resetBlockTimerTask(), blockedTime);
 		
-		cHTIDD.handleTagIDDiscover(bluetoothAdress);
+		cHTIDD.handleTagIDDiscover(tagID);
 	}
 
 }

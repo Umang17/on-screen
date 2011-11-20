@@ -19,6 +19,12 @@ public class ReadNfcTag {
 
 	private HandleTagIDDiscover hTIDD;
 
+	/**
+	 * Calls handleTagIDDiscover.handleTagIDDiscover(TagID)
+	 * when a new tagID is discovered.
+	 * 
+	 * @param handleTagIDDiscover
+	 */
 	public ReadNfcTag(HandleTagIDDiscover handleTagIDDiscover) {
 		hTIDD = handleTagIDDiscover;
 	}
@@ -102,12 +108,11 @@ public class ReadNfcTag {
 	}
 
 	private void handleNewTagIDIntent(Intent intent) {
-		final String bluetoothAdress = "00:1F:E1:EB:3B:DE";
-		String tagIDDiscovered = getNFCTagID(intent);
-		if (tagIDDiscovered == "") {
+		String tagID = getNFCTagID(intent);
+		if (tagID == "") {
 			return;
 		}
-		hTIDD.handleTagIDDiscover(bluetoothAdress);
+		hTIDD.handleTagIDDiscover(tagID);
 	}
 
 }

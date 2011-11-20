@@ -50,7 +50,8 @@ public class PresentatorActivity extends Activity {
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;	
 	private FileProgressDialog mFileProgressDialog;
-	
+	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
+
 
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -111,7 +112,6 @@ public class PresentatorActivity extends Activity {
 			}
 		}
 	};
-	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
 
 	/** Called when the activity is first created. */
 	@Override
