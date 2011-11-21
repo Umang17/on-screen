@@ -31,7 +31,7 @@ public class Bluetooth {
 	private final Handler mHandler;
 	private ConnectThread mConnectThread;
 	private ConnectedThread mConnectedThread;
-	
+
 	private boolean mConnected = false;
 
 	private static final int BYTE_SIZE = 1000;
@@ -39,12 +39,12 @@ public class Bluetooth {
 	private static final byte TYPE_PRESENTATION = 1;
 	private static final byte TYPE_COMMANDS = 5;
 	private static final byte TYPE_TIME = 7;
-	
+
 	private static final byte COMMAND_EXIT = 0;
 	private static final byte COMMAND_NEXT = 1;
 	private static final byte COMMAND_PREV = 2;
 	private static final byte COMMAND_BLANK = 3;
-	
+
 	private static final byte COMMAND_START = 7;
 	private static final byte COMMAND_PAUSE = 8;
 	private static final byte COMMAND_RESET = 9;
@@ -60,7 +60,8 @@ public class Bluetooth {
 	}
 
 	public boolean sendPresentation(File file) {
-		if (!mConnected) return false;
+		if (!mConnected)
+			return false;
 		new SendFile().execute(file);
 		return true;
 	}
@@ -96,25 +97,24 @@ public class Bluetooth {
 		mConnectedThread.write(COMMAND_BLANK);
 		return true;
 	}
-	
-	
+
 	private void sendClockSetting(byte command) {
-		if (isConnected()){
-			mConnectedThread.write(TYPE_TIME); //Time
-			mConnectedThread.write(command); //Type: Start,Pause,Reset
-		}		
+		if (isConnected()) {
+			mConnectedThread.write(TYPE_TIME); // Time
+			mConnectedThread.write(command); // Type: Start,Pause,Reset
+		}
 	}
 
 	public void sendStartClock() {
-		sendClockSetting(COMMAND_START); //Start	
+		sendClockSetting(COMMAND_START); // Start
 	}
 
 	public void sendPauseClock() {
-		sendClockSetting(COMMAND_PAUSE); //Pause		
+		sendClockSetting(COMMAND_PAUSE); // Pause
 	}
 
 	public void sendResetClock() {
-		sendClockSetting(COMMAND_RESET); //Reset
+		sendClockSetting(COMMAND_RESET); // Reset
 	}
 
 	private final byte[] longToBytes(long v) {
@@ -269,7 +269,7 @@ public class Bluetooth {
 			if (D)
 				Log.d(TAG, "sendFile");
 			File file = params[0];
-			
+
 			BufferedInputStream buf;
 			try {
 				buf = new BufferedInputStream(new FileInputStream(file));
@@ -278,7 +278,8 @@ public class Bluetooth {
 			}
 			long length = file.length();
 			Message m = new Message();
-			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_START, length).sendToTarget();
+			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_START,
+					length).sendToTarget();
 			mConnectedThread.write(TYPE_PRESENTATION);
 			if (D)
 				Log.d(TAG, "sent type");
@@ -286,7 +287,7 @@ public class Bluetooth {
 			mConnectedThread.write(longToBytes(length)); // send the size of the
 															// byte stream.
 			if (D)
-				Log.d(TAG, "sent length"+length);
+				Log.d(TAG, "sent length" + length);
 
 			String name = file.getName();
 			char[] nameChar = name.toCharArray();
@@ -314,12 +315,15 @@ public class Bluetooth {
 					return null;
 				}
 				mConnectedThread.write(buffer);
-					mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC, i).sendToTarget();
+				mHandler.obtainMessage(
+						PresentatorActivity.MESSAGE_PROGRESS_INC, i)
+						.sendToTarget();
 			}
 
 			mConnectedThread.write(intToBytes(10));
-			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC, length).sendToTarget();
-			
+			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC,
+					length).sendToTarget();
+
 			return null;
 		}
 
@@ -433,17 +437,35 @@ public class Bluetooth {
 					case 1: // presentation available...
 						// TODO: read all bytes!
 						// FIXME: ELIAS!!!
-						int read = 4;
-						do {
-							read = read - bytes;
-						bytes = mmInStream.read(buffer, 0, read); // read length of name
-						} while (bytes != read);
+						int read = 0;
+						int offset = 0,
+						length = 4;
+
+						// read length of name, 4 bytes
+						while (read != 4) {
+							bytes = mmInStream.read(buffer, offset, length);
+							read = read + bytes;
+							offset = offset + bytes - 1;
+							length = length - bytes;
+						}
 						if (D)
-							Log.d(TAG, "read " + bytes);
+							Log.d(TAG, "read (4) " + read);
 						int size = bytesToInt(buffer);
 						if (D)
 							Log.d(TAG, "length = " + size);
-						bytes = mmInStream.read(buffer, 0, size); // read name
+
+						read = 0;
+						offset = 0;
+						length = size;
+						// read name
+						while (read != size) {
+							bytes = mmInStream.read(buffer, 0, length);
+							read = read + bytes;
+							offset = offset + bytes - 1;
+							length = length - bytes;
+						}
+						
+						// convert name bytes to a string!
 						char[] chars = new char[size];
 						for (int i = 0; i < size; i++) {
 							chars[i] = (char) buffer[i];
@@ -452,26 +474,51 @@ public class Bluetooth {
 						if (D)
 							Log.d(TAG, "name = " + fileName);
 
-						bytes = mmInStream.read(buffer, 0, 4); // read current
-																// slide
+						read = 0;
+						offset = 0;
+						length = size;
+						// read current slide, 4 bytes
+						while (read != 4) {
+							bytes = mmInStream.read(buffer, offset, length);
+							read = read + bytes;
+							offset = offset + bytes - 1;
+							length = length - bytes;
+						}
 						int currentSlide = bytesToInt(buffer);
 						if (D)
 							Log.d(TAG, "current slide = " + currentSlide);
 
-						bytes = mmInStream.read(buffer, 0, 4); // read total
-																// number of
-																// slides
+						read = 0;
+						offset = 0;
+						length = size;
+						// read total slide, 4 bytes
+						while (read != 4) {
+							bytes = mmInStream.read(buffer, offset, length);
+							read = read + bytes;
+							offset = offset + bytes - 1;
+							length = length - bytes;
+						}
 						int totalNr = bytesToInt(buffer);
-
 						if (D)
 							Log.d(TAG, "total slides = " + totalNr);
 
-						bytes = mmInStream.read(buffer, 0, 4); // read time
+						read = 0;
+						offset = 0;
+						length = size;
+						// read time, 4 bytes
+						while (read != 4) {
+							bytes = mmInStream.read(buffer, offset, length);
+							read = read + bytes;
+							offset = offset + bytes - 1;
+							length = length - bytes;
+						}
 						int time = bytesToInt(buffer);
-						Log.d(TAG, "time = " + time);
+						if (D)
+							Log.d(TAG, "time = " + time);
+						
 						bytes = mmInStream.read(buffer, 0, 1); // read running
 						boolean running = buffer[0] == 1 ? true : false;
-												
+
 						Bundle bundle = new Bundle();
 						bundle.putString(PresentatorActivity.BUNDLE_NAME,
 								fileName);
@@ -480,7 +527,8 @@ public class Bluetooth {
 								totalNr);
 						bundle.putInt(PresentatorActivity.BUNDLE_CURRENT_SLIDE,
 								currentSlide);
-						bundle.putBoolean(PresentatorActivity.BUNDLE_RUNNING, running);
+						bundle.putBoolean(PresentatorActivity.BUNDLE_RUNNING,
+								running);
 						mHandler.obtainMessage(
 								PresentatorActivity.MESSAGE_TAKE_OVER, 4, -1,
 								bundle).sendToTarget(); // 4 is just a
@@ -490,13 +538,18 @@ public class Bluetooth {
 						mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_FILE_REC);
 						break;
 					case 7: // timer reset
-						//Coded as:
-						//1 if running else 0
-						//1 if reset else 0
-						int runningClock = mmInStream.read(); // running 1 == starta 0 == stop
+						// Coded as:
+						// 1 if running else 0
+						// 1 if reset else 0
+						int runningClock = mmInStream.read(); // running 1 ==
+																// starta 0 ==
+																// stop
 						int reset = mmInStream.read(); // reset 1 == nolla
-						
-						mHandler.obtainMessage(PresentatorActivity.MESSAGE_CLOCK, runningClock, reset);}
+
+						mHandler.obtainMessage(
+								PresentatorActivity.MESSAGE_CLOCK,
+								runningClock, reset);
+					}
 					if (D)
 						Log.d(TAG, "after read");
 					// Send the obtained bytes to the UI Activity
