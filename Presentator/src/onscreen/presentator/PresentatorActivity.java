@@ -44,12 +44,15 @@ public class PresentatorActivity extends Activity {
 
 	public int state = 0;
 
-	private final String TAG = "PresentatorActivity";
+	//private final String TAG = "PresentatorActivity";
 
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;	
 	private FileProgressDialog mFileProgressDialog;
 	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
+	
+	private Button btnStart;
+	private Button btnPause;
 
 
 	private final Handler mHandler = new Handler() {
@@ -89,9 +92,9 @@ public class PresentatorActivity extends Activity {
 					view.setText(name);
 					stopWatch.setBaseTime(time);
 					if (running) {
-						stopWatch.startClock();
+						startClockAndSetButtons();
 					} else {
-						stopWatch.pauseClock();
+						pauseClockAndSetButtons();
 					}
 				}
 				break;
@@ -102,7 +105,7 @@ public class PresentatorActivity extends Activity {
 				TextView view = (TextView) findViewById(R.id.presentationName);
 				view.setText(mPresentationFile.getName());
 				stopWatch.resetClock();
-				stopWatch.startClock();
+				startClockAndSetButtons();
 				break;
 
 			case MESSAGE_PROGRESS_START:
@@ -133,8 +136,6 @@ public class PresentatorActivity extends Activity {
 			}
 		}
 	};
-	private Button btnStart;
-	private Button btnPause;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -217,7 +218,6 @@ public class PresentatorActivity extends Activity {
 	private void startClockAndSetButtons() {
 		btnPause.setEnabled(true);
 		btnStart.setEnabled(false);	
-		mBluetooth.sendStartClock();
 		stopWatch.startClock();
 	}
 
