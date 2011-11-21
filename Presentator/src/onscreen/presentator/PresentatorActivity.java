@@ -2,13 +2,10 @@ package onscreen.presentator;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -125,16 +122,19 @@ public class PresentatorActivity extends Activity {
 				boolean reset = msg.arg2 == 1 ? true : false;
 				
 				if (reset) {
-					stopWatch.resetClock();
+					resetClockAndSetButtons();
 				}
 				if (runningClock) {
-					stopWatch.startClock();
+					startClockAndSetButtons();
 				} else {
-					stopWatch.pauseClock();
+					pauseClockAndSetButtons();
 				}
+				break;
 			}
 		}
 	};
+	private Button btnStart;
+	private Button btnPause;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -142,13 +142,13 @@ public class PresentatorActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.presentation);		
 		
-
 		//Setting up clock
 		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
-		Button btnStart = (Button) findViewById(R.id.start);
-		Button btnPause = (Button) findViewById(R.id.pause);
-		Button btnReset = (Button) findViewById(R.id.reset);
-		stopWatch = new StopWatch(chrono,btnStart,btnPause,btnReset);
+		btnStart = (Button) findViewById(R.id.start);
+		btnPause = (Button) findViewById(R.id.pause);
+		
+		stopWatch = new StopWatch(chrono);
+		btnPause.setEnabled(false);	
 
 		mBluetooth = new Bluetooth(mHandler);
 		
@@ -185,8 +185,9 @@ public class PresentatorActivity extends Activity {
 		btnStart.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
+				startClockAndSetButtons();
 				mBluetooth.sendStartClock();
-				stopWatch.startClock();
+				
 			}
 		});
 
@@ -194,21 +195,44 @@ public class PresentatorActivity extends Activity {
 
 			public void onClick(View v) {
 				mBluetooth.sendPauseClock();
-				stopWatch.pauseClock();
+				pauseClockAndSetButtons();
+				
 			}
 		});
-
+		
+		Button btnReset = (Button) findViewById(R.id.reset);
 		btnReset.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				mBluetooth.sendResetClock();
-				stopWatch.resetClock();
+				resetClockAndSetButtons();
 			}
 		});	
 
 		mFileProgressDialog = new FileProgressDialog(this, 0);
 		mFileProgressDialog.setCancelable(false); // can't cancel with back button
 
+	}
+
+	private void startClockAndSetButtons() {
+		btnPause.setEnabled(true);
+		btnStart.setEnabled(false);	
+		mBluetooth.sendStartClock();
+		stopWatch.startClock();
+	}
+
+	private void pauseClockAndSetButtons() {
+		btnStart.setEnabled(true);
+		btnPause.setEnabled(false);
+		btnStart.setText(R.string.resumeButton);
+		stopWatch.pauseClock();
+	}
+
+	private void resetClockAndSetButtons() {
+		btnStart.setEnabled(true);				
+		btnPause.setEnabled(false);
+		btnStart.setText(R.string.startButton);
+		stopWatch.resetClock();
 	}
 
 	@Override
