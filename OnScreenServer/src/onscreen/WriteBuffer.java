@@ -8,8 +8,8 @@ import java.util.ArrayList;
  */
 public class WriteBuffer {
 
-    private static int MAXINQUE = 3;
-    Que q = new Que();
+    private static int MAXINQUEUE = 3;
+    Queue q = new Queue();
 
     public synchronized byte[] get() {
         if (q.isEmpty()) {
@@ -36,32 +36,32 @@ public class WriteBuffer {
         notifyAll();
     }
 
-    private class Que {
+    private class Queue {
 
-        ArrayList que = new ArrayList<byte[]>();
+        ArrayList queue = new ArrayList<byte[]>();
 
         private boolean isEmpty() {
-            if (que.size() <= 0) {
+            if (queue.size() <= 0) {
                 return true;
             }
             return false;
         }
 
         private boolean isFull() {
-            if (que.size() >= MAXINQUE) {
+            if (queue.size() >= MAXINQUEUE) {
                 return true;
             }
             return false;
         }
 
         private byte[] get() {
-            byte[] oldest = (byte[]) que.get(0);
-            que.remove(0);
+            byte[] oldest = (byte[]) queue.get(0);
+            queue.remove(0);
             return oldest;
         }
 
         private void put(byte[] b) {
-            que.add(b);
+            queue.add(b);
         }
     }
 }

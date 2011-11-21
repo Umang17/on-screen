@@ -15,7 +15,6 @@ public class FileWriterThread extends Thread {
     private File fileName;
     private BufferedOutputStream out = null;
     private WriteBuffer wb;
-    private boolean running = true;
 
     public FileWriterThread(WriteBuffer wb, File file) {
         this.wb = wb;
@@ -30,7 +29,7 @@ public class FileWriterThread extends Thread {
 
     @Override
     public void run() {
-        while (running) {
+        while (!isInterrupted()) {
             write(wb.get());
         }
     }
@@ -45,9 +44,8 @@ public class FileWriterThread extends Thread {
     public synchronized void close() {
         try {
             out.flush();
-            running = false;
-            interrupt();
             out.close();
+            interrupt();
         } catch (IOException ex) {
         }
     }

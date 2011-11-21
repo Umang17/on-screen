@@ -11,7 +11,7 @@ public class OnScreen {
 
     static final String nativeSumatra = "\\SumatraPDF\\SumatraPDF.exe";
     static final String onScreenSumatra = "\\OnScreen\\SumatraPDF.exe";
-    static final String sumatraSettings = " -esc-to-exit -page 0 -presentation ";
+    static final String sumatraSettings = " -esc-to-exit -page 1 -presentation ";
     static final String env32 = System.getenv("PROGRAMFILES");
     static final String env64 = System.getenv("PROGRAMFILES(X86)");
     static final String BTOFFSETTING = "nobt";
