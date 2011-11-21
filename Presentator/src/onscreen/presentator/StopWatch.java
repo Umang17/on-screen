@@ -14,6 +14,7 @@ class StopWatch{
 	private Long currentTimeLastStop;
 	private boolean clockSetByComputer=false;
 	private boolean isRunning=false;
+	private boolean clockReseted=true;
 	
 	public StopWatch(final Chronometer chrono, Button btnStart, Button btnPause, Button btnReset){
 		this.chrono=chrono;
@@ -71,24 +72,36 @@ class StopWatch{
 	 * Start the clock to tick
 	 */
 	public void startClock(){
-		btnPause.setEnabled(true);
-		btnStart.setEnabled(false);
-		if (!resume) {
-			chrono.setBase(SystemClock.elapsedRealtime());
+		if (isRunning)
+			return;
+		
+		//Clock is not running
+		if (clockSetByComputer){
+			clockSetByComputer=false;
 			chrono.start();
+			return;
 		} else {
-			if (clockSetByComputer){
-				clockSetByComputer=false;
+			if(clockReseted){
+				chrono.setBase(SystemClock.elapsedRealtime());
 			} else {
 				long time=chrono.getBase()+SystemClock.elapsedRealtime()-currentTimeLastStop;
 				chrono.setBase(time);
 			}
-			chrono.start();
-		}
+		}		
+		chrono.start();
+		clockReseted=false;
 		isRunning=true;
+
+		
+		btnPause.setEnabled(true);
+		btnStart.setEnabled(false);		
+
 	}
 	
 	public void pauseClock(){
+		if (!isRunning){
+			return;
+		}
 		btnStart.setEnabled(true);
 		btnPause.setEnabled(false);
 		chrono.stop();
