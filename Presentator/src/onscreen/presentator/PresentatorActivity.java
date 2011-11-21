@@ -34,11 +34,13 @@ public class PresentatorActivity extends Activity {
 	public static final int MESSAGE_NO_PRES = 2;
 	public static final int MESSAGE_PROGRESS_INC = 3;
 	public static final int MESSAGE_PROGRESS_START = 4;
+	public static final int MESSAGE_CLOCK = 5;
 	
 	public static final String BUNDLE_NAME = "Name";
 	public static final String BUNDLE_TIME = "Time";
 	public static final String BUNDLE_CURRENT_SLIDE = "CSlide";
 	public static final String BUNDLE_TOTAL_SLIDE = "TSlide";
+	public static final String BUNDLE_RUNNING = "Running";
 
 	public static final int STATE_TAKE_OVER = 1;
 	public static final int STATE_LOAD = 2;
@@ -73,6 +75,7 @@ public class PresentatorActivity extends Activity {
 				int time = bundle.getInt(BUNDLE_TIME);
 				int currentSlide = bundle.getInt(BUNDLE_CURRENT_SLIDE);
 				int totalNrOfSlides = bundle.getInt(BUNDLE_TOTAL_SLIDE);
+				boolean running = bundle.getBoolean(BUNDLE_RUNNING);
 				
 				
 				// should output a dialog asking if user want to take over or
@@ -87,6 +90,12 @@ public class PresentatorActivity extends Activity {
 					// set time
 					TextView view = (TextView) findViewById(R.id.presentationName);
 					view.setText(name);
+					stopWatch.setBaseTime(time);
+					if (running) {
+						stopWatch.startClock();
+					} else {
+						stopWatch.pauseClock();
+					}
 				}
 				break;
 
@@ -95,7 +104,8 @@ public class PresentatorActivity extends Activity {
 				mFileProgressDialog.cancel();
 				TextView view = (TextView) findViewById(R.id.presentationName);
 				view.setText(mPresentationFile.getName());
-				// start clock
+				stopWatch.resetClock();
+				stopWatch.startClock();
 				break;
 
 			case MESSAGE_PROGRESS_START:
@@ -109,6 +119,19 @@ public class PresentatorActivity extends Activity {
 				// maybe incr with the size of the BYTE_SIZE
 				mFileProgressDialog.setProgress((Long)msg.obj);
 				break;
+			
+			case MESSAGE_CLOCK:
+				boolean runningClock = msg.arg1 == 1 ? true : false;
+				boolean reset = msg.arg2 == 1 ? true : false;
+				
+				if (reset) {
+					stopWatch.resetClock();
+				}
+				if (runningClock) {
+					stopWatch.startClock();
+				} else {
+					stopWatch.pauseClock();
+				}
 			}
 		}
 	};
@@ -127,7 +150,7 @@ public class PresentatorActivity extends Activity {
 		Button btnReset = (Button) findViewById(R.id.reset);
 		stopWatch = new StopWatch(chrono,btnStart,btnPause,btnReset);
 
-		mBluetooth = new Bluetooth(mHandler,stopWatch);
+		mBluetooth = new Bluetooth(mHandler);
 		
 		handleTagIDDiscoverWithBlock = new HandleTagIDDiscoverWithBlock(
 				new ConcreteHandleTagIDDiscover(mBluetooth));

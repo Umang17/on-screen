@@ -33,26 +33,23 @@ public class Bluetooth {
 	private ConnectedThread mConnectedThread;
 	
 	private boolean mConnected = false;
-	private StopWatch stopWatch;
 
 	private static final int BYTE_SIZE = 1000;
 
 	private static final byte TYPE_PRESENTATION = 1;
 	private static final byte TYPE_COMMANDS = 5;
-
+	private static final byte TYPE_TIME = 7;
+	
 	private static final byte COMMAND_EXIT = 0;
 	private static final byte COMMAND_NEXT = 1;
 	private static final byte COMMAND_PREV = 2;
 	private static final byte COMMAND_BLANK = 3;
 	
-	private static final byte TYPE_TIME = 7;
-	
 	private static final byte COMMAND_START = 7;
 	private static final byte COMMAND_PAUSE = 8;
 	private static final byte COMMAND_RESET = 9;
 
-	public Bluetooth(Handler handler,StopWatch stopWatch) {
-		this.stopWatch = stopWatch;
+	public Bluetooth(Handler handler) {
 		mHandler = handler;
 	}
 
@@ -98,6 +95,26 @@ public class Bluetooth {
 		mConnectedThread.write(TYPE_COMMANDS);
 		mConnectedThread.write(COMMAND_BLANK);
 		return true;
+	}
+	
+	
+	private void sendClockSetting(byte command) {
+		if (isConnected()){
+			mConnectedThread.write(TYPE_TIME); //Time
+			mConnectedThread.write(command); //Type: Start,Pause,Reset
+		}		
+	}
+
+	public void sendStartClock() {
+		sendClockSetting(COMMAND_START); //Start	
+	}
+
+	public void sendPauseClock() {
+		sendClockSetting(COMMAND_PAUSE); //Pause		
+	}
+
+	public void sendResetClock() {
+		sendClockSetting(COMMAND_RESET); //Reset
 	}
 
 	private final byte[] longToBytes(long v) {
@@ -399,7 +416,7 @@ public class Bluetooth {
 			if (D)
 				Log.d(TAG, "ConnectedThread - run");
 			byte[] buffer = new byte[1024]; // buffer store for the stream
-			int bytes; // bytes returned from read()
+			int bytes = 0; // bytes returned from read()
 
 			// Keep listening to the InputStream until an exception occurs
 			while (true) {
@@ -416,8 +433,13 @@ public class Bluetooth {
 					case 1: // presentation available...
 						// TODO: read all bytes!
 						// FIXME: ELIAS!!!
-						bytes = mmInStream.read(buffer, 0, 4); // read length of
-							Log.d(TAG, "read " + bytes);									// name
+						int read = 4;
+						do {
+							read = read - bytes;
+						bytes = mmInStream.read(buffer, 0, read); // read length of name
+						} while (bytes != read);
+						if (D)
+							Log.d(TAG, "read " + bytes);
 						int size = bytesToInt(buffer);
 						if (D)
 							Log.d(TAG, "length = " + size);
@@ -446,14 +468,10 @@ public class Bluetooth {
 
 						bytes = mmInStream.read(buffer, 0, 4); // read time
 						int time = bytesToInt(buffer);
-						//TODO ELIAS:FIX REFERENCE FOR stopWatch
-						stopWatch.setBaseTime(time);
 						Log.d(TAG, "time = " + time);
 						bytes = mmInStream.read(buffer, 0, 1); // read running
-						int running = bytesToInt(buffer);
-						
-						handleIfClockRunning(running,true);
-						
+						boolean running = buffer[0] == 1 ? true : false;
+												
 						Bundle bundle = new Bundle();
 						bundle.putString(PresentatorActivity.BUNDLE_NAME,
 								fileName);
@@ -462,6 +480,7 @@ public class Bluetooth {
 								totalNr);
 						bundle.putInt(PresentatorActivity.BUNDLE_CURRENT_SLIDE,
 								currentSlide);
+						bundle.putBoolean(PresentatorActivity.BUNDLE_RUNNING, running);
 						mHandler.obtainMessage(
 								PresentatorActivity.MESSAGE_TAKE_OVER, 4, -1,
 								bundle).sendToTarget(); // 4 is just a
@@ -470,18 +489,14 @@ public class Bluetooth {
 					case 4: // file rec...
 						mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_FILE_REC);
 						break;
-					case 7:
+					case 7: // timer reset
 						//Coded as:
 						//1 if running else 0
 						//1 if reset else 0
-						int runningClock=mmInStream.read();
-						int reset=mmInStream.read();
-						handleIfClockRunning(runningClock,false);
-						if(reset==1){
-							stopWatch.resetClock();
-						} 
+						int runningClock = mmInStream.read(); // running 1 == starta 0 == stop
+						int reset = mmInStream.read(); // reset 1 == nolla
 						
-					}
+						mHandler.obtainMessage(PresentatorActivity.MESSAGE_CLOCK, runningClock, reset);}
 					if (D)
 						Log.d(TAG, "after read");
 					// Send the obtained bytes to the UI Activity
@@ -491,15 +506,6 @@ public class Bluetooth {
 					break;
 				}
 			}
-		}
-
-		private void handleIfClockRunning(int running,boolean forced) {
-			if(running==1 && (!stopWatch.isRunningNow() || forced)){
-				stopWatch.startClock();
-			}else if (running==0 && (stopWatch.isRunningNow() || forced)) {
-				stopWatch.pauseClock();
-			}
-			
 		}
 
 		/* Call this from the main Activity to send data to the remote device */
@@ -531,25 +537,6 @@ public class Bluetooth {
 			}
 		}
 
-	}
-	
-	private void sendClockSetting(byte command) {
-		if (isConnected()){
-			mConnectedThread.write(TYPE_TIME); //Time
-			mConnectedThread.write(command); //Type: Start,Pause,Reset
-		}		
-	}
-
-	public void sendStartClock() {
-		sendClockSetting(COMMAND_START); //Start	
-	}
-
-	public void sendPauseClock() {
-		sendClockSetting(COMMAND_PAUSE); //Pause		
-	}
-
-	public void sendResetClock() {
-		sendClockSetting(COMMAND_RESET); //Reset
 	}
 
 }
