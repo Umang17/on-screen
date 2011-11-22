@@ -8,6 +8,7 @@
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
     <string name="file_progress_dialog">Transferring file...</string>
+    <string name="watch_zero">0:00:00</string>
 
     <!-- For Presentation.xml -->
     <string name="presentation_name">Open presentation</string>
