@@ -62,7 +62,7 @@ public class ConnectedThread implements Runnable, Observer {
                         break;
                     case KEYCONTROLLER:
                         int read = bufferedInputStream.read();
-                        boolean exit = OnScreen.keyController.recive(read, filePresented);
+                        boolean exit = OnScreen.keyController.recive(read);
                         if (exit) {
                             filePresented = null;
                         }
@@ -87,8 +87,6 @@ public class ConnectedThread implements Runnable, Observer {
             outputStream.write(1);
             outputStream.write(filePresented.getLengthofName());
             outputStream.write(filePresented.getNameAsByte());
-            outputStream.write(filePresented.getCurrentSlide());
-            outputStream.write(filePresented.getTotalSlides());
             outputStream.write(presentationTimer.getTime());
             outputStream.write(presentationTimer.getRunning());
             presentationTimer.addObserver(this);
@@ -100,6 +98,9 @@ public class ConnectedThread implements Runnable, Observer {
     }
 
     private void startPresenting() throws IOException {
+        if (filePresented != null) {
+            OnScreen.keyController.exit();
+        }
         filePresented = fileReciver.reciveFile(bufferedInputStream);
         Runtime rt = Runtime.getRuntime();
         Process pr = rt.exec(OnScreen.pdfReader + "\"" + filePresented.getFullName() + "\"");

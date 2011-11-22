@@ -26,26 +26,27 @@ public class KeyController {
         } catch (AWTException ex) {}
     }
 
-    boolean recive(int read, FilePresented file) {
+    boolean recive(int read) {
         switch(read) {
             case EXIT:
-                rob.keyPress(KeyEvent.VK_ESCAPE);
-                rob.keyPress(KeyEvent.VK_ESCAPE);
+                exit();
                 return true;
             case NEXT:
                 rob.keyPress(KeyEvent.VK_LEFT);
-                file.nextSlide();
                 break;
             case PREVIOUS:
                 rob.keyPress(KeyEvent.VK_RIGHT);
-                file.previousSlide();
                 break;
             case BLANK:
                 rob.keyPress(KeyEvent.VK_PERIOD);
-                file.toggleBlank();
                 break;
         }
         return false;
+    }
+
+    void exit() {
+                        rob.keyPress(KeyEvent.VK_ESCAPE);
+                rob.keyPress(KeyEvent.VK_ESCAPE);
     }
     
 }
