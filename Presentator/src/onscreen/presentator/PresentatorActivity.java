@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
@@ -159,60 +158,42 @@ public class PresentatorActivity extends Activity {
 		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
 		readNfcTag.onCreate(this);
 
-		Button prev = (Button) findViewById(R.id.prev);
-		prev.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				mBluetooth.sendPrev();
-			}
-		});
-
-		Button next = (Button) findViewById(R.id.next);
-		next.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				mBluetooth.sendNext();
-			}
-		});
-
-		Button blank = (Button) findViewById(R.id.blankscreen);
-		blank.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				mBluetooth.sendBlank();
-			}
-		});
-		
-		btnStart.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				startClockAndSetButtons();
-				mBluetooth.sendStartClock();
-				
-			}
-		});
-
-		btnPause.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				mBluetooth.sendPauseClock();
-				pauseClockAndSetButtons();
-				
-			}
-		});
-		
-		Button btnReset = (Button) findViewById(R.id.reset);
-		btnReset.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				mBluetooth.sendResetClock();
-				resetClockAndSetButtons();
-			}
-		});	
-
 		mFileProgressDialog = new FileProgressDialog(this, 0);
 		mFileProgressDialog.setCancelable(false); // can't cancel with back button
 
+	}
+	
+	public void onPrevClick(View v) {
+		mBluetooth.sendPrev();
+	}
+	
+	public void onNextClick(View v) {
+		mBluetooth.sendNext();
+	}
+	
+	public void onBlankClick(View v) {
+		mBluetooth.sendBlank();
+	}
+	
+	public void onStartClick(View v) {
+		startClockAndSetButtons();
+		mBluetooth.sendStartClock();
+		
+	}
+	
+	public void onPauseClick(View v) {
+		mBluetooth.sendPauseClock();
+		pauseClockAndSetButtons();
+		
+	}
+	
+	public void onResetClick(View v) {
+		mBluetooth.sendResetClock();
+		resetClockAndSetButtons();
+	}
+	
+	public void onPresentationClick(View v) {
+		openSelectPresentation();
 	}
 
 	private void startClockAndSetButtons() {
@@ -261,10 +242,6 @@ public class PresentatorActivity extends Activity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
-	}
-	
-	public void onPresentationClick(View v) {
-		openSelectPresentation();
 	}
 	
 	private void openSelectPresentation() {
