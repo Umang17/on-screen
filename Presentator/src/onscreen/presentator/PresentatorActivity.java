@@ -208,7 +208,7 @@ public class PresentatorActivity extends Activity {
 		}
 	}
 
-	public void onResetClick(View v) {
+	private void resetWatch() {
 		mBluetooth.sendResetClock();
 		resetClockAndSetButtons();
 	}
@@ -272,6 +272,9 @@ public class PresentatorActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.open_presentation:
 			openSelectPresentation();
+			return true;
+		case R.id.menu_reset_watch:
+			resetWatch();
 			return true;
 		case R.id.open_settings:
 			// TODO
