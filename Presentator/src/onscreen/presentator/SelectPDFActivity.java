@@ -4,7 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -69,12 +72,14 @@ public class SelectPDFActivity extends ListActivity {
 			addPDFsInside(fileDir, allPDFs);
 			// Sort the list
 			Collections.sort(allPDFs);
-		} else {
-			Log.w(TAG, storageState);
-		}
 
-		if (allPDFs.isEmpty()) {
-			Log.d(TAG, "Empty");
+			if (allPDFs.isEmpty()) {
+				showAlertDialog(R.string.pdf_none_found);
+				Log.d(TAG, "Empty");
+			}
+		} else {
+			showAlertDialog(R.string.pdf_storage_failed);
+			Log.w(TAG, storageState);
 		}
 	}
 
@@ -100,6 +105,25 @@ public class SelectPDFActivity extends ListActivity {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Creates a new AlertDialog and shows it, the PDFActivity will finish with
+	 * RESULT_CANCELED once the OK-button is pressed.
+	 * 
+	 * @param messageId
+	 *            The message to place in the dialog.
+	 */
+	private void showAlertDialog(int messageId) {
+		AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+		alertbox.setMessage(messageId);
+		alertbox.setNeutralButton(R.string.pdf_ok_text, new OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				setResult(RESULT_CANCELED, new Intent());
+				finish();
+			}
+		});
+		alertbox.show();
 	}
 
 	/**

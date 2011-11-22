@@ -10,10 +10,13 @@
     <string name="file_progress_dialog">Transferring file...</string>
     <string name="watch_zero">0:00:00</string>
 
+    <!-- PDFActivity -->
+    <string name="pdf_none_found">Didn\'t find any PDF files on the phone.</string>
+    <string name="pdf_storage_failed">Can\'t open the external storage.</string>
+    <string name="pdf_ok_text">OK</string>
+
     <!-- For Presentation.xml -->
     <string name="presentation_name">Open presentation</string>
-    <string name="prev_button">Prev</string>
-    <string name="next_button">Next</string>
     <string name="start_button">Start</string>
     <string name="resume_button">Resume</string>
     <string name="pause_button">Pause</string>
