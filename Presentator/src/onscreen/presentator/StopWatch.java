@@ -10,6 +10,8 @@ class StopWatch{
 	private Long currentTimeLastStop;
 	private boolean isRunning=false;
 	private boolean clockReseted=true;
+	public enum WatchState {RUNNING, PAUSED, STOPPED};
+	private WatchState state = WatchState.STOPPED;
 	
 	public StopWatch(final Chronometer chrono){
 		this.chrono=chrono;		
@@ -63,6 +65,7 @@ class StopWatch{
 		chrono.start();
 		isRunning=true;
 		clockReseted=false;
+		state = WatchState.RUNNING;
 	}
 	
 	private long getRestoreTime() {
@@ -75,13 +78,15 @@ class StopWatch{
 		}
 		chrono.stop();
 		setClockIsNotRunning();
+		state = WatchState.PAUSED;
 	}
 	
 	public void resetClock(){
 		chrono.stop();
-		chrono.setText("0:00:00");
+		chrono.setText(R.string.watch_zero);
 		setClockIsNotRunning();
 		clockReseted=true;
+		state = WatchState.STOPPED;
 	}
 	
 	private void setClockIsNotRunning(Long time) {
@@ -97,7 +102,7 @@ class StopWatch{
 		return SystemClock.elapsedRealtime();
 	}
 
-	public boolean isRunningNow(){
-		return isRunning;
+	public WatchState getState() {
+		return state;
 	}
 }

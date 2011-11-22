@@ -48,8 +48,7 @@ public class PresentatorActivity extends Activity {
 	private FileProgressDialog mFileProgressDialog;
 	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
 	
-	private Button btnStart;
-	private Button btnPause;
+	private Button btnStartStop;
 
 
 	private final Handler mHandler = new Handler() {
@@ -140,11 +139,9 @@ public class PresentatorActivity extends Activity {
 		
 		//Setting up clock
 		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
-		btnStart = (Button) findViewById(R.id.start);
-		btnPause = (Button) findViewById(R.id.pause);
+		btnStartStop = (Button) findViewById(R.id.start_stop);
 		
 		stopWatch = new StopWatch(chrono);
-		btnPause.setEnabled(false);	
 
 		mBluetooth = new Bluetooth(mHandler);
 		
@@ -171,16 +168,18 @@ public class PresentatorActivity extends Activity {
 		mBluetooth.sendBlank();
 	}
 	
-	public void onStartClick(View v) {
-		startClockAndSetButtons();
-		mBluetooth.sendStartClock();
-		
-	}
-	
-	public void onPauseClick(View v) {
-		mBluetooth.sendPauseClock();
-		pauseClockAndSetButtons();
-		
+	public void onStartStopClick(View v) {
+		switch (stopWatch.getState()) {
+		case RUNNING:
+			mBluetooth.sendPauseClock();
+			pauseClockAndSetButtons();
+			break;
+		case PAUSED:
+		case STOPPED:
+			startClockAndSetButtons();
+			mBluetooth.sendStartClock();
+			break;
+		}
 	}
 	
 	public void onResetClick(View v) {
@@ -193,22 +192,17 @@ public class PresentatorActivity extends Activity {
 	}
 
 	private void startClockAndSetButtons() {
-		btnPause.setEnabled(true);
-		btnStart.setEnabled(false);	
+		btnStartStop.setText(R.string.pause_button);
 		stopWatch.startClock();
 	}
 
 	private void pauseClockAndSetButtons() {
-		btnStart.setEnabled(true);
-		btnPause.setEnabled(false);
-		btnStart.setText(R.string.resume_button);
+		btnStartStop.setText(R.string.resume_button);
 		stopWatch.pauseClock();
 	}
 
 	private void resetClockAndSetButtons() {
-		btnStart.setEnabled(true);				
-		btnPause.setEnabled(false);
-		btnStart.setText(R.string.start_button);
+		btnStartStop.setText(R.string.start_button);
 		stopWatch.resetClock();
 	}
 
