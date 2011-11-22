@@ -6,18 +6,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PresentatorActivity extends Activity {
@@ -31,7 +34,7 @@ public class PresentatorActivity extends Activity {
 	public static final int MESSAGE_PROGRESS_INC = 3;
 	public static final int MESSAGE_PROGRESS_START = 4;
 	public static final int MESSAGE_CLOCK = 5;
-	
+
 	public static final String BUNDLE_NAME = "Name";
 	public static final String BUNDLE_TIME = "Time";
 	public static final String BUNDLE_RUNNING = "Running";
@@ -41,15 +44,20 @@ public class PresentatorActivity extends Activity {
 
 	public int state = 0;
 
-	//private final String TAG = "PresentatorActivity";
+	// used while taking over
+	private boolean running;
+	private int time;
+	private String name;
+
+	// private final String TAG = "PresentatorActivity";
 
 	private ReadNfcTag readNfcTag;
-	private StopWatch stopWatch;	
+	private StopWatch stopWatch;
 	private FileProgressDialog mFileProgressDialog;
+	private Dialog mTakeOverDialog;
 	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
-	
-	private Button btnStartStop;
 
+	private Button btnStartStop;
 
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -67,57 +75,41 @@ public class PresentatorActivity extends Activity {
 			case MESSAGE_TAKE_OVER:
 				Log.d("Handler", "taking over");
 				Bundle bundle = (Bundle) msg.obj;
-				String name = bundle.getString(BUNDLE_NAME);
-				int time = bundle.getInt(BUNDLE_TIME);
-				boolean running = bundle.getBoolean(BUNDLE_RUNNING);
-				
-				
-				// should output a dialog asking if user want to take over or
-				// send a new presentation. But only if a presentation already
-				// is loaded.
+				name = bundle.getString(BUNDLE_NAME);
+				time = bundle.getInt(BUNDLE_TIME);
+				running = bundle.getBoolean(BUNDLE_RUNNING);
+
 				if (mPresentationFile != null) {
-					// give user options...
-					Log.d("Handler", "Before sending");
-					mBluetooth.sendPresentation(mPresentationFile);
-					Log.d("Handler", "After sending");
+					mTakeOverDialog.show();
 				} else {
-					// set time
-					TextView view = (TextView) findViewById(R.id.presentationName);
-					view.setText(name);
-					stopWatch.setBaseTime(time);
-					if (running) {
-						startClockAndSetButtons();
-					} else {
-						pauseClockAndSetButtons();
-					}
+					takeOver();
 				}
+
 				break;
 
 			case MESSAGE_FILE_REC:
 				Log.d("Handler", "file rec...");
 				mFileProgressDialog.cancel();
-				TextView view = (TextView) findViewById(R.id.presentationName);
-				view.setText(mPresentationFile.getName());
 				stopWatch.resetClock();
 				startClockAndSetButtons();
 				break;
 
 			case MESSAGE_PROGRESS_START:
 				Log.d("Handler", "progress start...");
-				mFileProgressDialog.setFileSize((Long)msg.obj);
+				mFileProgressDialog.setFileSize((Long) msg.obj);
 				// maybe use setMax...
 				mFileProgressDialog.show();
 				break;
 
 			case MESSAGE_PROGRESS_INC:
 				// maybe incr with the size of the BYTE_SIZE
-				mFileProgressDialog.setProgress((Long)msg.obj);
+				mFileProgressDialog.setProgress((Long) msg.obj);
 				break;
-			
+
 			case MESSAGE_CLOCK:
 				boolean runningClock = msg.arg1 == 1 ? true : false;
 				boolean reset = msg.arg2 == 1 ? true : false;
-				
+
 				if (reset) {
 					resetClockAndSetButtons();
 				}
@@ -135,16 +127,16 @@ public class PresentatorActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.presentation);		
-		
-		//Setting up clock
+		setContentView(R.layout.presentation);
+
+		// Setting up clock
 		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
 		btnStartStop = (Button) findViewById(R.id.start_stop);
-		
+
 		stopWatch = new StopWatch(chrono);
 
 		mBluetooth = new Bluetooth(mHandler);
-		
+
 		handleTagIDDiscoverWithBlock = new HandleTagIDDiscoverWithBlock(
 				new ConcreteHandleTagIDDiscover(mBluetooth));
 
@@ -152,22 +144,56 @@ public class PresentatorActivity extends Activity {
 		readNfcTag.onCreate(this);
 
 		mFileProgressDialog = new FileProgressDialog(this, 0);
-		mFileProgressDialog.setCancelable(false); // can't cancel with back button
+		mFileProgressDialog.setCancelable(false); // can't cancel with back
+													// button
+
+		mTakeOverDialog = new Dialog(this);
+		LinearLayout ll = (LinearLayout) LayoutInflater.from(this).inflate(
+				R.layout.take_over_dialog, null);
+		mTakeOverDialog.setContentView(ll);
 
 	}
-	
+
+	private void upload() {
+		Log.d("Handler", "Before sending");
+		mBluetooth.sendPresentation(mPresentationFile);
+		Log.d("Handler", "After sending");
+	}
+
+	private void takeOver() {
+		TextView view = (TextView) findViewById(R.id.presentationName);
+		view.setText(name);
+		stopWatch.setBaseTime(time);
+		if (running) {
+			mBluetooth.sendStartClock();
+			startClockAndSetButtons();
+		} else {
+			pauseClockAndSetButtons();
+		}
+	}
+
+	public void OnUploadClick(View v) {
+		mTakeOverDialog.dismiss();
+		upload();
+	}
+
+	public void onTakeOverClick(View v) {
+		mTakeOverDialog.dismiss();
+		takeOver();
+	}
+
 	public void onPrevClick(View v) {
 		mBluetooth.sendPrev();
 	}
-	
+
 	public void onNextClick(View v) {
 		mBluetooth.sendNext();
 	}
-	
+
 	public void onBlankClick(View v) {
 		mBluetooth.sendBlank();
 	}
-	
+
 	public void onStartStopClick(View v) {
 		switch (stopWatch.getState()) {
 		case RUNNING:
@@ -181,12 +207,12 @@ public class PresentatorActivity extends Activity {
 			break;
 		}
 	}
-	
+
 	public void onResetClick(View v) {
 		mBluetooth.sendResetClock();
 		resetClockAndSetButtons();
 	}
-	
+
 	public void onPresentationClick(View v) {
 		openSelectPresentation();
 	}
@@ -233,10 +259,11 @@ public class PresentatorActivity extends Activity {
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
-	
+
 	private void openSelectPresentation() {
 		// Start the PDF selector
-		Intent loadIntent = new Intent(PresentatorActivity.this, SelectPDFActivity.class);
+		Intent loadIntent = new Intent(PresentatorActivity.this,
+				SelectPDFActivity.class);
 		startActivityForResult(loadIntent, STATE_LOAD);
 	}
 
@@ -264,7 +291,7 @@ public class PresentatorActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
 	protected void onPause() {
 		mFileProgressDialog.cancel();
@@ -297,8 +324,9 @@ public class PresentatorActivity extends Activity {
 			Log.d("debug", file);
 			File f = new File(file);
 			mPresentationFile = f;
-			state = STATE_LOAD;
-			mBluetooth.sendPresentation(mPresentationFile);
+			TextView view = (TextView) findViewById(R.id.presentationName);
+			view.setText(mPresentationFile.getName());
+			upload();
 			break;
 		}
 	}
