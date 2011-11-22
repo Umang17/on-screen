@@ -5,10 +5,12 @@
     android:versionName="1.0" >
 
     <uses-sdk android:minSdkVersion="10" />
-    <uses-permission android:name="android.permission.NFC"></uses-permission>
+
+    <uses-permission android:name="android.permission.NFC" >
+    </uses-permission>
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <!-- <uses-feature android:name="android.hardware.nfc" android:required="true" />-->
+    <!-- <uses-feature android:name="android.hardware.nfc" android:required="true" /> -->
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -22,23 +24,26 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
-            <intent-filter>
-       			<action android:name="android.nfc.action.TECH_DISCOVERED"/>
+            <intent-filter >
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
             </intent-filter>
-                
-            <meta-data android:name="android.nfc.action.TECH_DISCOVERED"
-                         android:resource="@xml/nfc_tech_filter" />   
-			
-			
+
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
+
             <!-- Handle notes detected from outside our application -->
-            <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+            <intent-filter >
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter> 
-            
+            </intent-filter>
         </activity>
-        <activity android:name=".SelectPDFActivity"></activity>
+        <activity
+            android:label="@string/open_presentation"
+            android:name=".SelectPDFActivity"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

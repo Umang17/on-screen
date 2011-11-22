@@ -9,10 +9,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.02"
-        
         android:gravity="center_vertical|center_horizontal"
-        android:textSize="14pt" 
-        android:text="Presentation1" />
+        android:onClick="onPresentationClick"
+        android:clickable="true"
+        android:text="@string/presentation_name"
+        android:textSize="14pt" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -24,14 +25,14 @@
             android:layout_width="wrap_content"
             android:layout_height="66dp"
             android:layout_weight="0.50"
-            android:text="Prev" />
+            android:text="@string/prev_button" />
 
         <Button
             android:id="@+id/next"
             android:layout_width="wrap_content"
             android:layout_height="66dp"
             android:layout_weight="0.50"
-            android:text="Next" />
+            android:text="@string/next_button" />
 
     </LinearLayout>
 
@@ -54,27 +55,27 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="0.33"
-	        android:text="Start" />
+	        android:text="@string/start_button" />
 	
 	    <Button
 	        android:id="@+id/pause"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="0.33"
-	        android:text="Pause" />
+	        android:text="@string/pause_button" />
 	
 	    <Button
 	        android:id="@+id/reset"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="0.34"
-	        android:text="Reset" />
+	        android:text="@string/reset_button" />
 	</LinearLayout>
 	
     <Button
         android:id="@+id/blankscreen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Blankscreen" />
+        android:text="@string/blank_button" />
 
 </LinearLayout>

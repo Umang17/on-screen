@@ -224,14 +224,14 @@ public class PresentatorActivity extends Activity {
 	private void pauseClockAndSetButtons() {
 		btnStart.setEnabled(true);
 		btnPause.setEnabled(false);
-		btnStart.setText(R.string.resumeButton);
+		btnStart.setText(R.string.resume_button);
 		stopWatch.pauseClock();
 	}
 
 	private void resetClockAndSetButtons() {
 		btnStart.setEnabled(true);				
 		btnPause.setEnabled(false);
-		btnStart.setText(R.string.startButton);
+		btnStart.setText(R.string.start_button);
 		stopWatch.resetClock();
 	}
 
@@ -262,15 +262,22 @@ public class PresentatorActivity extends Activity {
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
+	
+	public void onPresentationClick(View v) {
+		openSelectPresentation();
+	}
+	
+	private void openSelectPresentation() {
+		// Start the PDF selector
+		Intent loadIntent = new Intent(PresentatorActivity.this, SelectPDFActivity.class);
+		startActivityForResult(loadIntent, STATE_LOAD);
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.open_presentation:
-			// Start the PDF selector
-			Intent loadIntent = new Intent(PresentatorActivity.this,
-					SelectPDFActivity.class);
-			startActivityForResult(loadIntent, STATE_LOAD);
+			openSelectPresentation();
 			return true;
 		case R.id.open_settings:
 			// TODO
