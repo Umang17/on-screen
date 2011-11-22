@@ -2,11 +2,9 @@ package onscreen.presentator;
 
 import android.os.SystemClock;
 import android.widget.Chronometer;
-import android.widget.Chronometer.OnChronometerTickListener;
 
 class StopWatch{
 	private Chronometer chrono;
-	private String currentTime="";	
 	private Long currentTimeLastStop;
 	private boolean isRunning=false;
 	private boolean clockReseted=true;
@@ -15,13 +13,7 @@ class StopWatch{
 	
 	public StopWatch(final Chronometer chrono){
 		this.chrono=chrono;		
-		chrono.setFormat("H:MM:SS");
-		chrono.setOnChronometerTickListener(new OnChronometerTickListener() {
-
-			public void onChronometerTick(Chronometer arg0) {
-				chrono.refreshDrawableState();
-			}
-		});		
+		resetClock();
 	}
 	
 	/**
@@ -82,8 +74,9 @@ class StopWatch{
 	}
 	
 	public void resetClock(){
+		chrono.setBase(time());
+		chrono.refreshDrawableState();
 		chrono.stop();
-		chrono.setText(R.string.watch_zero);
 		setClockIsNotRunning();
 		clockReseted=true;
 		state = WatchState.STOPPED;
