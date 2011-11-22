@@ -34,8 +34,6 @@ public class PresentatorActivity extends Activity {
 	
 	public static final String BUNDLE_NAME = "Name";
 	public static final String BUNDLE_TIME = "Time";
-	public static final String BUNDLE_CURRENT_SLIDE = "CSlide";
-	public static final String BUNDLE_TOTAL_SLIDE = "TSlide";
 	public static final String BUNDLE_RUNNING = "Running";
 
 	public static final int STATE_TAKE_OVER = 1;
@@ -72,8 +70,6 @@ public class PresentatorActivity extends Activity {
 				Bundle bundle = (Bundle) msg.obj;
 				String name = bundle.getString(BUNDLE_NAME);
 				int time = bundle.getInt(BUNDLE_TIME);
-				int currentSlide = bundle.getInt(BUNDLE_CURRENT_SLIDE);
-				int totalNrOfSlides = bundle.getInt(BUNDLE_TOTAL_SLIDE);
 				boolean running = bundle.getBoolean(BUNDLE_RUNNING);
 				
 				

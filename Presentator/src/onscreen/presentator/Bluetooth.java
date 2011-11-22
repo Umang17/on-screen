@@ -469,34 +469,6 @@ public class Bluetooth {
 						read = 0;
 						offset = 0;
 						length = 4;
-						// read current slide, 4 bytes
-						while (read != 4) {
-							bytes = mmInStream.read(buffer, offset, length);
-							read = read + bytes;
-							offset = offset + bytes - 1;
-							length = length - bytes;
-						}
-						int currentSlide = bytesToInt(buffer);
-						if (D)
-							Log.d(TAG, "current slide = " + currentSlide);
-
-						read = 0;
-						offset = 0;
-						length = 4;
-						// read total slide, 4 bytes
-						while (read != 4) {
-							bytes = mmInStream.read(buffer, offset, length);
-							read = read + bytes;
-							offset = offset + bytes - 1;
-							length = length - bytes;
-						}
-						int totalNr = bytesToInt(buffer);
-						if (D)
-							Log.d(TAG, "total slides = " + totalNr);
-
-						read = 0;
-						offset = 0;
-						length = 4;
 						// read time, 4 bytes
 						while (read != 4) {
 							bytes = mmInStream.read(buffer, offset, length);
@@ -515,10 +487,6 @@ public class Bluetooth {
 						bundle.putString(PresentatorActivity.BUNDLE_NAME,
 								fileName);
 						bundle.putInt(PresentatorActivity.BUNDLE_TIME, time);
-						bundle.putInt(PresentatorActivity.BUNDLE_TOTAL_SLIDE,
-								totalNr);
-						bundle.putInt(PresentatorActivity.BUNDLE_CURRENT_SLIDE,
-								currentSlide);
 						bundle.putBoolean(PresentatorActivity.BUNDLE_RUNNING,
 								running);
 						mHandler.obtainMessage(
