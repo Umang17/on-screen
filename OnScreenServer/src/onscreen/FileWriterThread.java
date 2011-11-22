@@ -23,7 +23,7 @@ public class FileWriterThread extends Thread {
         try {
             out = new BufferedOutputStream(new FileOutputStream(fileName));
         } catch (FileNotFoundException ex) {
-            Notification.notify("Failed in open file");
+            Notification.debugMessage("Failed in open file");
         }
     }
 

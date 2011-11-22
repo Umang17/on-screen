@@ -37,7 +37,7 @@ public class ConnectedThread implements Runnable, Observer {
     @Override
     public void run() {
         try {
-            Notification.notify("Have recived connection");
+            Notification.debugMessage("Have recived connection");
             // prepare to receive data
             outputStream = mConnection.openOutputStream();
             bufferedInputStream =
@@ -50,7 +50,7 @@ public class ConnectedThread implements Runnable, Observer {
 
                 switch (command) {
                     case EXIT_CMD:
-                        Notification.notify("Killing connection.");
+                        Notification.debugMessage("Killing connection.");
                         mConnection.close();
                         return;
                     case FILE:
@@ -68,17 +68,17 @@ public class ConnectedThread implements Runnable, Observer {
                         }
                         break;
                     case TIMECONTROLL:
-                        Notification.notify("Some timer event was recived!");
+                        Notification.debugMessage("Some timer event was recived!");
                         presentationTimer.control(bufferedInputStream.read(), this);
                         break;
                     default:
-                        Notification.notify("Unknown control sequence " + command);
+                        Notification.debugMessage("Unknown control sequence " + command);
                         break;
                 }
 
             }
         } catch (Exception e) {
-            Notification.notify("Something went wrong ");
+            Notification.debugMessage("Something went wrong ");
             e.printStackTrace();
         }
     }
@@ -91,12 +91,13 @@ public class ConnectedThread implements Runnable, Observer {
             outputStream.write(filePresented.getCurrentSlide());
             outputStream.write(filePresented.getTotalSlides());
             outputStream.write(presentationTimer.getTime());
+            Notification.debugMessage("Sent time: " + byteArrayToInt(presentationTimer.getTime(), 0));
             outputStream.write(presentationTimer.getRunning());
+            Notification.debugMessage("Sent running: " + presentationTimer.getRunning());
             presentationTimer.addObserver(this);
-            Notification.notify("Sent presenting...");
         } else {
             outputStream.write(0);
-            Notification.notify("Sent a 0...");
+            Notification.debugMessage("Sent a 0...");
         }
         outputStream.flush();
     }
@@ -113,7 +114,7 @@ public class ConnectedThread implements Runnable, Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        Notification.notify("Notifying about update!");
+        Notification.debugMessage("Notifying about update!");
         try {
             NotifyThread nt = (NotifyThread) arg;
             if (nt.getCaller().equals(this)) {
@@ -125,5 +126,30 @@ public class ConnectedThread implements Runnable, Observer {
 
         } catch (IOException ex) {
         }
+    }
+
+    /**
+     * @deprecated 
+     * @param b
+     * @param offset
+     * @return 
+     */
+    private static int byteArrayToInt(byte[] b, int offset) {
+        int i = 0;
+        int pos = offset;
+        i += unsignedByteToInt(b[pos++]) << 24;
+        i += unsignedByteToInt(b[pos++]) << 16;
+        i += unsignedByteToInt(b[pos++]) << 8;
+        i += unsignedByteToInt(b[pos++]);
+        return i;
+    }
+
+    /**
+     * @deprecated 
+     * @param b
+     * @return 
+     */
+    private static int unsignedByteToInt(byte b) {
+        return (int) b & 0xFF;
     }
 }

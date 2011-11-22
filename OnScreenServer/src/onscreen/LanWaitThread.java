@@ -22,9 +22,9 @@ public class LanWaitThread implements Runnable {
             ServerSocketConnection scn = new ServerSocketConnection(8633);
             SocketConnection connection;
             while (true) {
-                Notification.notify("waiting for connection...\n");
+                Notification.debugMessage("waiting for connection...\n");
                 connection = (SocketConnection) scn.acceptAndOpen();
-                Notification.notify("got connection...\n");
+                Notification.debugMessage("got connection...\n");
 
                 Thread processThread = new Thread(
                         new ConnectedThread(connection));

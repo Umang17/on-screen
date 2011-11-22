@@ -51,7 +51,7 @@ public class OnScreen {
         } else if ((new File(env32 + onScreenSumatra)).exists()) {
             pdfReader = env32 + onScreenSumatra + sumatraSettings;
         } else {
-            Notification.notify("Could not find pdf reader!");
+            Notification.debugMessage("Could not find pdf reader!");
         }
 
         if (BT) {

@@ -45,7 +45,7 @@ public class MouseController {
 			mouseThread.rightClick((int) (value * 10));
 			break;
 		default:
-			Notification.notify("unknown control byte");
+			Notification.debugMessage("unknown control byte");
 			break;
 		}
 	}

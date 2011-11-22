@@ -3,7 +3,7 @@ package onscreen;
 public class Notification {   
     private static boolean debug = true;
     
-    public static void notify(String notification) {
+    public static void debugMessage(String notification) {
         if (debug) {
             System.out.println(notification);
         }

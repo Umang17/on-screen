@@ -32,7 +32,7 @@ public class FilePresented {
     }
 
     public synchronized byte[] getLengthofName() {
-        Notification.notify("the int is " + getNameAsByte().length + "the byte is " + intToByte(getNameAsByte().length));
+        Notification.debugMessage("the int is " + getNameAsByte().length + "the byte is " + intToByte(getNameAsByte().length));
         return intToByte(getNameAsByte().length);
     }
 

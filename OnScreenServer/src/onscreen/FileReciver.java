@@ -21,12 +21,12 @@ public class FileReciver {
     }
 
     public synchronized FilePresented reciveFile(BufferedInputStream stream) {
-        Notification.notify("Starting to recive file");
+        Notification.debugMessage("Starting to recive file");
 
         int size = read(stream, 8, 4);
 
         int nameSize = read(stream, 4);
-        Notification.notify("name size " + nameSize);
+        Notification.debugMessage("name size " + nameSize);
 
         String fileName = readString(stream, nameSize);
 
@@ -63,7 +63,7 @@ public class FileReciver {
                 a += read;
             }
         } catch (IOException ex) {
-            Notification.notify("Failed in reciving or writing data");
+            Notification.debugMessage("Failed in reciving or writing data");
         }
         fw.close();
         FilePresented filePres = new FilePresented(fileLocation, file.getName());
@@ -101,7 +101,7 @@ public class FileReciver {
         try {
             stream.read(sizeBytes, 0, i);
         } catch (IOException ex) {
-            Notification.notify("Failed in reciving " + ex.getLocalizedMessage());
+            Notification.debugMessage("Failed in reciving " + ex.getLocalizedMessage());
         }
 
         return byteArrayToInt(sizeBytes, offset);
@@ -113,7 +113,7 @@ public class FileReciver {
         try {
             stream.read(imageNameByte, 0, nameSize);
         } catch (IOException ex) {
-            Notification.notify("Failed in reciving " + ex.getLocalizedMessage());
+            Notification.debugMessage("Failed in reciving " + ex.getLocalizedMessage());
         }
         return byteToString(imageNameByte);
     }

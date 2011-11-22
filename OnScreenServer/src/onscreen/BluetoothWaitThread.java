@@ -29,7 +29,7 @@ public class BluetoothWaitThread implements Runnable {
         try {
             local = LocalDevice.getLocalDevice();
         } catch (BluetoothStateException ex) {
-            Notification.notify("Could not initiate bluetooth..");
+            Notification.debugMessage("Could not initiate bluetooth..");
             return;
         }
         
@@ -37,7 +37,7 @@ public class BluetoothWaitThread implements Runnable {
         try {
             local.setDiscoverable(DiscoveryAgent.GIAC);
 
-            Notification.notify(local.getBluetoothAddress() + "\n");
+            Notification.debugMessage(local.getBluetoothAddress() + "\n");
 
             UUID uuid = new UUID(80087355); // "04c6093b-0000-1000-8000-00805f9b34fb"
             String url = "btspp://localhost:" + uuid.toString()
