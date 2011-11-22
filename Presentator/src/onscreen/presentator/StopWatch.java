@@ -35,9 +35,7 @@ class StopWatch{
 		Long time2=time();
 		chrono.setBase(time2-time*1000);
 		clockReseted=false;
-		if(!isRunning){
-			setClockIsNotRunning(time2);
-		}
+		setClockIsNotRunning(time2);
 	}
 
 	/**
