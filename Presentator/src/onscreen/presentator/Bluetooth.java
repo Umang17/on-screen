@@ -15,7 +15,6 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 public class Bluetooth {
@@ -277,7 +276,6 @@ public class Bluetooth {
 				return null;
 			}
 			long length = file.length();
-			Message m = new Message();
 			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_START,
 					length).sendToTarget();
 			mConnectedThread.write(TYPE_PRESENTATION);
@@ -305,9 +303,7 @@ public class Bluetooth {
 				Log.d(TAG, "sent all but file...");
 
 			byte[] buffer = new byte[BYTE_SIZE];
-			long num_of_int = length / BYTE_SIZE; // somehow just send incr
-													// message
-													// at the right moments
+
 			for (long i = 0; i <= length; i += BYTE_SIZE) {
 				try {
 					buf.read(buffer);
@@ -390,8 +386,6 @@ public class Bluetooth {
 		private final BluetoothSocket mmSocket;
 		private final InputStream mmInStream;
 		private final OutputStream mmOutStream;
-
-		private static final int BYTE_SIZE = 1024;
 
 		public ConnectedThread(BluetoothSocket socket) {
 			if (D)
