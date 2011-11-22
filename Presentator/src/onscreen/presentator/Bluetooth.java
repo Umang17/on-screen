@@ -435,8 +435,6 @@ public class Bluetooth {
 						mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_NO_PRES);
 						break;
 					case 1: // presentation available...
-						// TODO: read all bytes!
-						// FIXME: ELIAS!!!
 						int read = 0;
 						int offset = 0,
 						length = 4;
@@ -476,7 +474,7 @@ public class Bluetooth {
 
 						read = 0;
 						offset = 0;
-						length = size;
+						length = 4;
 						// read current slide, 4 bytes
 						while (read != 4) {
 							bytes = mmInStream.read(buffer, offset, length);
@@ -490,7 +488,7 @@ public class Bluetooth {
 
 						read = 0;
 						offset = 0;
-						length = size;
+						length = 4;
 						// read total slide, 4 bytes
 						while (read != 4) {
 							bytes = mmInStream.read(buffer, offset, length);
@@ -504,7 +502,7 @@ public class Bluetooth {
 
 						read = 0;
 						offset = 0;
-						length = size;
+						length = 4;
 						// read time, 4 bytes
 						while (read != 4) {
 							bytes = mmInStream.read(buffer, offset, length);
@@ -548,7 +546,7 @@ public class Bluetooth {
 
 						mHandler.obtainMessage(
 								PresentatorActivity.MESSAGE_CLOCK,
-								runningClock, reset);
+								runningClock, reset).sendToTarget();
 					}
 					if (D)
 						Log.d(TAG, "after read");
