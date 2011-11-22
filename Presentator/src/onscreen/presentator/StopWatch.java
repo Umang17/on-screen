@@ -13,30 +13,13 @@ class StopWatch{
 	
 	public StopWatch(final Chronometer chrono){
 		this.chrono=chrono;		
-		
+		chrono.setFormat("H:MM:SS");
 		chrono.setOnChronometerTickListener(new OnChronometerTickListener() {
 
 			public void onChronometerTick(Chronometer arg0) {
-				
-					long seconds = (time() - chrono.getBase()) / 1000;
-					
-					int hour = (int) (seconds/3600);
-					if(hour>=10) {
-						chrono.setBase(chrono.getBase() - seconds*3600*1000);
-						seconds -= hour*3600;
-						hour = 0;
-					}
-					seconds -= hour*3600;
-					int minutes = (int) (seconds/60);
-					seconds -= minutes*60;
-					
-					currentTime = hour+":"
-									+(minutes<10?"0"+minutes:minutes)+":"
-									+(seconds<10?"0"+seconds:seconds);
-					arg0.setText(currentTime);
+				chrono.refreshDrawableState();
 			}
-		});
-		chrono.setText("0:00:00");			
+		});		
 	}
 	
 	/**
