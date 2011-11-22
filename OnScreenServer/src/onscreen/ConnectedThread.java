@@ -75,7 +75,6 @@ public class ConnectedThread implements Runnable, Observer {
                         Notification.debugMessage("Unknown control sequence " + command);
                         break;
                 }
-
             }
         } catch (Exception e) {
             Notification.debugMessage("Something went wrong ");
@@ -91,13 +90,11 @@ public class ConnectedThread implements Runnable, Observer {
             outputStream.write(filePresented.getCurrentSlide());
             outputStream.write(filePresented.getTotalSlides());
             outputStream.write(presentationTimer.getTime());
-            Notification.debugMessage("Sent time: " + byteArrayToInt(presentationTimer.getTime(), 0));
             outputStream.write(presentationTimer.getRunning());
-            Notification.debugMessage("Sent running: " + presentationTimer.getRunning());
             presentationTimer.addObserver(this);
         } else {
             outputStream.write(0);
-            Notification.debugMessage("Sent a 0...");
+            Notification.debugMessage("Sent not presenting");
         }
         outputStream.flush();
     }
@@ -125,31 +122,9 @@ public class ConnectedThread implements Runnable, Observer {
             outputStream.write(nt.getReset());
 
         } catch (IOException ex) {
+            Notification.debugMessage("Someting went wrong "
+                    + "when notifying about timer events " 
+                    + ex.getLocalizedMessage());
         }
-    }
-
-    /**
-     * @deprecated 
-     * @param b
-     * @param offset
-     * @return 
-     */
-    private static int byteArrayToInt(byte[] b, int offset) {
-        int i = 0;
-        int pos = offset;
-        i += unsignedByteToInt(b[pos++]) << 24;
-        i += unsignedByteToInt(b[pos++]) << 16;
-        i += unsignedByteToInt(b[pos++]) << 8;
-        i += unsignedByteToInt(b[pos++]);
-        return i;
-    }
-
-    /**
-     * @deprecated 
-     * @param b
-     * @return 
-     */
-    private static int unsignedByteToInt(byte b) {
-        return (int) b & 0xFF;
     }
 }
