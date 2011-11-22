@@ -41,7 +41,6 @@ public class FilePresented {
         writeBuffer[1] = (byte) (input >> 16);
         writeBuffer[2] = (byte) (input >> 8);
         writeBuffer[3] = (byte) (input);
-
         return writeBuffer;
     }
     

@@ -4,7 +4,6 @@ package onscreen;
  *
  * @author Mattias
  */
-
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.LocalDevice;
@@ -12,7 +11,6 @@ import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
-
 
 public class BluetoothWaitThread implements Runnable {
 
@@ -32,18 +30,19 @@ public class BluetoothWaitThread implements Runnable {
             Notification.debugMessage("Could not initiate bluetooth..");
             return;
         }
-        
+
         // setup the server to listen for connection
         try {
             local.setDiscoverable(DiscoveryAgent.GIAC);
 
-            Notification.debugMessage(local.getBluetoothAddress() + "\n");
+            Notification.debugMessage("Local bluetooth address: " + local.getBluetoothAddress() + "\n");
 
             UUID uuid = new UUID(80087355); // "04c6093b-0000-1000-8000-00805f9b34fb"
             String url = "btspp://localhost:" + uuid.toString()
                     + ";name=OnScreen";
             notifier = (StreamConnectionNotifier) Connector.open(url);
         } catch (Exception e) {
+            Notification.debugMessage("Problem starting bluetooth.");
             return;
         }
 
@@ -55,7 +54,13 @@ public class BluetoothWaitThread implements Runnable {
                         new ConnectedThread(connection));
                 processThread.start();
             } catch (Exception e) {
-                e.printStackTrace();
+                Notification.debugMessage("Problem while waiting for connection. Restarting!");
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                }
+                Thread btWaitThread = new Thread(new BluetoothWaitThread());
+                btWaitThread.start();
                 return;
             }
         }

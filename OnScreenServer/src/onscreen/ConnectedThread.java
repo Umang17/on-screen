@@ -78,7 +78,6 @@ public class ConnectedThread implements Runnable, Observer {
             }
         } catch (Exception e) {
             Notification.debugMessage("Something went wrong ");
-            e.printStackTrace();
         }
     }
 
@@ -87,6 +86,7 @@ public class ConnectedThread implements Runnable, Observer {
             outputStream.write(1);
             outputStream.write(filePresented.getLengthofName());
             outputStream.write(filePresented.getNameAsByte());
+            presentationTimer.pause(this);
             outputStream.write(presentationTimer.getTime());
             outputStream.write(presentationTimer.getRunning());
             presentationTimer.addObserver(this);

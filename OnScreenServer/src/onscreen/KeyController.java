@@ -7,27 +7,30 @@ package onscreen;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Mattias
  */
 public class KeyController {
-    
-    private static final int EXIT = 0;   
+
+    private static final int EXIT = 0;
     private static final int NEXT = 2;
     private static final int PREVIOUS = 1;
     private static final int BLANK = 3;
     private Robot rob;
-    
-    public KeyController () {
+
+    public KeyController() {
         try {
             rob = new Robot();
-        } catch (AWTException ex) {}
+        } catch (AWTException ex) {
+        }
     }
 
     boolean recive(int read) {
-        switch(read) {
+        switch (read) {
             case EXIT:
                 exit();
                 return true;
@@ -45,8 +48,11 @@ public class KeyController {
     }
 
     void exit() {
-                        rob.keyPress(KeyEvent.VK_ESCAPE);
-                rob.keyPress(KeyEvent.VK_ESCAPE);
+        rob.keyPress(KeyEvent.VK_ESCAPE);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ex) {
+            }
+        rob.keyPress(KeyEvent.VK_ESCAPE);
     }
-    
 }

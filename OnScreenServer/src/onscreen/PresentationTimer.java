@@ -20,7 +20,7 @@ public class PresentationTimer extends Observable {
     public PresentationTimer(ConnectedThread caller) {
         start(caller);
     }
-    
+
     public synchronized void setRanTime(int ranTime) {
         collectedTime += ranTime;
     }
@@ -41,12 +41,18 @@ public class PresentationTimer extends Observable {
 
     public synchronized void reset(ConnectedThread caller) {
         collectedTime = 0;
+        pause = true;
+        collectedTime = getCurrentTime() - startTime;
         setChanged();
         notifyObservers(new NotifyThread(1, getRunning(), caller));
     }
 
     public synchronized byte[] getTime() {
-        return intToByte(getCurrentTime() - startTime + collectedTime);
+        if (pause) {
+            return intToByte(collectedTime);
+        } else {
+            return intToByte(getCurrentTime() - startTime + collectedTime);
+        }
     }
 
     private int getCurrentTime() {
@@ -62,7 +68,7 @@ public class PresentationTimer extends Observable {
             start(caller);
         }
     }
-    
+
     public byte getRunning() {
         if (pause) {
             return SEND_PAUSE;
