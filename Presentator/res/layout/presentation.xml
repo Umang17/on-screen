@@ -5,17 +5,18 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/linearLayoutTop"
+    <RelativeLayout
+        android:id="@+id/RelativeLayoutTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical" >
+        android:layout_alignParentTop="true" >
 
         <TextView
             android:id="@+id/presentationName"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="20dp"
             android:clickable="true"
@@ -28,7 +29,8 @@
         <LinearLayout
             android:id="@+id/linearLayoutNextPrev"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_below="@id/presentationName" >
 
             <ImageButton
                 android:id="@+id/prev"
@@ -48,14 +50,14 @@
                 android:onClick="onNextClick"
                 android:src="@drawable/ic_menu_forward" />
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/RelativeLayoutMiddle"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/linearLayoutBottom"
-        android:layout_below="@id/linearLayoutTop" >
+        android:layout_above="@+id/RelativeLayoutBottom"
+        android:layout_below="@id/RelativeLayoutTop" >
 
         <RelativeLayout
             android:id="@+id/RelativeLayout_start_stop"
@@ -84,12 +86,11 @@
         </RelativeLayout>
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayoutBottom"
+    <RelativeLayout
+        android:id="@+id/RelativeLayoutBottom"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical" >
+        android:layout_alignParentBottom="true" >
 
         <Button
             android:id="@+id/blankscreen"
@@ -97,6 +98,6 @@
             android:layout_height="wrap_content"
             android:onClick="onBlankClick"
             android:text="@string/blank_button" />
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
