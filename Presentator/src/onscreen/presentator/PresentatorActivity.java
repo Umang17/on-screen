@@ -11,6 +11,7 @@ import onscreen.presentator.nfc.ConcreteHandleTagIDDiscover;
 import onscreen.presentator.nfc.HandleTagIDDiscoverWithBlock;
 import onscreen.presentator.nfc.ReadNfcTag;
 import onscreen.presentator.utility.FileProgressDialog;
+import onscreen.presentator.utility.StopWatch;
 
 import android.app.Activity;
 import android.app.Dialog;
