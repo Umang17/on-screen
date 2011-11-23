@@ -1,67 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/presentationName"
+    <LinearLayout
+        android:id="@+id/linearLayoutTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_weight="0.02"
-        android:clickable="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:onClick="onPresentationClick"
-        android:text="@string/presentation_name"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        <TextView
+            android:id="@+id/presentationName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:lines="2"
+            android:onClick="onPresentationClick"
+            android:text="@string/open_presentation"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <ImageButton
-            android:id="@+id/prev"
-            android:layout_width="wrap_content"
-            android:layout_height="66dp"
-            android:layout_margin="10dp"
-            android:layout_weight="0.50"
-            android:onClick="onPrevClick"
-            android:src="@drawable/ic_menu_back" />
+        <LinearLayout
+            android:id="@+id/linearLayoutNextPrev"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
 
-        <ImageButton
-            android:id="@+id/next"
-            android:layout_width="wrap_content"
-            android:layout_height="66dp"
-            android:layout_margin="10dp"
-            android:layout_weight="0.50"
-            android:onClick="onNextClick"
-            android:src="@drawable/ic_menu_forward" />
+            <ImageButton
+                android:id="@+id/prev"
+                android:layout_width="fill_parent"
+                android:layout_height="66dp"
+                android:layout_margin="10dp"
+                android:layout_weight="0.50"
+                android:onClick="onPrevClick"
+                android:src="@drawable/ic_menu_back" />
+
+            <ImageButton
+                android:id="@+id/next"
+                android:layout_width="fill_parent"
+                android:layout_height="66dp"
+                android:layout_margin="10dp"
+                android:layout_weight="0.50"
+                android:onClick="onNextClick"
+                android:src="@drawable/ic_menu_forward" />
+        </LinearLayout>
     </LinearLayout>
 
-    <Chronometer
-        android:id="@+id/chrono"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.23"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/watch_zero"
-        android:textSize="80sp" />
+    <RelativeLayout
+        android:id="@+id/RelativeLayoutMiddle"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/linearLayoutBottom"
+        android:layout_below="@id/linearLayoutTop" >
 
-    <Button
-        android:id="@+id/start_stop"
+        <RelativeLayout
+            android:id="@+id/RelativeLayout_start_stop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:clickable="true"
+            android:onClick="onStartStopClick" >
+
+            <ImageView
+                android:id="@+id/start_stop_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="25dp"
+                android:src="@drawable/ic_media_play" />
+
+            <Chronometer
+                android:id="@+id/chrono"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="10dp"
+                android:text="@string/watch_zero"
+                android:textSize="60sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutBottom"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:onClick="onStartStopClick"
-        android:text="@string/start_button" />
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/blankscreen"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onBlankClick"
-        android:text="@string/blank_button" />
+        <Button
+            android:id="@+id/blankscreen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onBlankClick"
+            android:text="@string/blank_button" />
+    </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

@@ -18,8 +18,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -57,7 +57,7 @@ public class PresentatorActivity extends Activity {
 	private Dialog mTakeOverDialog;
 	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
 
-	private Button btnStartStop;
+	private ImageView imageStartStop;
 
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -131,7 +131,7 @@ public class PresentatorActivity extends Activity {
 
 		// Setting up clock
 		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
-		btnStartStop = (Button) findViewById(R.id.start_stop);
+		imageStartStop = (ImageView) findViewById(R.id.start_stop_image);
 
 		stopWatch = new StopWatch(chrono);
 
@@ -218,17 +218,17 @@ public class PresentatorActivity extends Activity {
 	}
 
 	private void startClockAndSetButtons() {
-		btnStartStop.setText(R.string.pause_button);
+		imageStartStop.setImageResource(R.drawable.ic_media_pause);
 		stopWatch.startClock();
 	}
 
 	private void pauseClockAndSetButtons() {
-		btnStartStop.setText(R.string.resume_button);
+		imageStartStop.setImageResource(R.drawable.ic_media_play);
 		stopWatch.pauseClock();
 	}
 
 	private void resetClockAndSetButtons() {
-		btnStartStop.setText(R.string.start_button);
+		imageStartStop.setImageResource(R.drawable.ic_media_play);
 		stopWatch.resetClock();
 	}
 
