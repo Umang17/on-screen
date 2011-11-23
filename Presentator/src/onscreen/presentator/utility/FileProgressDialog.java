@@ -1,5 +1,9 @@
-package onscreen.presentator;
+package onscreen.presentator.utility;
 
+import onscreen.presentator.R;
+import onscreen.presentator.R.id;
+import onscreen.presentator.R.layout;
+import onscreen.presentator.R.string;
 import android.app.Dialog;
 import android.content.Context;
 import android.widget.ProgressBar;

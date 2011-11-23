@@ -12,7 +12,7 @@ class StopWatch{
 	private WatchState state = WatchState.STOPPED;
 	
 	public StopWatch(final Chronometer chrono){
-		this.chrono=chrono;		
+		this.chrono=chrono;
 		resetClock();
 	}
 	
@@ -82,7 +82,7 @@ class StopWatch{
 	
 	private void setClockIsNotRunning(Long time) {
 		currentTimeLastStop=time;
-		isRunning=false;		
+		isRunning=false;
 	}
 	
 	private void setClockIsNotRunning(){

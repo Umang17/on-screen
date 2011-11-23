@@ -12,13 +12,14 @@ import android.bluetooth.BluetoothSocket;
 public class BluetoothConnection implements ConnectionInterface {
 	private static final UUID MY_UUID = UUID
 			.fromString("04c6093b-0000-1000-8000-00805f9b34fb");
-	
+
 	private BluetoothSocket mSocket = null;
-	
+	private BluetoothAdapter bluetoothAdapter;
+
 	public BluetoothConnection(String addr) {
-		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		BluetoothDevice device = bluetoothAdapter.getRemoteDevice(addr);
-		
+
 		// Get a BluetoothSocket to connect with the given BluetoothDevice
 		try {
 			// MY_UUID is the app's UUID string, also used by the server
@@ -27,7 +28,7 @@ public class BluetoothConnection implements ConnectionInterface {
 		} catch (IOException e) {
 			// TODO bluetooth not available
 		}
-	}	
+	}
 
 	public OutputStream getOutputStream() throws IOException {
 		try {
@@ -42,12 +43,13 @@ public class BluetoothConnection implements ConnectionInterface {
 			return mSocket.getInputStream();
 		} catch (NullPointerException e) {
 			return null;
-		}	
+		}
 	}
 
 	public void connect() throws IOException {
+		bluetoothAdapter.cancelDiscovery();
 		try {
-		mSocket.connect();
+			mSocket.connect();
 		} catch (NullPointerException e) {
 		}
 	}
@@ -58,5 +60,5 @@ public class BluetoothConnection implements ConnectionInterface {
 		} catch (NullPointerException e) {
 		}
 	}
-	
+
 }

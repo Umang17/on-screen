@@ -1,12 +1,16 @@
 package onscreen.presentator;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Observable;
+import java.util.Observer;
 
-import onscreen.presentator.communication.BluetoothConnection;
 import onscreen.presentator.communication.Connection;
+import onscreen.presentator.communication.ConnectionInterface;
+import onscreen.presentator.communication.TagParser;
+import onscreen.presentator.nfc.ConcreteHandleTagIDDiscover;
+import onscreen.presentator.nfc.HandleTagIDDiscoverWithBlock;
+import onscreen.presentator.nfc.ReadNfcTag;
+import onscreen.presentator.utility.FileProgressDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -28,7 +32,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class PresentatorActivity extends Activity {
+public class PresentatorActivity extends Activity implements Observer {
 
 	private Connection mConnection;
 	private File mPresentationFile = null;
@@ -150,8 +154,10 @@ public class PresentatorActivity extends Activity {
 
 		mConnection = new Connection(mHandler);
 
+		ConcreteHandleTagIDDiscover concreteHandler = new ConcreteHandleTagIDDiscover();
+		concreteHandler.addObserver(this);
 		handleTagIDDiscoverWithBlock = new HandleTagIDDiscoverWithBlock(
-				new ConcreteHandleTagIDDiscover(mConnection));
+				concreteHandler);
 
 		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
 		readNfcTag.onCreate(this);
@@ -294,14 +300,8 @@ public class PresentatorActivity extends Activity {
 			// TODO
 			return true;
 		case R.id.connect:
-			try {
-				BluetoothConnection bluetooth = new BluetoothConnection("00:1F:E1:EB:3B:DE");
-				mConnection.connect(bluetooth);
-			} catch (IOException ex) {
-				Logger.getLogger(PresentatorActivity.class.getName()).log(
-						Level.SEVERE, null, ex);
-				Log.d(TAG, "Didn't connect!");
-			}
+			mConnection.connect(TagParser.parse("bla"));
+			//TODO remove
 			Log.d(TAG, "After connect");
 			return true;
 		case R.id.disconnect:
@@ -350,6 +350,17 @@ public class PresentatorActivity extends Activity {
 			view.setText(mPresentationFile.getName());
 			upload();
 			break;
+		}
+	}
+
+	public void update(Observable arg0, Object arg1) {
+		if (arg0 instanceof ConcreteHandleTagIDDiscover) {
+			String tagID = ((ConcreteHandleTagIDDiscover) arg0).getTag();
+
+			ConnectionInterface connection = TagParser.parse(tagID);
+
+			mConnection.connect(connection);
+
 		}
 	}
 }

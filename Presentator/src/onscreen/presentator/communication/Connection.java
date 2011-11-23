@@ -157,7 +157,7 @@ public class Connection {
 		return mConnected;
 	}
 
-	public synchronized void connect(ConnectionInterface connection) throws IOException {
+	public synchronized void connect(ConnectionInterface connection) {
 		if (D)
 			Log.d(TAG, "connect to: " + mConnection);
 

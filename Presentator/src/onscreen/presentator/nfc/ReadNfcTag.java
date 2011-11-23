@@ -1,5 +1,6 @@
-package onscreen.presentator;
+package onscreen.presentator.nfc;
 
+import onscreen.presentator.PresentatorActivity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,8 +21,8 @@ public class ReadNfcTag {
 	private HandleTagIDDiscover hTIDD;
 
 	/**
-	 * Calls handleTagIDDiscover.handleTagIDDiscover(TagID)
-	 * when a new tagID is discovered.
+	 * Calls handleTagIDDiscover.handleTagIDDiscover(TagID) when a new tagID is
+	 * discovered.
 	 * 
 	 * @param handleTagIDDiscover
 	 */
@@ -39,9 +40,9 @@ public class ReadNfcTag {
 		}
 
 		// Handle all of our received NFC intents in this activity.
-		mNfcPendingIntent = PendingIntent
-				.getActivity(mainClass, 0, new Intent(mainClass, mainClass.getClass())
-						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+		mNfcPendingIntent = PendingIntent.getActivity(mainClass, 0, new Intent(
+				mainClass, mainClass.getClass())
+				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 	}
 
 	public void onResume(Intent intent) {
