@@ -31,17 +31,15 @@ public class TagParser {
 
 	private static ConnectionInterface parserHelper(String tagID) {
 		if (!validateTag(tagID)) {
-			BluetoothConnection connection = new BluetoothConnection(
-					"00:1F:E1:EB:3B:DE");
-			return connection; // TODO remove return null!
+			return new BluetoothConnection("00:1F:E1:EB:3B:DE");
+			// TODO removes
 		}
 		String addr = tagID.substring(1, tagID.length());
 		switch (getType(tagID)) {
 		case BLUETOOTH:
-			BluetoothConnection connection = new BluetoothConnection(addr);
-			return connection;
+			return new BluetoothConnection(addr);
 		case IP:
-			// TODO
+			return new IPConnection(addr);
 		default:
 			return null;
 		}

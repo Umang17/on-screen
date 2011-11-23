@@ -14,50 +14,53 @@ public class BluetoothConnection implements ConnectionInterface {
 			.fromString("04c6093b-0000-1000-8000-00805f9b34fb");
 
 	private BluetoothSocket mSocket = null;
-	private BluetoothAdapter bluetoothAdapter;
+	private BluetoothAdapter mBluetoothAdapter;
+	private BluetoothDevice mBlueToothDevice;
 
 	public BluetoothConnection(String addr) {
-		bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		BluetoothDevice device = bluetoothAdapter.getRemoteDevice(addr);
+		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		mBlueToothDevice = mBluetoothAdapter.getRemoteDevice(addr);
+	}
+
+	public OutputStream getOutputStream() throws IOException {
+		if (mSocket != null) {
+			return mSocket.getOutputStream();
+		}
+		return null;
+	}
+
+	public InputStream getInputStream() throws IOException {
+		if (mSocket != null) {
+			return mSocket.getInputStream();
+		}
+		return null;
+	}
+
+	public void connect() throws IOException {
+		if (mSocket != null) {
+			try {
+				mSocket.close();
+			} catch (IOException e) {
+			}
+		}
+		mBluetoothAdapter.cancelDiscovery();
 
 		// Get a BluetoothSocket to connect with the given BluetoothDevice
 		try {
 			// MY_UUID is the app's UUID string, also used by the server
 			// code
-			mSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+			mSocket = mBlueToothDevice
+					.createInsecureRfcommSocketToServiceRecord(MY_UUID);
 		} catch (IOException e) {
 			// TODO bluetooth not available
 		}
-	}
-
-	public OutputStream getOutputStream() throws IOException {
-		try {
-			return mSocket.getOutputStream();
-		} catch (NullPointerException e) {
-			return null;
-		}
-	}
-
-	public InputStream getInputStream() throws IOException {
-		try {
-			return mSocket.getInputStream();
-		} catch (NullPointerException e) {
-			return null;
-		}
-	}
-
-	public void connect() throws IOException {
-		bluetoothAdapter.cancelDiscovery();
-		try {
-			mSocket.connect();
-		} catch (NullPointerException e) {
-		}
+		mSocket.connect();
 	}
 
 	public void disconnect() throws IOException {
-		try {
+		if (mSocket != null) {
 			mSocket.close();
-		} catch (NullPointerException e) {
+			mSocket = null;
 		}
 	}
 
