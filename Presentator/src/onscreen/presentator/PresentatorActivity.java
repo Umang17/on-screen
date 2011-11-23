@@ -18,7 +18,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -123,11 +125,19 @@ public class PresentatorActivity extends Activity {
 		}
 	};
 
+	private void setControlButtons(boolean enable) {
+		((Button) findViewById(R.id.blankscreen)).setEnabled(enable);
+		((ImageButton) findViewById(R.id.next)).setEnabled(enable);
+		((ImageButton) findViewById(R.id.prev)).setEnabled(enable);
+	}
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.presentation);
+
+		setControlButtons(false);
 
 		// Setting up clock
 		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
@@ -323,6 +333,8 @@ public class PresentatorActivity extends Activity {
 				Log.d("SelectPDFReturn", "Not ok");
 				break;
 			}
+			// TODO Fix the enabling / disabling of buttons
+			setControlButtons(true);
 			String file = data.getStringExtra("File");
 			Log.d("debug", file);
 			File f = new File(file);
