@@ -9,7 +9,7 @@ import java.net.Socket;
 public class IPConnection implements ConnectionInterface {
 	private Socket mSocket = null;
 	private String mAddr;
-	private int mPort = 37;
+	private static final int mPort = 8633;
 
 	public IPConnection(String addr) {
 		mAddr = addr;
