@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import onscreen.presentator.communication.BluetoothConnection;
+import onscreen.presentator.communication.Connection;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -27,7 +30,7 @@ import android.widget.TextView;
 
 public class PresentatorActivity extends Activity {
 
-	private Bluetooth mBluetooth;
+	private Connection mConnection;
 	private File mPresentationFile = null;
 
 	public static final int MESSAGE_FILE_REC = 0;
@@ -51,7 +54,7 @@ public class PresentatorActivity extends Activity {
 	private int time;
 	private String name;
 
-	// private final String TAG = "PresentatorActivity";
+	private final String TAG = "PresentatorActivity";
 
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;
@@ -71,7 +74,7 @@ public class PresentatorActivity extends Activity {
 				if (mPresentationFile == null) {
 					break;
 				}
-				mBluetooth.sendPresentation(mPresentationFile);
+				upload();
 				break;
 
 			case MESSAGE_TAKE_OVER:
@@ -145,10 +148,10 @@ public class PresentatorActivity extends Activity {
 
 		stopWatch = new StopWatch(chrono);
 
-		mBluetooth = new Bluetooth(mHandler);
+		mConnection = new Connection(mHandler);
 
 		handleTagIDDiscoverWithBlock = new HandleTagIDDiscoverWithBlock(
-				new ConcreteHandleTagIDDiscover(mBluetooth));
+				new ConcreteHandleTagIDDiscover(mConnection));
 
 		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
 		readNfcTag.onCreate(this);
@@ -166,7 +169,7 @@ public class PresentatorActivity extends Activity {
 
 	private void upload() {
 		Log.d("Handler", "Before sending");
-		mBluetooth.sendPresentation(mPresentationFile);
+		mConnection.sendPresentation(mPresentationFile);
 		Log.d("Handler", "After sending");
 	}
 
@@ -174,8 +177,9 @@ public class PresentatorActivity extends Activity {
 		TextView view = (TextView) findViewById(R.id.presentationName);
 		view.setText(name);
 		stopWatch.setBaseTime(time);
+		Log.d("TIME", "Time is: " + time);
 		if (running) {
-			mBluetooth.sendStartClock();
+			mConnection.sendStartClock();
 			startClockAndSetButtons();
 		} else {
 			pauseClockAndSetButtons();
@@ -193,33 +197,33 @@ public class PresentatorActivity extends Activity {
 	}
 
 	public void onPrevClick(View v) {
-		mBluetooth.sendPrev();
+		mConnection.sendPrev();
 	}
 
 	public void onNextClick(View v) {
-		mBluetooth.sendNext();
+		mConnection.sendNext();
 	}
 
 	public void onBlankClick(View v) {
-		mBluetooth.sendBlank();
+		mConnection.sendBlank();
 	}
 
 	public void onStartStopClick(View v) {
 		switch (stopWatch.getState()) {
 		case RUNNING:
-			mBluetooth.sendPauseClock();
+			mConnection.sendPauseClock();
 			pauseClockAndSetButtons();
 			break;
 		case PAUSED:
 		case STOPPED:
 			startClockAndSetButtons();
-			mBluetooth.sendStartClock();
+			mConnection.sendStartClock();
 			break;
 		}
 	}
 
 	private void resetWatch() {
-		mBluetooth.sendResetClock();
+		mConnection.sendResetClock();
 		resetClockAndSetButtons();
 	}
 
@@ -254,10 +258,10 @@ public class PresentatorActivity extends Activity {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-			mBluetooth.sendNext();
+			mConnection.sendNext();
 			return true;
 		} else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-			mBluetooth.sendPrev();
+			mConnection.sendPrev();
 			return true;
 		}
 		return super.onKeyUp(keyCode, event);
@@ -291,14 +295,17 @@ public class PresentatorActivity extends Activity {
 			return true;
 		case R.id.connect:
 			try {
-				mBluetooth.connect("00:1F:E1:EB:3B:DE");
+				BluetoothConnection bluetooth = new BluetoothConnection("00:1F:E1:EB:3B:DE");
+				mConnection.connect(bluetooth);
 			} catch (IOException ex) {
 				Logger.getLogger(PresentatorActivity.class.getName()).log(
 						Level.SEVERE, null, ex);
+				Log.d(TAG, "Didn't connect!");
 			}
+			Log.d(TAG, "After connect");
 			return true;
 		case R.id.disconnect:
-			mBluetooth.stop();
+			mConnection.stop();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

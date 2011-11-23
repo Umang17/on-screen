@@ -4,19 +4,23 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import onscreen.presentator.communication.BluetoothConnection;
+import onscreen.presentator.communication.Connection;
+
 public class ConcreteHandleTagIDDiscover implements HandleTagIDDiscover {
 	
-	private Bluetooth mBluetooth;
+	private Connection mConnection;
 	final String bluetoothAdress = "00:1F:E1:EB:3B:DE";
 
-	public ConcreteHandleTagIDDiscover(Bluetooth mBluetooth){
-		this.mBluetooth=mBluetooth;
+	public ConcreteHandleTagIDDiscover(Connection connection){
+		this.mConnection = connection;
 	}
 
 	public void handleTagIDDiscover(String tagID) {
-		if (!mBluetooth.isConnected()){
+		if (!mConnection.isConnected()){
 			try {
-				mBluetooth.connect(bluetoothAdress);
+				BluetoothConnection bluetooth = new BluetoothConnection("00:1F:E1:EB:3B:DE");
+				mConnection.connect(bluetooth);
 			} catch (IOException ex) {
 				Logger.getLogger(PresentatorActivity.class.getName()).log(
 						Level.SEVERE, null, ex);
