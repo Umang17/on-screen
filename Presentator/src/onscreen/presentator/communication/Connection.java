@@ -18,7 +18,7 @@ import android.util.Log;
 
 public class Connection {
 
-	private static final String TAG = "Bluetooth";
+	private static final String TAG = "Connection";
 	private static final boolean D = true;
 
 	private final Handler mHandler;
@@ -111,7 +111,7 @@ public class Connection {
 
 	public synchronized void connect(ConnectionInterface connection) {
 		if (D)
-			Log.d(TAG, "connect to: " + mConnection);
+			Log.d(TAG, "connect to: " + connection);
 
 		mConnection = connection;
 		// Cancel any thread currently running a connection
