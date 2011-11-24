@@ -85,8 +85,6 @@ public class PresentatorActivity extends Activity implements Observer {
 			getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 					R.layout.titlebar);
 		}
-		ImageView image = (ImageView) findViewById(R.id.titleImage);
-		image.setImageResource(R.drawable.got_connection);
 
 		setControlButtons(false);
 
