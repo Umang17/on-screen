@@ -13,7 +13,7 @@ public class FilePresented {
 
     public FilePresented(String path, String name) {
         this.path = path;
-        this.name = name;
+        this.name = name; 
     }
 
     public synchronized File getFile() {

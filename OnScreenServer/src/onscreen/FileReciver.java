@@ -20,7 +20,7 @@ public class FileReciver {
         fileLocation = homeFolder + separator + "OnScreen" + separator;
     }
 
-    public synchronized FilePresented reciveFile(BufferedInputStream stream) {
+    public synchronized FilePresented reciveFile(BufferedInputStream stream) throws IOException {
         Notification.debugMessage("Starting to recive file");
 
         int size = read(stream, 8, 4);
@@ -33,7 +33,7 @@ public class FileReciver {
         return reciveFile(stream, size, fileName);
     }
 
-    private FilePresented reciveFile(BufferedInputStream stream, int size, String fileName) {
+    private FilePresented reciveFile(BufferedInputStream stream, int size, String fileName) throws IOException {
         WriteBuffer wb = new WriteBuffer();
 
         File file = new File(fileLocation + fileName);
@@ -64,8 +64,13 @@ public class FileReciver {
             }
         } catch (IOException ex) {
             Notification.debugMessage("Failed in reciving or writing data");
-        }
+        } catch (NullPointerException ex) {
+        } 
         fw.close();
+
+        if (file.length() > size - 100 && file.length() < size + 100) {
+            throw new IOException("Something went wrong when reciving the file try again!");
+        }
         FilePresented filePres = new FilePresented(fileLocation, file.getName());
         return filePres;
     }

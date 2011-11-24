@@ -72,12 +72,12 @@ public class ConnectedThread implements Runnable, Observer {
                         presentationTimer.control(bufferedInputStream.read(), this);
                         break;
                     default:
-                        Notification.debugMessage("Unknown control sequence " + command);
+                        Notification.debugMessage("Unknown control sequence: " + command);
                         break;
                 }
             }
         } catch (Exception e) {
-            Notification.debugMessage("Something went wrong ");
+            Notification.debugMessage("Something went wrong: " + e.getMessage());
         }
     }
 

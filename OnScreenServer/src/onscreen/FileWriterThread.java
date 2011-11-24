@@ -38,6 +38,8 @@ public class FileWriterThread extends Thread {
         try {
             out.write(bytes);
         } catch (IOException ex) {
+        } catch (NullPointerException ex) {
+            close();
         }
     }
 

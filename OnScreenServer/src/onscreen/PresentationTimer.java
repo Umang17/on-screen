@@ -33,18 +33,21 @@ public class PresentationTimer extends Observable {
     }
 
     public synchronized void pause(ConnectedThread caller) {
-        pause = true;
-        collectedTime = getCurrentTime() - startTime;
-        setChanged();
-        notifyObservers(new NotifyThread(0, getRunning(), caller));
+        if (!pause) {
+            collectedTime = getCurrentTime() - startTime;
+            pause = true;
+            setChanged();
+            notifyObservers(new NotifyThread(0, getRunning(), caller));
+        }
     }
 
     public synchronized void reset(ConnectedThread caller) {
         collectedTime = 0;
-        pause = true;
-        collectedTime = getCurrentTime() - startTime;
-        setChanged();
-        notifyObservers(new NotifyThread(1, getRunning(), caller));
+        if (!pause) {
+            pause = true;
+            setChanged();
+            notifyObservers(new NotifyThread(1, getRunning(), caller));
+        }
     }
 
     public synchronized byte[] getTime() {
