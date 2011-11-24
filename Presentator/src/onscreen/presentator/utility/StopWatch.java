@@ -1,10 +1,12 @@
 package onscreen.presentator.utility;
 
+import android.content.Context;
 import android.os.SystemClock;
+import android.util.AttributeSet;
 import android.widget.Chronometer;
 
-public class StopWatch {
-	private Chronometer chrono;
+public class StopWatch extends Chronometer {
+
 	private Long currentTimeLastStop;
 	private boolean isRunning = false;
 	private boolean clockReseted = true;
@@ -15,9 +17,12 @@ public class StopWatch {
 
 	private WatchState state = WatchState.STOPPED;
 
-	public StopWatch(final Chronometer chrono) {
-		this.chrono = chrono;
-		resetClock();
+	public StopWatch(Context context) {
+		super(context);
+	}
+	
+	public StopWatch(Context context, AttributeSet attr) {
+		super(context, attr);
 	}
 
 	/**
@@ -27,7 +32,7 @@ public class StopWatch {
 		if (!isRunning) {
 			return getRestoreTime() / 1000;
 		} else {
-			return (time() - chrono.getBase()) / 1000;
+			return (time() - this.getBase()) / 1000;
 		}
 	}
 
@@ -38,7 +43,7 @@ public class StopWatch {
 	 */
 	public void setBaseTime(int time) {
 		Long time2 = time();
-		chrono.setBase(time2 - time * 1000);
+		this.setBase(time2 - time * 1000);
 		clockReseted = false;
 		currentTimeLastStop = time2;
 	}
@@ -51,35 +56,35 @@ public class StopWatch {
 			return;
 
 		if (clockReseted) {
-			chrono.setBase(time());
+			this.setBase(time());
 		} else {
 			long time = getRestoreTime();
-			chrono.setBase(time);
+			this.setBase(time);
 		}
 
-		chrono.start();
+		this.start();
 		isRunning = true;
 		clockReseted = false;
 		state = WatchState.RUNNING;
 	}
 
 	private long getRestoreTime() {
-		return chrono.getBase() + time() - currentTimeLastStop;
+		return this.getBase() + time() - currentTimeLastStop;
 	}
 
 	public void pauseClock() {
 		if (!isRunning) {
 			return;
 		}
-		chrono.stop();
+		this.stop();
 		setClockIsNotRunning();
 		state = WatchState.PAUSED;
 	}
 
 	public void resetClock() {
-		chrono.setBase(time());
-		chrono.refreshDrawableState();
-		chrono.stop();
+		this.setBase(time());
+		this.refreshDrawableState();
+		this.stop();
 		setClockIsNotRunning();
 		clockReseted = true;
 		state = WatchState.STOPPED;
