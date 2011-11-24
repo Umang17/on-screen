@@ -110,7 +110,7 @@ public class Connection {
 	}
 	
 	public String getAddr() {
-		if (mConnection == null) {
+		if (mConnection == null || !mConnected) {
 			return null;
 		}
 		return mConnection.getAddr();

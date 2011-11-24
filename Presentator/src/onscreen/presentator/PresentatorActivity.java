@@ -163,7 +163,11 @@ public class PresentatorActivity extends Activity implements Observer {
 			resetWatch();
 			return true;
 		case R.id.connect:
-			mConnection.connect(TagParser.parse("bla"));
+			ConnectionInterface connection = TagParser.parse("bla");
+			if (connection.getAddr() != mConnection.getAddr()) {
+				mConnection.stop();
+				mConnection.connect(connection);
+			}
 			// TODO remove
 			Log.d(TAG, "After connect");
 			return true;
