@@ -51,6 +51,7 @@ public class ConnectedThread implements Runnable, Observer {
                 switch (command) {
                     case EXIT_CMD:
                         Notification.debugMessage("Killing connection.");
+                        presentationTimer.deleteObserver(this);
                         mConnection.close();
                         return;
                     case FILE:

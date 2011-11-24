@@ -43,17 +43,19 @@ public class PresentationTimer extends Observable {
 
     public synchronized void reset(ConnectedThread caller) {
         collectedTime = 0;
-        if (!pause) {
-            pause = true;
-            setChanged();
-            notifyObservers(new NotifyThread(1, getRunning(), caller));
-        }
+
+        pause = true;
+        setChanged();
+        notifyObservers(new NotifyThread(1, getRunning(), caller));
+
     }
 
     public synchronized byte[] getTime() {
         if (pause) {
+            Notification.debugMessage("Sending time " + (collectedTime));
             return intToByte(collectedTime);
         } else {
+            Notification.debugMessage("Sending time: " + (getCurrentTime() - startTime + collectedTime));
             return intToByte(getCurrentTime() - startTime + collectedTime);
         }
     }
