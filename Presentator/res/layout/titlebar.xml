@@ -16,8 +16,9 @@
         android:id="@+id/titleImage"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:padding="2dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:background="@drawable/ic_media_pause" />
+        android:background="@drawable/got_connection" />
 
 </RelativeLayout>
