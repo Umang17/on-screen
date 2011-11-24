@@ -16,9 +16,11 @@ public class PresentationTimer extends Observable {
     private int startTime;
     private int collectedTime;
     private boolean pause = false;
+    private ClockPrinter clockprinter;
 
     public PresentationTimer(ConnectedThread caller) {
         start(caller);
+        clockprinter=new ClockPrinter(this);
     }
 
     public synchronized void setRanTime(int ranTime) {
