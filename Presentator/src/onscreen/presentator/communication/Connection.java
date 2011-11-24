@@ -315,7 +315,6 @@ public class Connection {
 
 		public ConnectingThread(ConnectionInterface connection) {
 			mmConnection = connection;
-
 		}
 
 		@Override
@@ -326,10 +325,10 @@ public class Connection {
 					connected(mmConnection);
 					return;
 				} catch (IOException e) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e1) {
-					}
+				}
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
 				}
 			}
 			connectionFailed();

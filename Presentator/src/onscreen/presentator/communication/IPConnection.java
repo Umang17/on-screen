@@ -47,4 +47,8 @@ public class IPConnection implements ConnectionInterface {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "IPConnection: " + mAddr;
+	}
 }

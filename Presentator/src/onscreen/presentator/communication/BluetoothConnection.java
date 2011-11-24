@@ -64,4 +64,8 @@ public class BluetoothConnection implements ConnectionInterface {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "BluetoothConnection: " + mBlueToothDevice.getAddress();
+	}
 }
