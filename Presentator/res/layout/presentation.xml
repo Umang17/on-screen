@@ -19,10 +19,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="20dp"
-            android:clickable="true"
             android:gravity="center_vertical|center_horizontal"
             android:lines="2"
-            android:onClick="onPresentationClick"
             android:text="@string/open_presentation"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 

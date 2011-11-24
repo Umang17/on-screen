@@ -268,10 +268,6 @@ public class PresentatorActivity extends Activity implements Observer {
 		}
 	}
 
-	public void onPresentationClick(View v) {
-		openSelectPresentation();
-	}
-
 	private void setControlButtons(boolean enable) {
 		((Button) findViewById(R.id.blankscreen)).setEnabled(enable);
 		((ImageButton) findViewById(R.id.next)).setEnabled(enable);
