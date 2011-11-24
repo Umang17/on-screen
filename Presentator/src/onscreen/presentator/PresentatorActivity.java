@@ -356,9 +356,11 @@ public class PresentatorActivity extends Activity implements Observer {
 			String tagID = ((ConcreteHandleTagIDDiscover) arg0).getTag();
 
 			ConnectionInterface connection = TagParser.parse(tagID);
-
-			mConnection.connect(connection);
-
+			
+			if (connection.getAddr() != mConnection.getAddr()) {
+				mConnection.stop();
+				mConnection.connect(connection);
+			}
 		}
 	}
 }

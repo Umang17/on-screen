@@ -22,9 +22,9 @@ public class Connection {
 	private static final boolean D = true;
 
 	private final Handler mHandler;
-	private ConnectedThread mConnectedThread;
-	private ConnectingThread mConnectingThread;
-	private ConnectionInterface mConnection;
+	private ConnectedThread mConnectedThread = null;
+	private ConnectingThread mConnectingThread = null;
+	private ConnectionInterface mConnection = null;
 
 	private boolean mConnected = false;
 
@@ -107,6 +107,13 @@ public class Connection {
 
 	public boolean isConnected() {
 		return mConnected;
+	}
+	
+	public String getAddr() {
+		if (mConnection == null) {
+			return null;
+		}
+		return mConnection.getAddr();
 	}
 
 	public synchronized void connect(ConnectionInterface connection) {

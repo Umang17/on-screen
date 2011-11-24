@@ -16,10 +16,12 @@ public class BluetoothConnection implements ConnectionInterface {
 	private BluetoothSocket mSocket = null;
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothDevice mBlueToothDevice;
+	private String mAddr = null;
 
 	public BluetoothConnection(String addr) {
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBlueToothDevice = mBluetoothAdapter.getRemoteDevice(addr);
+		mAddr = addr;
 	}
 
 	public OutputStream getOutputStream() throws IOException {
@@ -62,6 +64,10 @@ public class BluetoothConnection implements ConnectionInterface {
 			mSocket.close();
 			mSocket = null;
 		}
+	}
+
+	public String getAddr() {
+		return mAddr;
 	}
 
 	@Override
