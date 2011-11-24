@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import onscreen.presentator.PresentatorActivity;
+import onscreen.presentator.utility.ByteOperation;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,7 +21,6 @@ public class Connection {
 	private static final String TAG = "Bluetooth";
 	private static final boolean D = true;
 
-	// private final BluetoothAdapter mAdapter;
 	private final Handler mHandler;
 	private ConnectedThread mConnectedThread;
 	private ConnectingThread mConnectingThread;
@@ -105,54 +105,6 @@ public class Connection {
 		sendClockSetting(COMMAND_RESET); // Reset
 	}
 
-	private final byte[] longToBytes(long v) {
-		byte[] writeBuffer = new byte[8];
-
-		writeBuffer[0] = (byte) (v >>> 56);
-		writeBuffer[1] = (byte) (v >>> 48);
-		writeBuffer[2] = (byte) (v >>> 40);
-		writeBuffer[3] = (byte) (v >>> 32);
-		writeBuffer[4] = (byte) (v >>> 24);
-		writeBuffer[5] = (byte) (v >>> 16);
-		writeBuffer[6] = (byte) (v >>> 8);
-		writeBuffer[7] = (byte) (v >>> 0);
-
-		return writeBuffer;
-	}
-
-	private final byte[] intToBytes(int v) {
-		byte[] writeBuffer = new byte[4];
-
-		writeBuffer[0] = (byte) (v >>> 24);
-		writeBuffer[1] = (byte) (v >>> 16);
-		writeBuffer[2] = (byte) (v >>> 8);
-		writeBuffer[3] = (byte) (v >>> 0);
-
-		return writeBuffer;
-	}
-
-	private final int bytesToInt(byte[] b) {
-		int i = 0;
-
-		i += unsignedByteToInt(b[0]) << 24;
-		i += unsignedByteToInt(b[1]) << 16;
-		i += unsignedByteToInt(b[2]) << 8;
-		i += unsignedByteToInt(b[3]);
-		return i;
-	}
-
-	private static int unsignedByteToInt(byte b) {
-		return (int) b & 0xFF;
-	}
-
-	private final byte[] charArrayToBytes(char[] array) {
-		byte[] bytes = new byte[array.length];
-		for (int i = 0; i < array.length; i++) {
-			bytes[i] = (byte) array[i];
-		}
-		return bytes;
-	}
-
 	public boolean isConnected() {
 		return mConnected;
 	}
@@ -207,7 +159,6 @@ public class Connection {
 			mConnectedThread.cancel();
 			mConnectedThread = null;
 		}
-
 	}
 
 	/**
@@ -267,23 +218,32 @@ public class Connection {
 			if (D)
 				Log.d(TAG, "sent type");
 
-			mConnectedThread.write(longToBytes(length)); // send the size of the
-															// byte stream.
+			mConnectedThread.write(ByteOperation.longToBytes(length)); // send
+																		// the
+																		// size
+																		// of
+																		// the
+			// byte stream.
 			if (D)
 				Log.d(TAG, "sent length" + length);
 
 			String name = file.getName();
 			char[] nameChar = name.toCharArray();
 			int nameSize = nameChar.length;
-			mConnectedThread.write(intToBytes(nameSize)); // send the size of
-															// the
-															// name
+			mConnectedThread.write(ByteOperation.intToBytes(nameSize)); // send
+																		// the
+																		// size
+																		// of
+			// the
+			// name
 			if (D)
 				Log.d(TAG, "sent name size");
 
-			mConnectedThread.write(charArrayToBytes(nameChar)); // send the name
-																// of
-																// the file
+			mConnectedThread.write(ByteOperation.charArrayToBytes(nameChar)); // send
+																				// the
+																				// name
+			// of
+			// the file
 			if (D)
 				Log.d(TAG, "sent all but file...");
 
@@ -301,13 +261,12 @@ public class Connection {
 						.sendToTarget();
 			}
 
-			mConnectedThread.write(intToBytes(10));
+			mConnectedThread.write(ByteOperation.intToBytes(10));
 			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC,
 					length).sendToTarget();
 
 			return null;
 		}
-
 	}
 
 	private class ConnectingThread extends Thread {
@@ -341,7 +300,6 @@ public class Connection {
 			} catch (IOException e) {
 			}
 		}
-
 	}
 
 	private class ConnectedThread extends Thread {
@@ -405,7 +363,7 @@ public class Connection {
 						}
 						if (D)
 							Log.d(TAG, "read (4) " + read);
-						int size = bytesToInt(buffer);
+						int size = ByteOperation.bytesToInt(buffer);
 						if (D)
 							Log.d(TAG, "length = " + size);
 
@@ -439,7 +397,7 @@ public class Connection {
 							offset = offset + bytes - 1;
 							length = length - bytes;
 						}
-						int time = bytesToInt(buffer);
+						int time = ByteOperation.bytesToInt(buffer);
 						if (D)
 							Log.d(TAG, "time = " + time);
 
@@ -501,7 +459,6 @@ public class Connection {
 			} catch (IOException e) {
 				if (D)
 					Log.d(TAG, "write failed");
-
 			}
 		}
 
@@ -512,7 +469,5 @@ public class Connection {
 			} catch (IOException e) {
 			}
 		}
-
 	}
-
 }
