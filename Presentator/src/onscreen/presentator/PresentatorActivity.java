@@ -297,12 +297,9 @@ public class PresentatorActivity extends Activity implements Observer {
 		case R.id.menu_reset_watch:
 			resetWatch();
 			return true;
-		case R.id.open_settings:
-			// TODO
-			return true;
 		case R.id.connect:
 			mConnection.connect(TagParser.parse("bla"));
-			//TODO remove
+			// TODO remove
 			Log.d(TAG, "After connect");
 			return true;
 		case R.id.disconnect:
