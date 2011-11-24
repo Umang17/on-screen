@@ -52,6 +52,9 @@ public class PresentatorActivity extends Activity implements Observer {
 	public static final int STATE_TAKE_OVER = 1;
 	public static final int STATE_LOAD = 2;
 
+	private static final int DIALOG_FILE_PROGRESS = 0;
+	private static final int DIALOG_TAKE_OVER = 1;
+
 	public int state = 0;
 
 	// used while taking over
@@ -63,81 +66,12 @@ public class PresentatorActivity extends Activity implements Observer {
 
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;
-	private FileProgressDialog mFileProgressDialog;
-	private Dialog mTakeOverDialog;
+	private FileProgressDialog mFileProgressDialog = null;
 	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
 
 	private ImageView imageStartStop;
 
-	private final Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-
-			case MESSAGE_NO_PRES:
-				Log.d("Handler", "no pres!");
-				if (mPresentationFile == null) {
-					break;
-				}
-				upload();
-				break;
-
-			case MESSAGE_TAKE_OVER:
-				Log.d("Handler", "taking over");
-				Bundle bundle = (Bundle) msg.obj;
-				name = bundle.getString(BUNDLE_NAME);
-				time = bundle.getInt(BUNDLE_TIME);
-				running = bundle.getBoolean(BUNDLE_RUNNING);
-
-				if (mPresentationFile != null) {
-					mTakeOverDialog.show();
-				} else {
-					takeOver();
-				}
-
-				break;
-
-			case MESSAGE_FILE_REC:
-				Log.d("Handler", "file rec...");
-				mFileProgressDialog.cancel();
-				stopWatch.resetClock();
-				startClockAndSetButtons();
-				break;
-
-			case MESSAGE_PROGRESS_START:
-				Log.d("Handler", "progress start...");
-				mFileProgressDialog.setFileSize((Long) msg.obj);
-				// maybe use setMax...
-				mFileProgressDialog.show();
-				break;
-
-			case MESSAGE_PROGRESS_INC:
-				// maybe incr with the size of the BYTE_SIZE
-				mFileProgressDialog.setProgress((Long) msg.obj);
-				break;
-
-			case MESSAGE_CLOCK:
-				boolean runningClock = msg.arg1 == 1 ? true : false;
-				boolean reset = msg.arg2 == 1 ? true : false;
-
-				if (reset) {
-					resetClockAndSetButtons();
-				}
-				if (runningClock) {
-					startClockAndSetButtons();
-				} else {
-					pauseClockAndSetButtons();
-				}
-				break;
-			}
-		}
-	};
-
-	private void setControlButtons(boolean enable) {
-		((Button) findViewById(R.id.blankscreen)).setEnabled(enable);
-		((ImageButton) findViewById(R.id.next)).setEnabled(enable);
-		((ImageButton) findViewById(R.id.prev)).setEnabled(enable);
-	}
+	private final Handler mHandler = new PresentatorHandler();
 
 	/** Called when the activity is first created. */
 	@Override
@@ -162,95 +96,28 @@ public class PresentatorActivity extends Activity implements Observer {
 
 		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
 		readNfcTag.onCreate(this);
-
-		mFileProgressDialog = new FileProgressDialog(this, 0);
-		mFileProgressDialog.setCancelable(false); // can't cancel with back
-													// button
-
-		mTakeOverDialog = new Dialog(this);
-		LinearLayout ll = (LinearLayout) LayoutInflater.from(this).inflate(
-				R.layout.take_over_dialog, null);
-		mTakeOverDialog.setContentView(ll);
-
 	}
 
-	private void upload() {
-		Log.d("Handler", "Before sending");
-		mConnection.sendPresentation(mPresentationFile);
-		Log.d("Handler", "After sending");
-	}
-
-	private void takeOver() {
-		TextView view = (TextView) findViewById(R.id.presentationName);
-		view.setText(name);
-		stopWatch.setBaseTime(time);
-		Log.d("TIME", "Time is: " + time);
-		if (running) {
-			mConnection.sendStartClock();
-			startClockAndSetButtons();
-		} else {
-			pauseClockAndSetButtons();
-		}
-	}
-
-	public void onUploadClick(View v) {
-		mTakeOverDialog.dismiss();
-		upload();
-	}
-
-	public void onTakeOverClick(View v) {
-		mTakeOverDialog.dismiss();
-		takeOver();
-	}
-
-	public void onPrevClick(View v) {
-		mConnection.sendPrev();
-	}
-
-	public void onNextClick(View v) {
-		mConnection.sendNext();
-	}
-
-	public void onBlankClick(View v) {
-		mConnection.sendBlank();
-	}
-
-	public void onStartStopClick(View v) {
-		switch (stopWatch.getState()) {
-		case RUNNING:
-			mConnection.sendPauseClock();
-			pauseClockAndSetButtons();
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog;
+		switch (id) {
+		case DIALOG_FILE_PROGRESS:
+			mFileProgressDialog = new FileProgressDialog(this, 0);
+			mFileProgressDialog.setCancelable(false);
+			dialog = mFileProgressDialog;
 			break;
-		case PAUSED:
-		case STOPPED:
-			startClockAndSetButtons();
-			mConnection.sendStartClock();
+		case DIALOG_TAKE_OVER:
+			dialog = new Dialog(this);
+			LinearLayout ll = (LinearLayout) LayoutInflater.from(this).inflate(
+					R.layout.take_over_dialog, null);
+			dialog.setContentView(ll);
+			break;
+		default:
+			dialog = null;
 			break;
 		}
-	}
-
-	private void resetWatch() {
-		mConnection.sendResetClock();
-		resetClockAndSetButtons();
-	}
-
-	public void onPresentationClick(View v) {
-		openSelectPresentation();
-	}
-
-	private void startClockAndSetButtons() {
-		imageStartStop.setImageResource(R.drawable.ic_media_pause);
-		stopWatch.startClock();
-	}
-
-	private void pauseClockAndSetButtons() {
-		imageStartStop.setImageResource(R.drawable.ic_media_play);
-		stopWatch.pauseClock();
-	}
-
-	private void resetClockAndSetButtons() {
-		imageStartStop.setImageResource(R.drawable.ic_media_play);
-		stopWatch.resetClock();
+		return dialog;
 	}
 
 	@Override
@@ -281,13 +148,6 @@ public class PresentatorActivity extends Activity implements Observer {
 		return true;
 	}
 
-	private void openSelectPresentation() {
-		// Start the PDF selector
-		Intent loadIntent = new Intent(PresentatorActivity.this,
-				SelectPDFActivity.class);
-		startActivityForResult(loadIntent, STATE_LOAD);
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -312,7 +172,6 @@ public class PresentatorActivity extends Activity implements Observer {
 
 	@Override
 	protected void onPause() {
-		mFileProgressDialog.cancel();
 		readNfcTag.onPause();
 		super.onPause();
 	}
@@ -356,10 +215,165 @@ public class PresentatorActivity extends Activity implements Observer {
 			String tagID = ((ConcreteHandleTagIDDiscover) arg0).getTag();
 
 			ConnectionInterface connection = TagParser.parse(tagID);
-			
+
 			if (connection.getAddr() != mConnection.getAddr()) {
 				mConnection.stop();
 				mConnection.connect(connection);
+			}
+		}
+	}
+
+	public void onUploadClick(View v) {
+		dismissDialog(DIALOG_TAKE_OVER);
+		upload();
+	}
+
+	public void onTakeOverClick(View v) {
+		dismissDialog(DIALOG_TAKE_OVER);
+		takeOver();
+	}
+
+	public void onPrevClick(View v) {
+		mConnection.sendPrev();
+	}
+
+	public void onNextClick(View v) {
+		mConnection.sendNext();
+	}
+
+	public void onBlankClick(View v) {
+		mConnection.sendBlank();
+	}
+
+	public void onStartStopClick(View v) {
+		switch (stopWatch.getState()) {
+		case RUNNING:
+			mConnection.sendPauseClock();
+			pauseClockAndSetButtons();
+			break;
+		case PAUSED:
+		case STOPPED:
+			startClockAndSetButtons();
+			mConnection.sendStartClock();
+			break;
+		}
+	}
+
+	public void onPresentationClick(View v) {
+		openSelectPresentation();
+	}
+
+	private void setControlButtons(boolean enable) {
+		((Button) findViewById(R.id.blankscreen)).setEnabled(enable);
+		((ImageButton) findViewById(R.id.next)).setEnabled(enable);
+		((ImageButton) findViewById(R.id.prev)).setEnabled(enable);
+	}
+
+	private void upload() {
+		Log.d("Handler", "Before sending");
+		mConnection.sendPresentation(mPresentationFile);
+		Log.d("Handler", "After sending");
+	}
+
+	private void takeOver() {
+		TextView view = (TextView) findViewById(R.id.presentationName);
+		view.setText(name);
+		stopWatch.setBaseTime(time);
+		Log.d("TIME", "Time is: " + time);
+		if (running) {
+			mConnection.sendStartClock();
+			startClockAndSetButtons();
+		} else {
+			pauseClockAndSetButtons();
+		}
+	}
+
+	private void resetWatch() {
+		mConnection.sendResetClock();
+		resetClockAndSetButtons();
+	}
+
+	private void startClockAndSetButtons() {
+		imageStartStop.setImageResource(R.drawable.ic_media_pause);
+		stopWatch.startClock();
+	}
+
+	private void pauseClockAndSetButtons() {
+		imageStartStop.setImageResource(R.drawable.ic_media_play);
+		stopWatch.pauseClock();
+	}
+
+	private void resetClockAndSetButtons() {
+		imageStartStop.setImageResource(R.drawable.ic_media_play);
+		stopWatch.resetClock();
+	}
+
+	private void openSelectPresentation() {
+		// Start the PDF selector
+		Intent loadIntent = new Intent(PresentatorActivity.this,
+				SelectPDFActivity.class);
+		startActivityForResult(loadIntent, STATE_LOAD);
+	}
+
+	private class PresentatorHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+
+			case MESSAGE_NO_PRES:
+				Log.d("Handler", "no pres!");
+				if (mPresentationFile == null) {
+					break;
+				}
+				upload();
+				break;
+
+			case MESSAGE_TAKE_OVER:
+				Log.d("Handler", "taking over");
+				Bundle bundle = (Bundle) msg.obj;
+				name = bundle.getString(BUNDLE_NAME);
+				time = bundle.getInt(BUNDLE_TIME);
+				running = bundle.getBoolean(BUNDLE_RUNNING);
+
+				if (mPresentationFile != null) {
+					showDialog(DIALOG_TAKE_OVER);
+				} else {
+					takeOver();
+				}
+				break;
+
+			case MESSAGE_FILE_REC:
+				Log.d("Handler", "file rec...");
+				dismissDialog(DIALOG_FILE_PROGRESS);
+				stopWatch.resetClock();
+				startClockAndSetButtons();
+				break;
+
+			case MESSAGE_PROGRESS_START:
+				Log.d("Handler", "progress start...");
+				// maybe use setMax...
+				showDialog(DIALOG_FILE_PROGRESS);
+				mFileProgressDialog.setFileSize((Long) msg.obj);
+				break;
+
+			case MESSAGE_PROGRESS_INC:
+				// maybe incr with the size of the BYTE_SIZE
+				mFileProgressDialog.setProgress((Long) msg.obj);
+				break;
+
+			case MESSAGE_CLOCK:
+				boolean runningClock = msg.arg1 == 1 ? true : false;
+				boolean reset = msg.arg2 == 1 ? true : false;
+
+				if (reset) {
+					resetClockAndSetButtons();
+				}
+				if (runningClock) {
+					startClockAndSetButtons();
+				} else {
+					pauseClockAndSetButtons();
+				}
+				break;
 			}
 		}
 	}
