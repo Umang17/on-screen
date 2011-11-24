@@ -193,7 +193,7 @@ public class PresentatorActivity extends Activity implements Observer {
 		}
 	}
 
-	public void OnUploadClick(View v) {
+	public void onUploadClick(View v) {
 		mTakeOverDialog.dismiss();
 		upload();
 	}
