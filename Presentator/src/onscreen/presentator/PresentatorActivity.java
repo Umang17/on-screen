@@ -26,8 +26,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
-import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -77,15 +77,20 @@ public class PresentatorActivity extends Activity implements Observer {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		final boolean customTitleSupported = requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+
 		setContentView(R.layout.presentation);
+
+		if (customTitleSupported) {
+			getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
+					R.layout.titlebar);
+		}
 
 		setControlButtons(false);
 
 		// Setting up clock
-		Chronometer chrono = (Chronometer) findViewById(R.id.chrono);
+		stopWatch = (StopWatch) findViewById(R.id.chrono);
 		imageStartStop = (ImageView) findViewById(R.id.start_stop_image);
-
-		stopWatch = new StopWatch(chrono);
 
 		mConnection = new Connection(mHandler);
 

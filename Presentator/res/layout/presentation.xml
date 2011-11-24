@@ -75,7 +75,7 @@
                 android:layout_marginLeft="25dp"
                 android:src="@drawable/ic_media_play" />
 
-            <Chronometer
+            <onscreen.presentator.utility.StopWatch
                 android:id="@+id/chrono"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
