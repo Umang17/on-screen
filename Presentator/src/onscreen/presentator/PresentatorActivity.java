@@ -44,6 +44,8 @@ public class PresentatorActivity extends Activity implements Observer {
 	public static final int MESSAGE_PROGRESS_INC = 3;
 	public static final int MESSAGE_PROGRESS_START = 4;
 	public static final int MESSAGE_CLOCK = 5;
+	public static final int MESSAGE_CONNECTED = 6;
+	public static final int MESSAGE_DISCONNECTED = 7;
 
 	public static final String BUNDLE_NAME = "Name";
 	public static final String BUNDLE_TIME = "Time";
@@ -319,11 +321,22 @@ public class PresentatorActivity extends Activity implements Observer {
 				SelectPDFActivity.class);
 		startActivityForResult(loadIntent, STATE_LOAD);
 	}
-
+	
 	private class PresentatorHandler extends Handler {
+
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
+			
+			case MESSAGE_CONNECTED:
+				ImageView connected = (ImageView) findViewById(R.id.titleImage);
+				connected.setImageResource(R.drawable.connected);
+				break;
+				
+			case MESSAGE_DISCONNECTED:
+				ImageView disconnected = (ImageView) findViewById(R.id.titleImage);
+				disconnected.setImageResource(R.drawable.disconnected);
+				break;
 
 			case MESSAGE_NO_PRES:
 				Log.d("Handler", "no pres!");

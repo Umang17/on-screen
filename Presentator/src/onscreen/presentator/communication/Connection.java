@@ -135,6 +135,7 @@ public class Connection {
 	public synchronized void connected(ConnectionInterface connection) {
 		if (D)
 			Log.d(TAG, "connected");
+		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_CONNECTED);
 
 		// Cancel any thread currently running a connection
 		if (mConnectedThread != null) {
@@ -156,6 +157,7 @@ public class Connection {
 		if (D)
 			Log.d(TAG, "stop");
 		mConnected = false;
+		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_DISCONNECTED);
 
 		if (mConnectingThread != null) {
 			mConnectingThread.cancel();
@@ -175,6 +177,7 @@ public class Connection {
 		if (D)
 			Log.d(TAG, "in connectionFailed");
 		mConnected = false;
+		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_DISCONNECTED);
 		// Send a failure message back to the Activity
 		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
 		// Bundle bundle = new Bundle();
@@ -193,6 +196,7 @@ public class Connection {
 		if (D)
 			Log.d(TAG, "in connectionLost");
 		mConnected = false;
+		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_DISCONNECTED);
 		// Send a failure message back to the Activity
 		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
 		// Bundle bundle = new Bundle();
@@ -225,32 +229,22 @@ public class Connection {
 			if (D)
 				Log.d(TAG, "sent type");
 
-			mConnectedThread.write(ByteOperation.longToBytes(length)); // send
-																		// the
-																		// size
-																		// of
-																		// the
-			// byte stream.
+			// send the size of the byte stream
+			mConnectedThread.write(ByteOperation.longToBytes(length)); 
 			if (D)
 				Log.d(TAG, "sent length" + length);
 
 			String name = file.getName();
 			char[] nameChar = name.toCharArray();
 			int nameSize = nameChar.length;
-			mConnectedThread.write(ByteOperation.intToBytes(nameSize)); // send
-																		// the
-																		// size
-																		// of
-			// the
-			// name
+			// send the size of the name
+			mConnectedThread.write(ByteOperation.intToBytes(nameSize));
 			if (D)
 				Log.d(TAG, "sent name size");
 
-			mConnectedThread.write(ByteOperation.charArrayToBytes(nameChar)); // send
-																				// the
-																				// name
-			// of
-			// the file
+			// send the name of the file
+			mConnectedThread.write(ByteOperation.charArrayToBytes(nameChar));
+
 			if (D)
 				Log.d(TAG, "sent all but file...");
 
