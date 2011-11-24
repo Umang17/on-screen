@@ -23,6 +23,27 @@ public class TagParser {
 		for (String s : addresses) {
 			ConnectionInterface connection = parserHelper(s);
 			if (connection != null) {
+				
+				// BluetoothAdapter bluetoothAdapter =
+				// BluetoothAdapter.getDefaultAdapter();
+				// if (bluetoothAdapter == null) {
+				// // bluetooth not existing on the device
+				// continue;
+				// }
+				// if (bluetoothAdapter.isEnabled()) {
+				// // check if bluetooth is enabled
+				// }
+				//
+				// ConnectivityManager connManager = (ConnectivityManager)
+				// getSystemService(PresentatorActivity.CONNECTIVITY_SERVICE);
+				// NetworkInfo mWifi =
+				// connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+				//
+				// if (mWifi.isConnected()) {
+				// // Do whatever
+				// }
+
+				
 				return connection;
 			}
 		}
