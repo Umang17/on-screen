@@ -1,8 +1,6 @@
 package onscreen;
 
 import java.awt.AWTException;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -16,7 +14,7 @@ public class Notification {
 
     private static boolean debug = true;
     private static boolean init = false;
-    private static TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("src/tray.gif"));
+    private static TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("C:\\tray.gif"));
 
     private static void init() {
         SystemTray tray = SystemTray.getSystemTray();
@@ -26,27 +24,16 @@ public class Notification {
             return;
         }
         ActionListener exitListener = new ActionListener() {
-
+            
+            @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Exiting...");
                 System.exit(0);
             }
         };
-        PopupMenu popup = new PopupMenu();
-        MenuItem defaultItem = new MenuItem("Exit");
-        defaultItem.addActionListener(exitListener);
-        popup.add(defaultItem);
-
-        ActionListener actionListener = new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                trayIcon.displayMessage("Action Event",
-                        "An Action Event Has Been Performed!",
-                        TrayIcon.MessageType.INFO);
-            }
-        };
+ 
         trayIcon.setImageAutoSize(true);
-    trayIcon.addActionListener(actionListener);
+        trayIcon.addActionListener(exitListener);
         init = true;
     }
 

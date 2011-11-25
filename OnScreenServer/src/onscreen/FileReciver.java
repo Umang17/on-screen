@@ -74,25 +74,22 @@ public class FileReciver {
         FileWriterThread fw = new FileWriterThread(wb, file);
         fw.start();
         try {
-            for (int a = 0; a < size + NUM_BYTES;) {
-                byte[] bytes = new byte[NUM_BYTES];
+            for (int a = 0; a < size;) {
+                int use = NUM_BYTES;
+                if ((a + NUM_BYTES) > size) {
+                    use = size - a;
+                } 
+                byte[] bytes = new byte[use];
                 int read = stream.read(bytes);
-
-                // Makes sure all bytes are written to the file and not to much
-                // data.
-                if (read < 0) {
-                    break;
-                } else if (read < NUM_BYTES) {
-                    wb.put(subArray(bytes, 0, read));
-                    break;
-                } else if (read == NUM_BYTES) {
-                    wb.put(bytes);
-                }
+                wb.put(subArray(bytes, 0, read));
+                 
                 a += read;
+                Notification.debugMessage("read= " + a + "size = " + size);
             }
         } catch (IOException ex) {
             Notification.debugMessage("Failed in reciving or writing data");
         } catch (NullPointerException ex) {
+            Notification.debugMessage("Failed in reciving or writing data np excpe");
         }
         fw.close();
 
