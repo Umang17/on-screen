@@ -73,7 +73,17 @@ public class ReadNfcTag {
 		if (mNfcAdapter == null) {
 			return;
 		}
-		mNfcAdapter.disableForegroundDispatch(mainClass);
+		try {
+			mNfcAdapter.disableForegroundDispatch(mainClass);
+		} catch (Exception e) {
+			try {
+				if(!mNfcAdapter.isEnabled()){
+					mNfcAdapter = NfcAdapter.getDefaultAdapter(mainClass);
+				}
+			} catch (Exception e2) {}
+			
+		}
+		
 	}
 
 	/**
