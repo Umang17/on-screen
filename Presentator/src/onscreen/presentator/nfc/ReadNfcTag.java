@@ -1,6 +1,6 @@
 package onscreen.presentator.nfc;
 
-import onscreen.presentator.PresentatorActivity;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -17,7 +17,7 @@ public class ReadNfcTag {
 	private PendingIntent mNfcPendingIntent;
 	private IntentFilter[] mWriteTagFilters;
 
-	private PresentatorActivity mainClass;
+	private Activity mainClass;
 	private NfcAdapter mNfcAdapter;
 
 	private HandleTagDiscover hTIDD;
@@ -34,7 +34,12 @@ public class ReadNfcTag {
 		hTIDD = handleTagIDDiscover;
 	}
 
-	public void onCreate(PresentatorActivity mainClass) {
+	/**
+	 * The class that you want to handle the intents in.
+	 * Use this in your onCreate-method.
+	 * @param mainClass
+	 */
+	public void onCreate(Activity mainClass) {
 
 		this.mainClass = mainClass;
 

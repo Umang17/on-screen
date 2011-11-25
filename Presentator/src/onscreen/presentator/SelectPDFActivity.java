@@ -4,6 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import onscreen.presentator.nfc.ConcreteHandleTagDiscover;
+import onscreen.presentator.nfc.HandleTagDiscoverWithBlock;
+import onscreen.presentator.nfc.ReadNfcTag;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -20,6 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class SelectPDFActivity extends ListActivity {
 	private final ArrayList<PdfFile> allPDFs = new ArrayList<PdfFile>();
+	private ReadNfcTag readNfcTag;
 	private static final String TAG = "SelectPDF";
 
 	@Override
@@ -52,8 +57,31 @@ public class SelectPDFActivity extends ListActivity {
 				finish();
 			}
 		});
+		ConcreteHandleTagDiscover concreteHandler = new ConcreteHandleTagDiscover();
+		HandleTagDiscoverWithBlock handleTagIDDiscoverWithBlock = new HandleTagDiscoverWithBlock(
+				concreteHandler);
+		
+		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
+		readNfcTag.onCreate(this);
 	}
 
+	@Override
+	protected void onPause() {
+		readNfcTag.onPause();
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		readNfcTag.onResume(getIntent());
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		readNfcTag.onNewIntent(intent);
+	}
+	
 	/**
 	 * Adds all PDF files on the phone to the list.
 	 */
