@@ -22,6 +22,10 @@ public class FileReciver {
         String homeFolder = System.getProperty("user.home");
         separator = System.getProperty("file.separator");
         fileLocation = homeFolder + separator + "OnScreen" + separator;
+        File dir = new File(fileLocation);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
     }
 
     /**
