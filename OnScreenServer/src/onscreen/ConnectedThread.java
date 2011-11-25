@@ -113,11 +113,11 @@ public class ConnectedThread implements Runnable, Observer {
     }
 
     /**
-     * Runned when a file is recived. Takes care of killing the old presentation,
+     * Runs when a file is recived. Takes care of killing the old presentation,
      * reciving the new file, and starting that presentation and timer. Also 
      * sends a start message to the phone to start presenting.
      * 
-     * @throws IOException in case the outstream is not writable.
+     * @throws IOException in case the out stream is not writable.
      */
     private void startPresenting() throws IOException {
         if (filePresented != null) {
