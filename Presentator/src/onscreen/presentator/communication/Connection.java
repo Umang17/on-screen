@@ -253,19 +253,20 @@ public class Connection {
 
 				byte[] buffer = new byte[BYTE_SIZE];
 
-				for (long i = 0; i <= length; i += BYTE_SIZE) {
+				int read = 0;
+				for (long i = 0; i < length; i += read) {
 					try {
-						buf.read(buffer);
+						read = buf.read(buffer);
+						mConnectedThread.write(buffer, 0, read);
+						mHandler.obtainMessage(
+								PresentatorActivity.MESSAGE_PROGRESS_INC, i)
+								.sendToTarget();
 					} catch (IOException e) {
 						return null;
 					}
-					mConnectedThread.write(buffer);
-					mHandler.obtainMessage(
-							PresentatorActivity.MESSAGE_PROGRESS_INC, i)
-							.sendToTarget();
 				}
-
-				mConnectedThread.write(ByteOperation.intToBytes(10));
+				// TODO WTF is this 10???
+				// mConnectedThread.write(ByteOperation.intToBytes(10));
 				mHandler.obtainMessage(
 						PresentatorActivity.MESSAGE_PROGRESS_INC, length)
 						.sendToTarget();
@@ -457,6 +458,16 @@ public class Connection {
 		public void write(byte[] bytes) {
 			try {
 				mmOutStream.write(bytes);
+			} catch (IOException e) {
+				if (D)
+					Log.d(TAG, "writing failed");
+				connectionLost();
+			}
+		}
+
+		public void write(byte[] buffer, int offset, int count) {
+			try {
+				mmOutStream.write(buffer, offset, count);
 			} catch (IOException e) {
 				if (D)
 					Log.d(TAG, "writing failed");
