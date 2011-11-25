@@ -353,6 +353,9 @@ public class Connection {
 					int controlInt = mmInStream.read();
 
 					switch (controlInt) {
+					case -1:
+						connectionLost();
+						break;
 					case 0: // no presentation...
 						mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_NO_PRES);
 						break;
@@ -456,6 +459,7 @@ public class Connection {
 			} catch (IOException e) {
 				if (D)
 					Log.d(TAG, "writing failed");
+				connectionLost();
 			}
 		}
 
@@ -466,6 +470,7 @@ public class Connection {
 			} catch (IOException e) {
 				if (D)
 					Log.d(TAG, "write failed");
+				connectionLost();
 			}
 		}
 

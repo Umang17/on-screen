@@ -12,6 +12,7 @@
     <string name="presenting_file">Presenting: %1$s</string>
     <string name="transferring_file">Transferring: %1$s</string>
     <string name="selected_file">Selected: %1$s</string>
+    <string name="disconnected_message">Disconnected from server.</string>
 
     <!-- PDFActivity -->
     <string name="pdf_none_found">Didn\'t find any PDF files on the phone.</string>
