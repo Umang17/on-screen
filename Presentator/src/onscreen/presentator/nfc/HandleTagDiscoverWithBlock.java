@@ -3,14 +3,14 @@ package onscreen.presentator.nfc;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class HandleTagIDDiscoverWithBlock implements HandleTagIDDiscover {
+public class HandleTagDiscoverWithBlock implements HandleTagDiscover {
 
 	private Timer timer;
 	private boolean blocked = false;
 	private final long blockedTime = 1000;
-	private HandleTagIDDiscover cHTIDD;
+	private HandleTagDiscover cHTIDD;
 
-	public HandleTagIDDiscoverWithBlock(HandleTagIDDiscover cHTIDD) {
+	public HandleTagDiscoverWithBlock(HandleTagDiscover cHTIDD) {
 		this.cHTIDD = cHTIDD;
 		timer = new Timer();
 	}
@@ -22,14 +22,14 @@ public class HandleTagIDDiscoverWithBlock implements HandleTagIDDiscover {
 		}
 	}
 
-	public void handleTagIDDiscover(String tagID) {
+	public void handleTagDiscover(String tagID) {
 		if (blocked) { // Ignorde multiple tagsscan within blockedTime.
 			return;
 		}
 		blocked = true;
 		timer.schedule(new resetBlockTimerTask(), blockedTime);
 
-		cHTIDD.handleTagIDDiscover(tagID);
+		cHTIDD.handleTagDiscover(tagID);
 	}
 
 }

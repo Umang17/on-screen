@@ -7,8 +7,8 @@ import java.util.Observer;
 import onscreen.presentator.communication.Connection;
 import onscreen.presentator.communication.ConnectionInterface;
 import onscreen.presentator.communication.TagParser;
-import onscreen.presentator.nfc.ConcreteHandleTagIDDiscover;
-import onscreen.presentator.nfc.HandleTagIDDiscoverWithBlock;
+import onscreen.presentator.nfc.ConcreteHandleTagDiscover;
+import onscreen.presentator.nfc.HandleTagDiscoverWithBlock;
 import onscreen.presentator.nfc.ReadNfcTag;
 import onscreen.presentator.utility.FileProgressDialog;
 import onscreen.presentator.utility.StopWatch;
@@ -69,7 +69,7 @@ public class PresentatorActivity extends Activity implements Observer {
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;
 	private FileProgressDialog mFileProgressDialog = null;
-	private HandleTagIDDiscoverWithBlock handleTagIDDiscoverWithBlock;
+	private HandleTagDiscoverWithBlock handleTagIDDiscoverWithBlock;
 
 	private ImageView imageStartStop;
 
@@ -96,9 +96,9 @@ public class PresentatorActivity extends Activity implements Observer {
 
 		mConnection = new Connection(mHandler);
 
-		ConcreteHandleTagIDDiscover concreteHandler = new ConcreteHandleTagIDDiscover();
+		ConcreteHandleTagDiscover concreteHandler = new ConcreteHandleTagDiscover();
 		concreteHandler.addObserver(this);
-		handleTagIDDiscoverWithBlock = new HandleTagIDDiscoverWithBlock(
+		handleTagIDDiscoverWithBlock = new HandleTagDiscoverWithBlock(
 				concreteHandler);
 
 		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
@@ -220,8 +220,8 @@ public class PresentatorActivity extends Activity implements Observer {
 	}
 
 	public void update(Observable arg0, Object arg1) {
-		if (arg0 instanceof ConcreteHandleTagIDDiscover) {
-			String tagID = ((ConcreteHandleTagIDDiscover) arg0).getTag();
+		if (arg0 instanceof ConcreteHandleTagDiscover) {
+			String tagID = ((ConcreteHandleTagDiscover) arg0).getTag();
 
 			ConnectionInterface connection = TagParser.parse(tagID);
 
