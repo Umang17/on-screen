@@ -1,9 +1,5 @@
 package onscreen;
 
-/**
- *
- * @author Mattias
- */
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.LocalDevice;
@@ -12,6 +8,12 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
 
+/**
+ * BluetoothWaitThread sets up the bluetooth adapater and waits for 
+ * phones to connect. 
+ * 
+ * @author Mattias
+ */
 public class BluetoothWaitThread implements Runnable {
 
     @Override
@@ -19,8 +21,11 @@ public class BluetoothWaitThread implements Runnable {
         waitForConnection();
     }
 
+    /**
+     * Starts a bluetooth connection and waits for phones.
+     */
     private void waitForConnection() {
-        // retrieve the local Bluetooth device object
+        // retrieve the local Bluetooth device
         LocalDevice local = null;
         StreamConnectionNotifier notifier;
         StreamConnection connection = null;
@@ -54,10 +59,12 @@ public class BluetoothWaitThread implements Runnable {
                         new ConnectedThread(connection));
                 processThread.start();
             } catch (Exception e) {
+                // try to hande problems with bluetooth waiting. 
                 Notification.debugMessage("Problem while waiting for connection. Restarting!");
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
+                    return;
                 }
                 Thread btWaitThread = new Thread(new BluetoothWaitThread());
                 btWaitThread.start();

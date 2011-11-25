@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
+ * The file writer thread are responisble to write a file to disk from a queue. 
  *
  * @author Mattias
  */
@@ -16,6 +17,12 @@ public class FileWriterThread extends Thread {
     private BufferedOutputStream out = null;
     private WriteBuffer wb;
 
+    /**
+     * Creates a new file writer thread to write a file to disk.
+     * 
+     * @param wb the write buffer to read from
+     * @param file the file to write to 
+     */
     public FileWriterThread(WriteBuffer wb, File file) {
         this.wb = wb;
         fileName = file;
@@ -27,6 +34,9 @@ public class FileWriterThread extends Thread {
         }
     }
 
+    /**
+     * Starts the thread and returns when interrupted.
+     */
     @Override
     public void run() {
         while (!isInterrupted()) {
@@ -34,6 +44,11 @@ public class FileWriterThread extends Thread {
         }
     }
 
+    /**
+     * Writes a byte array to the file. Closes the file on a nullpointer exception.
+     * 
+     * @param bytes the bytes to write
+     */
     public synchronized void write(byte[] bytes) {
         try {
             out.write(bytes);
@@ -43,6 +58,10 @@ public class FileWriterThread extends Thread {
         }
     }
 
+    /**
+     * Finishes the filewriter by closing the stream and interrupting forcing 
+     * run to terminate and thread to die.
+     */
     public synchronized void close() {
         try {
             out.flush();

@@ -3,9 +3,10 @@ package onscreen;
 import java.io.File;
 
 /**
+ * The main class, starts all connections and handles the pdf reader and arguments 
+ * to the program.
  *
  * @author Mattias
- * 
  */
 public class OnScreen {
 
@@ -18,15 +19,17 @@ public class OnScreen {
     static final String LANOFFSETTING = "nolan";
     static boolean BT = true;
     static boolean LAN = true;
-    public static MouseController mouseController;
     public static String pdfReader;
     static KeyController keyController;
 
     /**
+     * Creates a new server system for the onscreen.
+     * 
      * @param args the command line arguments
      */
+    // TODO: Linux bluetooth
+    // TODO: Better reading of arguments
     public static void main(String[] args) {
-        mouseController = new MouseController();
         keyController = new KeyController();
 
         if (args.length > 0) {

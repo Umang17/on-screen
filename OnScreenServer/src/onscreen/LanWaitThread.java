@@ -1,31 +1,36 @@
 package onscreen;
 
-/**
- *
- * @author Mattias
- */
 import java.io.IOException;
 import javax.microedition.io.SocketConnection;
 import com.intel.bluetooth.gcf.socket.ServerSocketConnection;
 
+/**
+ * Sets up a lan connection and wait for a connecting phone.
+ * 
+ * @author Mattias
+ */
 public class LanWaitThread implements Runnable {
 
     public static int PORT = 8633;
 
+    /**
+     * Run the thread to start and wait.
+     */
     @Override
     public void run() {
         waitForConnection();
     }
 
+    /**
+     * Starts the connection and waits for a connection.
+     */
     private void waitForConnection() {
-
-        // Use a normal server socket connection
         try {
             ServerSocketConnection scn = new ServerSocketConnection(PORT);
             SocketConnection connection;
+            Notification.debugMessage("Local lan address: "
+                    + scn.getLocalAddress() + ":" + PORT + "\n");
             while (true) {
-                Notification.debugMessage("Local lan address: "
-                        + scn.getLocalAddress() + ":" + PORT + "\n");
                 connection = (SocketConnection) scn.acceptAndOpen();
 
                 Thread processThread = new Thread(
@@ -33,6 +38,7 @@ public class LanWaitThread implements Runnable {
                 processThread.start();
             }
         } catch (IOException e) {
+            // Attempts to restart and finding a free port in case of problem.
             Notification.debugMessage("Failed on LAN. Restarting!\n");
             PORT++;
             try {

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Recives a file on a connection and take care of writing it to file.
  *
  * @author Mattias
  */
@@ -14,12 +15,23 @@ public class FileReciver {
     private String fileLocation;
     private String separator;
 
+    /**
+     * Creates a new file reciver and sets the folder properties.
+     */
     public FileReciver() {
         String homeFolder = System.getProperty("user.home");
         separator = System.getProperty("file.separator");
         fileLocation = homeFolder + separator + "OnScreen" + separator;
     }
 
+    /**
+     * Reciving the file from an connection and writes it to disk. also reads the 
+     * file data suck as size and name.
+     *  
+     * @param stream the inputstream to recive from 
+     * @return a file presented
+     * @throws IOException if there is a problem reading or writing
+     */
     public synchronized FilePresented reciveFile(BufferedInputStream stream) throws IOException {
         Notification.debugMessage("Starting to recive file");
 
@@ -33,9 +45,19 @@ public class FileReciver {
         return reciveFile(stream, size, fileName);
     }
 
+    /**
+     * Recives the actual file and writes it to disk.
+     * 
+     * @param stream the stream to recive from
+     * @param size the size of the file, in bytes
+     * @param fileName the name of the file
+     * @return the file recived 
+     * @throws IOException if problem writing or reading
+     */
     private FilePresented reciveFile(BufferedInputStream stream, int size, String fileName) throws IOException {
         WriteBuffer wb = new WriteBuffer();
 
+        // Creates the file and makes sure that it does not exist already.
         File file = new File(fileLocation + fileName);
         System.out.println(fileName);
         for (int i = 0; file.exists();) {
@@ -44,45 +66,62 @@ public class FileReciver {
             file = new File(fileLocation + fName + i++ + "." + type);
         }
 
+        // Creates a new thread to write the file
         FileWriterThread fw = new FileWriterThread(wb, file);
         fw.start();
         try {
             for (int a = 0; a < size + NUM_BYTES;) {
                 byte[] bytes = new byte[NUM_BYTES];
                 int read = stream.read(bytes);
+
+                // Makes sure all bytes are written to the file and not to much
+                // data.
                 if (read < 0) {
                     break;
-                }
-                if (read == NUM_BYTES) {
-                    wb.put(bytes);
-                }
-                if (read < NUM_BYTES) {
+                } else if (read < NUM_BYTES) {
                     wb.put(subArray(bytes, 0, read));
                     break;
+                } else if (read == NUM_BYTES) {
+                    wb.put(bytes);
                 }
                 a += read;
             }
         } catch (IOException ex) {
             Notification.debugMessage("Failed in reciving or writing data");
         } catch (NullPointerException ex) {
-        } 
+        }
         fw.close();
 
+        // Check if the file is close in size to what it's supposed to be.
         if (file.length() > size - 100 && file.length() < size + 100) {
             throw new IOException("Something went wrong when reciving the file try again!");
         }
+
         FilePresented filePres = new FilePresented(fileLocation, file.getName());
         return filePres;
     }
 
-    private String byteToString(byte[] imageNameByte) {
-        char[] chars = new char[imageNameByte.length];
-        for (int i = 0; i < imageNameByte.length; i++) {
-            chars[i] = (char) imageNameByte[i];
+    /**
+     * Creates a string from the recived byte array
+     * 
+     * @param bytes the bytes to transform
+     * @return the string represented by the bytes
+     */
+    private String byteToString(byte[] bytes) {
+        char[] chars = new char[bytes.length];
+        for (int i = 0; i < bytes.length; i++) {
+            chars[i] = (char) bytes[i];
         }
         return String.copyValueOf(chars);
     }
 
+    /**
+     * Creates a int from a recived byte array.
+     * 
+     * @param b the byte array to transform
+     * @param offset the position where to start in the byte array
+     * @return the int representing the byte array
+     */
     private static int byteArrayToInt(byte[] b, int offset) {
         int i = 0;
         int pos = offset;
@@ -93,14 +132,35 @@ public class FileReciver {
         return i;
     }
 
+    /**
+     * Creates a int from a byte
+     * 
+     * @param b the byte
+     * @return a int 
+     */
     private static int unsignedByteToInt(byte b) {
         return (int) b & 0xFF;
     }
 
+    /**
+     * Reads a number of bytes from a stream offset defaults to 0.
+     * 
+     * @param stream the stream to read from
+     * @param i the length to read
+     * @return the read integer
+     */
     private int read(BufferedInputStream stream, int i) {
         return read(stream, i, 0);
     }
 
+    /**
+     * Reads a int from the stream
+     * 
+     * @param stream the stream to read from 
+     * @param i the length to read
+     * @param offset the offset to read 
+     * @return the read integer
+     */
     private int read(BufferedInputStream stream, int i, int offset) {
         byte[] sizeBytes = new byte[i];
         try {
@@ -112,6 +172,13 @@ public class FileReciver {
         return byteArrayToInt(sizeBytes, offset);
     }
 
+    /**
+     * Reads a string from the stream
+     * 
+     * @param stream the stream to read from
+     * @param nameSize the size of the stream to run
+     * @return the string read from the stream
+     */
     private String readString(BufferedInputStream stream, int nameSize) {
         byte[] imageNameByte = new byte[nameSize];
 
@@ -123,6 +190,14 @@ public class FileReciver {
         return byteToString(imageNameByte);
     }
 
+    /**
+     * Creates a subarray between indexes for a byte array
+     *  
+     * @param bytes the original byte array
+     * @param first the first byte
+     * @param last the last byte
+     * @return the byte array stripped down
+     */
     private byte[] subArray(byte[] bytes, int first, int last) {
         byte[] stripped = new byte[last - first];
         for (int i = first; i < last; i++) {

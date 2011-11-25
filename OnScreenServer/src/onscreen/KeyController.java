@@ -7,11 +7,11 @@ package onscreen;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
+ * Controls the system by sending key events to the system, used to control a 
+ * presentation.
+ * 
  * @author Mattias
  */
 public class KeyController {
@@ -22,6 +22,9 @@ public class KeyController {
     private static final int BLANK = 3;
     private Robot rob;
 
+    /**
+     * Attempts to create a new controller robot.
+     */
     public KeyController() {
         try {
             rob = new Robot();
@@ -29,6 +32,13 @@ public class KeyController {
         }
     }
 
+    /**
+     * Recives a int with a control code and performs the corresponding action on 
+     * the system.
+     * 
+     * @param read the control int
+     * @return true if the system should exit presentation mode, false otherwise.
+     */
     boolean recive(int read) {
         switch (read) {
             case EXIT:
@@ -47,12 +57,15 @@ public class KeyController {
         return false;
     }
 
+    /**
+     * Sends a exist signal to the system.
+     */
     void exit() {
         rob.keyPress(KeyEvent.VK_ESCAPE);
         try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
-            }
+        }
         rob.keyPress(KeyEvent.VK_ESCAPE);
     }
 }

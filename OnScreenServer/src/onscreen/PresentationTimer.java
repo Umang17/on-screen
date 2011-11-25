@@ -3,6 +3,7 @@ package onscreen;
 import java.util.Observable;
 
 /**
+ * Remembers and controls the timer of the presentation.
  *
  * @author Mattias
  */
@@ -17,14 +18,29 @@ public class PresentationTimer extends Observable {
     private int collectedTime;
     private boolean pause = false;
 
+    /**
+     * Creates a new presentation timer 
+     * 
+     * @param caller the caller is not to be notified of this event again!
+     */
     public PresentationTimer(ConnectedThread caller) {
         start(caller);
     }
 
+    /**
+     * Appends the previous ran time to the current collected time.
+     * 
+     * @param ranTime the time to add to the timer 
+     */
     public synchronized void setRanTime(int ranTime) {
         collectedTime += ranTime;
     }
 
+    /**
+     * Start the timer, is safe to call multiple times.
+     * 
+     * @param caller the caller is not to be notified of this event again!
+     */
     public synchronized void start(ConnectedThread caller) {
         if (pause) {
             pause = false;
@@ -34,6 +50,11 @@ public class PresentationTimer extends Observable {
         }
     }
 
+    /**
+     * Pauses the timer, is safe to call multiple times.
+     * 
+     * @param caller the caller is not to be notified of this event again!
+     */
     public synchronized void pause(ConnectedThread caller) {
         if (!pause) {
             collectedTime += getCurrentTime() - startTime;
@@ -43,6 +64,11 @@ public class PresentationTimer extends Observable {
         }
     }
 
+    /**
+     * Resets the timer, is NOT safe to call multiple times.
+     * 
+     * @param caller the caller is not to be notified of this event again!
+     */
     public synchronized void reset(ConnectedThread caller) {
         collectedTime = 0;
         pause = true;
@@ -51,6 +77,11 @@ public class PresentationTimer extends Observable {
 
     }
 
+    /**
+     * Get the current time ran for the timer.
+     *  
+     * @return the current time as byte array
+     */
     public synchronized byte[] getTime() {
         if (pause) {
             Notification.debugMessage("Sending time(pause): " + (collectedTime));
@@ -61,10 +92,21 @@ public class PresentationTimer extends Observable {
         }
     }
 
+    /**
+     * Get the current time for the system.
+     * 
+     * @return the current time for the system in seconds
+     */
     private int getCurrentTime() {
         return (int) (System.currentTimeMillis() / 1000);
     }
 
+    /**
+     * Handels incoming control messages.
+     *  
+     * @param read the message to handle
+     * @param caller the caller is not to be notified of this event again! 
+     */
     public void control(int read, ConnectedThread caller) {
         if (read == RESET) {
             reset(caller);
@@ -75,6 +117,11 @@ public class PresentationTimer extends Observable {
         }
     }
 
+    /**
+     * Get whether the timer is running or not.
+     * 
+     * @return 1 if running 0 if not
+     */
     public byte getRunning() {
         if (pause) {
             return SEND_PAUSE;
@@ -83,6 +130,12 @@ public class PresentationTimer extends Observable {
         }
     }
 
+    /**
+     * Transforms a integer to a byte array of length 4.
+     * 
+     * @param input the integer
+     * @return the byte array representing the integer
+     */
     private byte[] intToByte(int input) {
         byte[] writeBuffer = new byte[4];
         writeBuffer[0] = (byte) (input >> 24);

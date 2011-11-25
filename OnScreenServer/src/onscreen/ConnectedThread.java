@@ -1,9 +1,5 @@
 package onscreen;
 
-/**
- *
- * @author Mattias
- */
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,6 +7,12 @@ import java.util.Observable;
 import java.util.Observer;
 import javax.microedition.io.StreamConnection;
 
+/**
+ * Connected thread is lanunched when a connection is initialized. It does all 
+ * handling of the connection and creates in/outstreams. 
+ * 
+ * @author Mattias
+ */
 public class ConnectedThread implements Runnable, Observer {
 
     private StreamConnection mConnection;
@@ -21,11 +23,14 @@ public class ConnectedThread implements Runnable, Observer {
     private static PresentationTimer presentationTimer = null;
     private static final int EXIT_CMD = -1;
     private static final int FILE = 1;
-    private static final int MOUSECONTROLLER = 2;
     private static final int KEYCONTROLLER = 5;
     private static final int TIMECONTROLL = 7;
     private static final int STARTPRESENTATION = 4;
 
+    /**
+     * 
+     * @param connection the connection to handle, either bluetooth or lan.
+     */
     ConnectedThread(StreamConnection connection) {
         if (presentationTimer == null) {
             presentationTimer = new PresentationTimer(this);
@@ -34,6 +39,9 @@ public class ConnectedThread implements Runnable, Observer {
         fileReciver = new FileReciver();
     }
 
+    /**
+     * Starts the handeling of the connection.
+     */
     @Override
     public void run() {
         try {
@@ -50,16 +58,13 @@ public class ConnectedThread implements Runnable, Observer {
 
                 switch (command) {
                     case EXIT_CMD:
+                        // Clean and terminate the connection.
                         Notification.debugMessage("Killing connection.");
                         presentationTimer.deleteObserver(this);
                         mConnection.close();
                         return;
                     case FILE:
                         startPresenting();
-                        break;
-                    case MOUSECONTROLLER:
-                        OnScreen.mouseController.recive(
-                                bufferedInputStream.read(), bufferedInputStream.read());
                         break;
                     case KEYCONTROLLER:
                         int read = bufferedInputStream.read();
@@ -82,6 +87,15 @@ public class ConnectedThread implements Runnable, Observer {
         }
     }
 
+    /**
+     * Sends a startmessage that either starts with a 0 if nothing is presenting
+     * and in that case only contains a 0. If something is presenting the message
+     * starts with a 1, followed by 4bytes length of name, then the name, 4 bytes 
+     * time and last one byte if the time is running or not. Also sets up some 
+     * timer things considering server if already presenting.
+     * 
+     * @throws IOException if there is a problem with the outputstream.
+     */
     private void sendStartMessage() throws IOException {
         if (filePresented != null) {
             outputStream.write(1);
@@ -98,6 +112,13 @@ public class ConnectedThread implements Runnable, Observer {
         outputStream.flush();
     }
 
+    /**
+     * Runned when a file is recived. Takes care of killing the old presentation,
+     * reciving the new file, and starting that presentation and timer. Also 
+     * sends a start message to the phone to start presenting.
+     * 
+     * @throws IOException in case the outstream is not writable.
+     */
     private void startPresenting() throws IOException {
         if (filePresented != null) {
             OnScreen.keyController.exit();
@@ -111,6 +132,13 @@ public class ConnectedThread implements Runnable, Observer {
         presentationTimer.addObserver(this);
     }
 
+    /**
+     * Sends a update to threads about timer events. Will only notify phones that
+     * not initiated the timer event.
+     * 
+     * @param o The presentation timer.
+     * @param arg A notification object
+     */
     @Override
     public void update(Observable o, Object arg) {
         Notification.debugMessage("Notifying about update!");
@@ -125,7 +153,7 @@ public class ConnectedThread implements Runnable, Observer {
 
         } catch (IOException ex) {
             Notification.debugMessage("Someting went wrong "
-                    + "when notifying about timer events " 
+                    + "when notifying about timer events "
                     + ex.getLocalizedMessage());
         }
     }
