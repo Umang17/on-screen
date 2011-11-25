@@ -88,7 +88,7 @@ public class PresentatorActivity extends Activity implements Observer {
 					R.layout.titlebar);
 		}
 
-		hideControlButtons(false);
+		setControlButtonsVisible(false);
 
 		// Setting up clock
 		stopWatch = (StopWatch) findViewById(R.id.chrono);
@@ -268,7 +268,7 @@ public class PresentatorActivity extends Activity implements Observer {
 		}
 	}
 
-	private void hideControlButtons(boolean visible) {
+	private void setControlButtonsVisible(boolean visible) {
 		if (visible) {
 			((TextView) findViewById(R.id.textViewInfo)).setText("");
 		} else {
@@ -338,13 +338,13 @@ public class PresentatorActivity extends Activity implements Observer {
 			case MESSAGE_CONNECTED:
 				ImageView connected = (ImageView) findViewById(R.id.titleImage);
 				connected.setImageResource(R.drawable.connected);
-				hideControlButtons(true);
+				setControlButtonsVisible(true);
 				break;
 
 			case MESSAGE_DISCONNECTED:
 				ImageView disconnected = (ImageView) findViewById(R.id.titleImage);
 				disconnected.setImageResource(R.drawable.disconnected);
-				hideControlButtons(false);
+				setControlButtonsVisible(false);
 				break;
 
 			case MESSAGE_NO_PRES:
