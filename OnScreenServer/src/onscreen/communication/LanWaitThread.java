@@ -1,8 +1,9 @@
-package onscreen;
+package onscreen.communication;
 
 import java.io.IOException;
 import javax.microedition.io.SocketConnection;
 import com.intel.bluetooth.gcf.socket.ServerSocketConnection;
+import onscreen.Notification;
 
 /**
  * Sets up a lan connection and wait for a connecting phone.

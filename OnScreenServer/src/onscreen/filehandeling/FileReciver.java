@@ -1,8 +1,9 @@
-package onscreen;
+package onscreen.filehandeling;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import onscreen.Notification;
 
 /**
  * Recives a file on a connection and take care of writing it to file.
@@ -73,18 +74,20 @@ public class FileReciver {
         // Creates a new thread to write the file
         FileWriterThread fw = new FileWriterThread(wb, file);
         fw.start();
-        try {
+        try {       
+            byte[] bytes = new byte[NUM_BYTES];
+            
             for (int a = 0; a < size;) {
-                int use = NUM_BYTES;
                 if ((a + NUM_BYTES) > size) {
+                    int use = NUM_BYTES;
                     use = size - a;
+                    bytes = new byte[use];
                 } 
-                byte[] bytes = new byte[use];
+                
                 int read = stream.read(bytes);
                 wb.put(subArray(bytes, 0, read));
                  
                 a += read;
-                Notification.debugMessage("read= " + a + "size = " + size);
             }
         } catch (IOException ex) {
             Notification.debugMessage("Failed in reciving or writing data");
@@ -92,11 +95,6 @@ public class FileReciver {
             Notification.debugMessage("Failed in reciving or writing data np excpe");
         }
         fw.close();
-
-        // Check if the file is close in size to what it's supposed to be.
-        if (file.length() > size - 100 && file.length() < size + 100) {
-            throw new IOException("Something went wrong when reciving the file try again!");
-        }
 
         FilePresented filePres = new FilePresented(fileLocation, file.getName());
         return filePres;
@@ -200,6 +198,9 @@ public class FileReciver {
      * @return the byte array stripped down
      */
     private byte[] subArray(byte[] bytes, int first, int last) {
+        if (first == 0 && last == bytes.length) {
+            return bytes;
+        }
         byte[] stripped = new byte[last - first];
         for (int i = first; i < last; i++) {
             stripped[i - first] = bytes[i];

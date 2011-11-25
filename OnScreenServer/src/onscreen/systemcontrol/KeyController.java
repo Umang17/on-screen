@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package onscreen;
+package onscreen.systemcontrol;
 
 import java.awt.AWTException;
 import java.awt.Robot;
@@ -39,7 +39,7 @@ public class KeyController {
      * @param read the control int
      * @return true if the system should exit presentation mode, false otherwise.
      */
-    boolean recive(int read) {
+    public boolean recive(int read) {
         switch (read) {
             case EXIT:
                 exit();
@@ -60,7 +60,7 @@ public class KeyController {
     /**
      * Sends a exist signal to the system.
      */
-    void exit() {
+    public void exit() {
         rob.keyPress(KeyEvent.VK_ESCAPE);
         try {
             Thread.sleep(50);

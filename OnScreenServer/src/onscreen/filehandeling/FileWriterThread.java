@@ -1,10 +1,11 @@
-package onscreen;
+package onscreen.filehandeling;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import onscreen.Notification;
 
 /**
  * The file writer thread are responisble to write a file to disk from a queue. 

@@ -1,5 +1,8 @@
 package onscreen;
 
+import onscreen.systemcontrol.KeyController;
+import onscreen.communication.BluetoothWaitThread;
+import onscreen.communication.LanWaitThread;
 import java.io.File;
 
 /**
@@ -22,7 +25,7 @@ public class OnScreen {
     static boolean BT = true;
     static boolean LAN = true;
     public static String pdfReader = "";
-    static KeyController keyController;
+    public static KeyController keyController;
 
     /**
      * Creates a new server system for the onscreen.
@@ -73,5 +76,7 @@ public class OnScreen {
             Thread lanWaitThread = new Thread(new LanWaitThread());
             lanWaitThread.start();
         }
+        
+        Notification.init();
     }
 }

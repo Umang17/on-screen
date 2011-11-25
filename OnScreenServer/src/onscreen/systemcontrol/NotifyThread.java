@@ -1,4 +1,6 @@
-package onscreen;
+package onscreen.systemcontrol;
+
+import onscreen.communication.ConnectedThread;
 
 /**
  * A simple class to send data between the timer and connections to handle timer 

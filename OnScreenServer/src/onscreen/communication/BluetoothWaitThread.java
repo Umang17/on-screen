@@ -1,4 +1,4 @@
-package onscreen;
+package onscreen.communication;
 
 import java.io.IOException;
 import javax.bluetooth.BluetoothStateException;
@@ -8,6 +8,7 @@ import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
+import onscreen.Notification;
 
 /**
  * BluetoothWaitThread sets up the bluetooth adapater and waits for 

@@ -1,4 +1,4 @@
-package onscreen;
+package onscreen.communication;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -6,6 +6,12 @@ import java.io.OutputStream;
 import java.util.Observable;
 import java.util.Observer;
 import javax.microedition.io.StreamConnection;
+import onscreen.filehandeling.FilePresented;
+import onscreen.filehandeling.FileReciver;
+import onscreen.Notification;
+import onscreen.systemcontrol.NotifyThread;
+import onscreen.OnScreen;
+import onscreen.systemcontrol.PresentationTimer;
 
 /**
  * Connected thread is lanunched when a connection is initialized. It does all 

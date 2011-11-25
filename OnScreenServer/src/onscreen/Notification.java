@@ -14,9 +14,9 @@ public class Notification {
 
     private static boolean debug = true;
     private static boolean init = false;
-    private static TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("C:\\tray.gif"));
+    private static TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("tray.gif"));
 
-    private static void init() {
+    public static void init() {
         SystemTray tray = SystemTray.getSystemTray();
         try {
             tray.add(trayIcon);

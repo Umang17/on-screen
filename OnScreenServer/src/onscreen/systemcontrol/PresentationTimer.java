@@ -1,6 +1,8 @@
-package onscreen;
+package onscreen.systemcontrol;
 
+import onscreen.communication.ConnectedThread;
 import java.util.Observable;
+import onscreen.Notification;
 
 /**
  * Remembers and controls the timer of the presentation.

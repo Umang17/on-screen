@@ -1,4 +1,4 @@
-package onscreen;
+package onscreen.filehandeling;
 
 import java.io.File;
 
