@@ -16,11 +16,9 @@ public class PresentationTimer extends Observable {
     private int startTime;
     private int collectedTime;
     private boolean pause = false;
-    private ClockPrinter clockprinter;
 
     public PresentationTimer(ConnectedThread caller) {
         start(caller);
-        clockprinter=new ClockPrinter(this);
     }
 
     public synchronized void setRanTime(int ranTime) {
@@ -28,15 +26,17 @@ public class PresentationTimer extends Observable {
     }
 
     public synchronized void start(ConnectedThread caller) {
-        pause = false;
-        startTime = getCurrentTime();
-        setChanged();
-        notifyObservers(new NotifyThread(0, getRunning(), caller));
+        if (pause) {
+            pause = false;
+            startTime = getCurrentTime();
+            setChanged();
+            notifyObservers(new NotifyThread(0, getRunning(), caller));
+        }
     }
 
     public synchronized void pause(ConnectedThread caller) {
         if (!pause) {
-            collectedTime = getCurrentTime() - startTime;
+            collectedTime += getCurrentTime() - startTime;
             pause = true;
             setChanged();
             notifyObservers(new NotifyThread(0, getRunning(), caller));
@@ -45,7 +45,6 @@ public class PresentationTimer extends Observable {
 
     public synchronized void reset(ConnectedThread caller) {
         collectedTime = 0;
-
         pause = true;
         setChanged();
         notifyObservers(new NotifyThread(1, getRunning(), caller));
@@ -54,7 +53,7 @@ public class PresentationTimer extends Observable {
 
     public synchronized byte[] getTime() {
         if (pause) {
-            Notification.debugMessage("Sending time " + (collectedTime));
+            Notification.debugMessage("Sending time(pause): " + (collectedTime));
             return intToByte(collectedTime);
         } else {
             Notification.debugMessage("Sending time: " + (getCurrentTime() - startTime + collectedTime));
