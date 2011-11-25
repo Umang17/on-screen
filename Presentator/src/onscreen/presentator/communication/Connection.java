@@ -197,6 +197,7 @@ public class Connection {
 			Log.d(TAG, "in connectionLost");
 		mConnected = false;
 		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_DISCONNECTED);
+		stop();
 		// Send a failure message back to the Activity
 		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
 		// Bundle bundle = new Bundle();
@@ -355,7 +356,7 @@ public class Connection {
 					switch (controlInt) {
 					case -1:
 						connectionLost();
-						break;
+						return;
 					case 0: // no presentation...
 						mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_NO_PRES);
 						break;

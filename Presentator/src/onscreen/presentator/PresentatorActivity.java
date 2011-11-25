@@ -32,7 +32,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class PresentatorActivity extends Activity implements Observer {
 
@@ -344,9 +343,9 @@ public class PresentatorActivity extends Activity implements Observer {
 				setControlButtonsVisible(true);
 				break;
 			case MESSAGE_DISCONNECTED:
-				Toast.makeText(PresentatorActivity.this,
-						R.string.disconnected_message, Toast.LENGTH_LONG)
-						.show();
+				// Toast.makeText(PresentatorActivity.this,
+				// R.string.disconnected_message, Toast.LENGTH_LONG)
+				// .show();
 				Log.d(TAG, "Disconnected from: " + mConnection.getAddr());
 				((ImageView) findViewById(R.id.titleImage))
 						.setImageResource(R.drawable.disconnected);
