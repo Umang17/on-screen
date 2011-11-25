@@ -20,6 +20,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
-        android:background="@drawable/disconnected" />
+        android:background="@drawable/disconnected"
+        android:visibility="invisible" />
 
 </RelativeLayout>

@@ -336,14 +336,14 @@ public class PresentatorActivity extends Activity implements Observer {
 			switch (msg.what) {
 
 			case MESSAGE_CONNECTED:
-				ImageView connected = (ImageView) findViewById(R.id.titleImage);
-				connected.setImageResource(R.drawable.connected);
+				((ImageView) findViewById(R.id.titleImage))
+						.setImageResource(R.drawable.connected);
 				setControlButtonsVisible(true);
 				break;
 
 			case MESSAGE_DISCONNECTED:
-				ImageView disconnected = (ImageView) findViewById(R.id.titleImage);
-				disconnected.setImageResource(R.drawable.disconnected);
+				((ImageView) findViewById(R.id.titleImage))
+						.setImageResource(R.drawable.disconnected);
 				setControlButtonsVisible(false);
 				break;
 
