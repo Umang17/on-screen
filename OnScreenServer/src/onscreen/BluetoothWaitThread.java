@@ -33,7 +33,7 @@ public class BluetoothWaitThread implements Runnable {
         try {
             local = LocalDevice.getLocalDevice();
         } catch (BluetoothStateException ex) {
-            Notification.debugMessage("Could not initiate the bluetooth adapter..\n"
+            Notification.message("Could not initiate the bluetooth adapter..\n"
                     + "Do you have bluetooth turned on? Please restart application if you want to"
                     + "use bluetooth");
             return;
@@ -41,7 +41,7 @@ public class BluetoothWaitThread implements Runnable {
         try {
             local.setDiscoverable(DiscoveryAgent.GIAC);
         } catch (BluetoothStateException ex) {
-            Notification.debugMessage("The bluetooth adapter could not be set discoverable.");
+            Notification.message("The bluetooth adapter could not be set discoverable.");
         }
 
         Notification.debugMessage("Local bluetooth address: " + local.getBluetoothAddress() + "\n");
@@ -54,7 +54,7 @@ public class BluetoothWaitThread implements Runnable {
         try {
             notifier = (StreamConnectionNotifier) Connector.open(url);
         } catch (IOException e) {
-            Notification.debugMessage("Problem opening bluetooth stream.");
+            Notification.message("Problem opening bluetooth stream.");
             return;
         }
 
@@ -67,7 +67,7 @@ public class BluetoothWaitThread implements Runnable {
                 processThread.start();
             } catch (Exception e) {
                 // try to hande problems with bluetooth waiting. 
-                Notification.debugMessage("Problem while waiting for connection. Restarting!");
+                Notification.message("Problem while waiting for connection. Restarting!");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {

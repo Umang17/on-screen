@@ -39,7 +39,7 @@ public class LanWaitThread implements Runnable {
             }
         } catch (IOException e) {
             // Attempts to restart and finding a free port in case of problem.
-            Notification.debugMessage("Failed on LAN. Restarting!\n");
+            Notification.message("Failed on LAN. Restarting!\n");
             PORT++;
             try {
                 Thread.sleep(100);
