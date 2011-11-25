@@ -28,9 +28,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class PresentatorActivity extends Activity implements Observer {
@@ -88,7 +88,7 @@ public class PresentatorActivity extends Activity implements Observer {
 					R.layout.titlebar);
 		}
 
-		setControlButtons(false);
+		hideControlButtons(false);
 
 		// Setting up clock
 		stopWatch = (StopWatch) findViewById(R.id.chrono);
@@ -208,8 +208,6 @@ public class PresentatorActivity extends Activity implements Observer {
 				Log.d("SelectPDFReturn", "Not ok");
 				break;
 			}
-			// TODO Fix the enabling / disabling of buttons
-			setControlButtons(true);
 			String file = data.getStringExtra("File");
 			Log.d("debug", file);
 			File f = new File(file);
@@ -270,10 +268,19 @@ public class PresentatorActivity extends Activity implements Observer {
 		}
 	}
 
-	private void setControlButtons(boolean enable) {
-		((Button) findViewById(R.id.blankscreen)).setEnabled(enable);
-		((ImageButton) findViewById(R.id.next)).setEnabled(enable);
-		((ImageButton) findViewById(R.id.prev)).setEnabled(enable);
+	private void hideControlButtons(boolean visible) {
+		if (visible) {
+			((TextView) findViewById(R.id.textViewInfo)).setText("");
+		} else {
+			((TextView) findViewById(R.id.textViewInfo))
+					.setText(R.string.disconnected_info);
+		}
+		((Button) findViewById(R.id.blankscreen))
+				.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+		((LinearLayout) findViewById(R.id.linearLayoutNextPrev))
+				.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+		((RelativeLayout) findViewById(R.id.RelativeLayoutClock))
+				.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
 	}
 
 	private void upload() {
@@ -321,21 +328,23 @@ public class PresentatorActivity extends Activity implements Observer {
 				SelectPDFActivity.class);
 		startActivityForResult(loadIntent, STATE_LOAD);
 	}
-	
+
 	private class PresentatorHandler extends Handler {
 
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			
+
 			case MESSAGE_CONNECTED:
 				ImageView connected = (ImageView) findViewById(R.id.titleImage);
 				connected.setImageResource(R.drawable.connected);
+				hideControlButtons(true);
 				break;
-				
+
 			case MESSAGE_DISCONNECTED:
 				ImageView disconnected = (ImageView) findViewById(R.id.titleImage);
 				disconnected.setImageResource(R.drawable.disconnected);
+				hideControlButtons(false);
 				break;
 
 			case MESSAGE_NO_PRES:
