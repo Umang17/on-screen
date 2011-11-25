@@ -108,7 +108,7 @@ public class Connection {
 	public boolean isConnected() {
 		return mConnected;
 	}
-	
+
 	public String getAddr() {
 		if (mConnection == null || !mConnected) {
 			return null;
@@ -230,7 +230,7 @@ public class Connection {
 				Log.d(TAG, "sent type");
 
 			// send the size of the byte stream
-			mConnectedThread.write(ByteOperation.longToBytes(length)); 
+			mConnectedThread.write(ByteOperation.longToBytes(length));
 			if (D)
 				Log.d(TAG, "sent length" + length);
 
@@ -285,6 +285,7 @@ public class Connection {
 					connected(mmConnection);
 					return;
 				} catch (IOException e) {
+					Log.d(TAG, "Failed to connect: " + e.getLocalizedMessage());
 				}
 				try {
 					Thread.sleep(100);
