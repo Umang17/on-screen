@@ -225,47 +225,52 @@ public class Connection {
 			long length = file.length();
 			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_START,
 					length).sendToTarget();
-			mConnectedThread.write(TYPE_PRESENTATION);
-			if (D)
-				Log.d(TAG, "sent type");
+			try {
+				mConnectedThread.write(TYPE_PRESENTATION);
+				if (D)
+					Log.d(TAG, "sent type");
 
-			// send the size of the byte stream
-			mConnectedThread.write(ByteOperation.longToBytes(length));
-			if (D)
-				Log.d(TAG, "sent length" + length);
+				// send the size of the byte stream
+				mConnectedThread.write(ByteOperation.longToBytes(length));
+				if (D)
+					Log.d(TAG, "sent length" + length);
 
-			String name = file.getName();
-			char[] nameChar = name.toCharArray();
-			int nameSize = nameChar.length;
-			// send the size of the name
-			mConnectedThread.write(ByteOperation.intToBytes(nameSize));
-			if (D)
-				Log.d(TAG, "sent name size");
+				String name = file.getName();
+				char[] nameChar = name.toCharArray();
+				int nameSize = nameChar.length;
+				// send the size of the name
+				mConnectedThread.write(ByteOperation.intToBytes(nameSize));
+				if (D)
+					Log.d(TAG, "sent name size");
 
-			// send the name of the file
-			mConnectedThread.write(ByteOperation.charArrayToBytes(nameChar));
+				// send the name of the file
+				mConnectedThread
+						.write(ByteOperation.charArrayToBytes(nameChar));
 
-			if (D)
-				Log.d(TAG, "sent all but file...");
+				if (D)
+					Log.d(TAG, "sent all but file...");
 
-			byte[] buffer = new byte[BYTE_SIZE];
+				byte[] buffer = new byte[BYTE_SIZE];
 
-			for (long i = 0; i <= length; i += BYTE_SIZE) {
-				try {
-					buf.read(buffer);
-				} catch (IOException e) {
-					return null;
+				for (long i = 0; i <= length; i += BYTE_SIZE) {
+					try {
+						buf.read(buffer);
+					} catch (IOException e) {
+						return null;
+					}
+					mConnectedThread.write(buffer);
+					mHandler.obtainMessage(
+							PresentatorActivity.MESSAGE_PROGRESS_INC, i)
+							.sendToTarget();
 				}
-				mConnectedThread.write(buffer);
+
+				mConnectedThread.write(ByteOperation.intToBytes(10));
 				mHandler.obtainMessage(
-						PresentatorActivity.MESSAGE_PROGRESS_INC, i)
+						PresentatorActivity.MESSAGE_PROGRESS_INC, length)
 						.sendToTarget();
+			} catch (NullPointerException e) {
+				Log.d(TAG, "Null: " + e.getLocalizedMessage());
 			}
-
-			mConnectedThread.write(ByteOperation.intToBytes(10));
-			mHandler.obtainMessage(PresentatorActivity.MESSAGE_PROGRESS_INC,
-					length).sendToTarget();
-
 			return null;
 		}
 	}

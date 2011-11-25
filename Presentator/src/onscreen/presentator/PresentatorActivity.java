@@ -111,7 +111,6 @@ public class PresentatorActivity extends Activity implements Observer {
 		switch (id) {
 		case DIALOG_FILE_PROGRESS:
 			mFileProgressDialog = new FileProgressDialog(this, 0);
-			mFileProgressDialog.setCancelable(false);
 			dialog = mFileProgressDialog;
 			break;
 		case DIALOG_TAKE_OVER:
@@ -212,8 +211,10 @@ public class PresentatorActivity extends Activity implements Observer {
 			Log.d("debug", file);
 			File f = new File(file);
 			mPresentationFile = f;
-			TextView view = (TextView) findViewById(R.id.presentationName);
-			view.setText(mPresentationFile.getName());
+			name = mPresentationFile.getName();
+			((TextView) findViewById(R.id.presentationName)).setText(String
+					.format(getResources().getString(R.string.selected_file),
+							name));
 			upload();
 			break;
 		}
@@ -225,7 +226,8 @@ public class PresentatorActivity extends Activity implements Observer {
 
 			ConnectionInterface connection = TagParser.parse(tagID);
 
-			if (connection.getAddr() != mConnection.getAddr()) {
+			if (mConnection.getAddr() == null
+					|| connection.getAddr().compareTo((mConnection.getAddr())) != 0) {
 				mConnection.stop();
 				mConnection.connect(connection);
 			}
@@ -274,10 +276,6 @@ public class PresentatorActivity extends Activity implements Observer {
 		} else {
 			((TextView) findViewById(R.id.textViewInfo))
 					.setText(R.string.disconnected_info);
-			if (mPresentationFile == null) {
-				((TextView) findViewById(R.id.presentationName))
-						.setText(R.string.no_selected_presentation);
-			}
 		}
 		((Button) findViewById(R.id.blankscreen))
 				.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
@@ -294,8 +292,8 @@ public class PresentatorActivity extends Activity implements Observer {
 	}
 
 	private void takeOver() {
-		TextView view = (TextView) findViewById(R.id.presentationName);
-		view.setText(name);
+		((TextView) findViewById(R.id.presentationName)).setText(String.format(
+				getResources().getString(R.string.presenting_file), name));
 		mPresentationFile = null;
 		stopWatch.setBaseTime(time);
 		Log.d("TIME", "Time is: " + time);
@@ -339,19 +337,30 @@ public class PresentatorActivity extends Activity implements Observer {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-
 			case MESSAGE_CONNECTED:
 				((ImageView) findViewById(R.id.titleImage))
 						.setImageResource(R.drawable.connected);
 				setControlButtonsVisible(true);
 				break;
-
 			case MESSAGE_DISCONNECTED:
 				((ImageView) findViewById(R.id.titleImage))
 						.setImageResource(R.drawable.disconnected);
+				if (mFileProgressDialog != null) {
+					if (mFileProgressDialog.isShowing()) {
+						dismissDialog(DIALOG_FILE_PROGRESS);
+					}
+				}
+				if (mPresentationFile == null) {
+					((TextView) findViewById(R.id.presentationName))
+							.setText(R.string.no_selected_presentation);
+				} else {
+					((TextView) findViewById(R.id.presentationName))
+							.setText(String.format(
+									getResources().getString(
+											R.string.selected_file), name));
+				}
 				setControlButtonsVisible(false);
 				break;
-
 			case MESSAGE_NO_PRES:
 				Log.d("Handler", "no pres!");
 				if (mPresentationFile == null) {
@@ -359,7 +368,6 @@ public class PresentatorActivity extends Activity implements Observer {
 				}
 				upload();
 				break;
-
 			case MESSAGE_TAKE_OVER:
 				Log.d("Handler", "taking over");
 				Bundle bundle = (Bundle) msg.obj;
@@ -373,26 +381,26 @@ public class PresentatorActivity extends Activity implements Observer {
 					takeOver();
 				}
 				break;
-
 			case MESSAGE_FILE_REC:
 				Log.d("Handler", "file rec...");
+				((TextView) findViewById(R.id.presentationName)).setText(String
+						.format(getResources().getString(
+								R.string.presenting_file), name));
 				dismissDialog(DIALOG_FILE_PROGRESS);
 				stopWatch.resetClock();
 				startClockAndSetButtons();
 				break;
-
 			case MESSAGE_PROGRESS_START:
 				Log.d("Handler", "progress start...");
-				// maybe use setMax...
+				((TextView) findViewById(R.id.presentationName)).setText(String
+						.format(getResources().getString(
+								R.string.transferring_file), name));
 				showDialog(DIALOG_FILE_PROGRESS);
 				mFileProgressDialog.setFileSize((Long) msg.obj);
 				break;
-
 			case MESSAGE_PROGRESS_INC:
-				// maybe incr with the size of the BYTE_SIZE
 				mFileProgressDialog.setProgress((Long) msg.obj);
 				break;
-
 			case MESSAGE_CLOCK:
 				boolean runningClock = msg.arg1 == 1 ? true : false;
 				boolean reset = msg.arg2 == 1 ? true : false;

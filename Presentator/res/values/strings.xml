@@ -9,6 +9,9 @@
     <string name="watch_zero">0:00:00</string>
     <string name="menu_reset_watch">Reset timer</string>
     <string name="disconnected_info">You are not connected to any device, use connect in the menu or scan a NFC tag to connect.</string>
+    <string name="presenting_file">Presenting: %1$s</string>
+    <string name="transferring_file">Transferring: %1$s</string>
+    <string name="selected_file">Selected: %1$s</string>
 
     <!-- PDFActivity -->
     <string name="pdf_none_found">Didn\'t find any PDF files on the phone.</string>
