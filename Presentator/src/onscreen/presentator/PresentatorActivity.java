@@ -274,6 +274,10 @@ public class PresentatorActivity extends Activity implements Observer {
 		} else {
 			((TextView) findViewById(R.id.textViewInfo))
 					.setText(R.string.disconnected_info);
+			if (mPresentationFile == null) {
+				((TextView) findViewById(R.id.presentationName))
+						.setText(R.string.no_selected_presentation);
+			}
 		}
 		((Button) findViewById(R.id.blankscreen))
 				.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
@@ -292,6 +296,7 @@ public class PresentatorActivity extends Activity implements Observer {
 	private void takeOver() {
 		TextView view = (TextView) findViewById(R.id.presentationName);
 		view.setText(name);
+		mPresentationFile = null;
 		stopWatch.setBaseTime(time);
 		Log.d("TIME", "Time is: " + time);
 		if (running) {
