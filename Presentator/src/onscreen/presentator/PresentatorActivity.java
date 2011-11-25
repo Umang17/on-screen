@@ -357,7 +357,8 @@ public class PresentatorActivity extends Activity implements Observer {
 					((TextView) findViewById(R.id.presentationName))
 							.setText(String.format(
 									getResources().getString(
-											R.string.selected_file), name));
+											R.string.selected_file),
+									mPresentationFile.getName()));
 				}
 				setControlButtonsVisible(false);
 				break;
