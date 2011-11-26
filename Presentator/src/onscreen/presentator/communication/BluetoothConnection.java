@@ -9,7 +9,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
+/**
+ * A bluetooth connection. Gets the bluetooth address to connect to in the
+ * constructor. For additional comments see ConnectionInterface.java
+ * 
+ * @author Elias Näslund and John Viklund
+ * 
+ */
 public class BluetoothConnection implements ConnectionInterface {
+	// MY_UUID is the app's UUID string, also used by the server code
 	private static final UUID MY_UUID = UUID
 			.fromString("04c6093b-0000-1000-8000-00805f9b34fb");
 
@@ -45,12 +53,11 @@ public class BluetoothConnection implements ConnectionInterface {
 			} catch (IOException e) {
 			}
 		}
+		// Disable discovery for connecting faster
 		mBluetoothAdapter.cancelDiscovery();
 
-		// Get a BluetoothSocket to connect with the given BluetoothDevice
 		try {
-			// MY_UUID is the app's UUID string, also used by the server
-			// code
+
 			mSocket = mBlueToothDevice
 					.createInsecureRfcommSocketToServiceRecord(MY_UUID);
 		} catch (IOException e) {

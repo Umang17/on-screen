@@ -16,6 +16,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+/**
+ * This class handles the communication with the server.
+ * 
+ * @author Elias Näslund
+ * 
+ */
 public class Connection {
 
 	private static final String TAG = "Connection";
@@ -34,23 +40,55 @@ public class Connection {
 	private static final byte TYPE_COMMANDS = 5;
 	private static final byte TYPE_TIME = 7;
 
-	private static final byte COMMAND_EXIT = 0;
-	private static final byte COMMAND_NEXT = 1;
-	private static final byte COMMAND_PREV = 2;
-	private static final byte COMMAND_BLANK = 3;
+	public static final byte COMMAND_EXIT = 0;
+	public static final byte COMMAND_NEXT = 1;
+	public static final byte COMMAND_PREV = 2;
+	public static final byte COMMAND_BLANK = 3;
 
-	private static final byte COMMAND_START = 7;
-	private static final byte COMMAND_PAUSE = 8;
-	private static final byte COMMAND_RESET = 9;
+	public static final byte COMMAND_START = 7;
+	public static final byte COMMAND_PAUSE = 8;
+	public static final byte COMMAND_RESET = 9;
 
+	/**
+	 * Takes a handler for sending messages.
+	 * 
+	 * @param handler
+	 */
 	public Connection(Handler handler) {
 		mHandler = handler;
 	}
 
+	/**
+	 * To send the presentation file
+	 * 
+	 * @param file
+	 * @return true if sending file and false if not connected
+	 */
 	public boolean sendPresentation(File file) {
-		if (!mConnected)
+		if (!isConnected())
 			return false;
 		new SendFile().execute(file);
+		return true;
+	}
+
+	/**
+	 * To send a command to the server. Use the COMMAND_ byte.
+	 * 
+	 * @param command
+	 * @return false if not connected else true
+	 */
+	public boolean sendCommand(byte command) {
+		if (!isConnected()) {
+			return false;
+		}
+		if (command == COMMAND_START || command == COMMAND_PAUSE
+				|| command == COMMAND_RESET) {
+			mConnectedThread.write(TYPE_TIME);
+		} else {
+			mConnectedThread.write(TYPE_COMMANDS);
+		}
+		mConnectedThread.write(command);
+
 		return true;
 	}
 
@@ -86,13 +124,6 @@ public class Connection {
 		return true;
 	}
 
-	private void sendClockSetting(byte command) {
-		if (isConnected()) {
-			mConnectedThread.write(TYPE_TIME); // Time
-			mConnectedThread.write(command); // Type: Start,Pause,Reset
-		}
-	}
-
 	public void sendStartClock() {
 		sendClockSetting(COMMAND_START); // Start
 	}
@@ -105,10 +136,27 @@ public class Connection {
 		sendClockSetting(COMMAND_RESET); // Reset
 	}
 
+	private void sendClockSetting(byte command) {
+		if (isConnected()) {
+			mConnectedThread.write(TYPE_TIME); // Time
+			mConnectedThread.write(command); // Type: Start,Pause,Reset
+		}
+	}
+
+	/**
+	 * Check if a connection is running.
+	 * 
+	 * @return true if connected otherwise false
+	 */
 	public boolean isConnected() {
 		return mConnected;
 	}
 
+	/**
+	 * Get the address of the connection.
+	 * 
+	 * @return String
+	 */
 	public String getAddr() {
 		if (mConnection == null || !mConnected) {
 			return null;
@@ -116,6 +164,11 @@ public class Connection {
 		return mConnection.getAddr();
 	}
 
+	/**
+	 * Attempts to connect to the connection in an own thread.
+	 * 
+	 * @param ConnectionInterface
+	 */
 	public synchronized void connect(ConnectionInterface connection) {
 		if (D)
 			Log.d(TAG, "connect to: " + connection);
@@ -132,7 +185,12 @@ public class Connection {
 		mConnectingThread.start();
 	}
 
-	public synchronized void connected(ConnectionInterface connection) {
+	/**
+	 * Called from the connecting thread when connection is made
+	 * 
+	 * @param ConnectionInterface
+	 */
+	private synchronized void connected(ConnectionInterface connection) {
 		if (D)
 			Log.d(TAG, "connected");
 		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_CONNECTED);
@@ -145,6 +203,7 @@ public class Connection {
 
 		if (D)
 			Log.d(TAG, "connected - after killing");
+
 		// Start the thread to manage the connection and perform transmissions
 		mConnectedThread = new ConnectedThread(connection);
 		mConnectedThread.start();
@@ -209,6 +268,12 @@ public class Connection {
 		// BluetoothChatService.this.start();
 	}
 
+	/**
+	 * Private class for sending a file async.
+	 * 
+	 * @author Elias Näslund
+	 * 
+	 */
 	private class SendFile extends AsyncTask<File, Integer, Void> {
 
 		@Override
@@ -265,8 +330,7 @@ public class Connection {
 						return null;
 					}
 				}
-				// TODO WTF is this 10???
-				// mConnectedThread.write(ByteOperation.intToBytes(10));
+
 				mHandler.obtainMessage(
 						PresentatorActivity.MESSAGE_PROGRESS_INC, length)
 						.sendToTarget();
@@ -277,6 +341,13 @@ public class Connection {
 		}
 	}
 
+	/**
+	 * Private class for connecting. Based on code from
+	 * http://developer.android.com/resources/samples/BluetoothChat/index.html.
+	 * 
+	 * @author Elias Näslund
+	 * 
+	 */
 	private class ConnectingThread extends Thread {
 		private final ConnectionInterface mmConnection;
 
@@ -311,6 +382,14 @@ public class Connection {
 		}
 	}
 
+	/**
+	 * Private class for sending and reading bytes from the connection. Based on
+	 * code from
+	 * http://developer.android.com/resources/samples/BluetoothChat/index.html.
+	 * 
+	 * @author Elias Näslund
+	 * 
+	 */
 	private class ConnectedThread extends Thread {
 		private final ConnectionInterface mmConnection;
 		private final InputStream mmInStream;
@@ -329,7 +408,7 @@ public class Connection {
 				tmpIn = connection.getInputStream();
 				tmpOut = connection.getOutputStream();
 			} catch (IOException e) {
-				// kill connection
+				// TODO kill connection
 			}
 
 			mmInStream = tmpIn;
@@ -454,7 +533,10 @@ public class Connection {
 			}
 		}
 
-		/* Call this from the main Activity to send data to the remote device */
+		/**
+		 * Call this to send data to the remote device
+		 * 
+		 */
 		public void write(byte[] bytes) {
 			try {
 				mmOutStream.write(bytes);
@@ -464,7 +546,11 @@ public class Connection {
 				connectionLost();
 			}
 		}
-
+		
+		/**
+		 * Call this to send data to the remote device
+		 * 
+		 */
 		public void write(byte[] buffer, int offset, int count) {
 			try {
 				mmOutStream.write(buffer, offset, count);
@@ -475,7 +561,10 @@ public class Connection {
 			}
 		}
 
-		/* Call this from the main Activity to send data to the remote device */
+		/**
+		 * Call this to send data to the remote device
+		 * 
+		 */
 		public void write(byte bytes) {
 			try {
 				mmOutStream.write(bytes);
@@ -486,7 +575,9 @@ public class Connection {
 			}
 		}
 
-		/* Call this from the main Activity to shutdown the connection */
+		/**
+		 *  Call this from the main Activity to shutdown the connection 
+		 */
 		public void cancel() {
 			try {
 				mmConnection.disconnect();

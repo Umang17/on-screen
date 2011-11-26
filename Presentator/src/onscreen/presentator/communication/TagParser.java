@@ -4,7 +4,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * PATTERNS: b:addr\ni:ip
+ * A class for validating addresses and return o ConnectionInferface ready to
+ * use.
+ * 
+ * @author Elias Näslund and John Viklund
  * 
  */
 public class TagParser {
@@ -12,18 +15,33 @@ public class TagParser {
 		BLUETOOTH, IP, INVALID
 	};
 
+	// Advanced pattern to see that the ip address is correct. Checks number of
+	// dots and that no part of the address is over 255.
 	private static final String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+
+	// Pattern to see if it is a valid bluetooth address.
 	private static final String BLUETOOTH_PATTERN = "^\\p{XDigit}\\p{XDigit}(:\\p{XDigit}\\p{XDigit}){5}$";
 
+	/**
+	 * Parse a tag from the nfc. The tag should look something like b:addr\ni:ip
+	 * 
+	 * TODO return all valid connections
+	 * 
+	 * @param tagID
+	 * @return ConnectionInterface or null if none is valid
+	 */
 	public static ConnectionInterface parse(String tagID) {
+		// Split the string to get all different kinds of connections.
 		String[] addresses = tagID.split("\n");
 		for (String s : addresses) {
+			// call the parser to check that the address is correct and returned
+			// as a ConnectionInterface ready to use.
 			ConnectionInterface connection = parserHelper(s);
 			if (connection != null) {
-				
+
 				// BluetoothAdapter bluetoothAdapter =
 				// BluetoothAdapter.getDefaultAdapter();
 				// if (bluetoothAdapter == null) {
@@ -43,20 +61,27 @@ public class TagParser {
 				// // Do whatever
 				// }
 
-				
 				return connection;
 			}
 		}
 		return null;
 	}
 
-	private static ConnectionInterface parserHelper(String tagID) {
-		if (!validateTag(tagID)) {
+	/**
+	 * Takes a string and validates it and return the right type of connection.
+	 * 
+	 * The string should look like b:address or i:address.
+	 * 
+	 * @param address
+	 * @return ConnectionInterface or null if not valid
+	 */
+	private static ConnectionInterface parserHelper(String address) {
+		if (!validateAddress(address)) {
 			return new BluetoothConnection("00:1F:E1:EB:3B:DE");
 			// TODO removes
 		}
-		String addr = tagID.substring(1, tagID.length());
-		switch (getType(tagID)) {
+		String addr = address.substring(1, address.length());
+		switch (getType(address)) {
 		case BLUETOOTH:
 			return new BluetoothConnection(addr);
 		case IP:
@@ -66,20 +91,26 @@ public class TagParser {
 		}
 	}
 
-	private static boolean validateTag(String tagID) {
+	/**
+	 * Validates the address.
+	 * 
+	 * @param tagID
+	 * @return true if valid, false otherwise
+	 */
+	private static boolean validateAddress(String address) {
 		Pattern pattern;
 		Matcher match;
-		if (tagID.length() <= 2) {
+		if (address.length() <= 2) {
 			return false;
 		}
-		switch (getType(tagID)) {
+		switch (getType(address)) {
 		case IP:
 			pattern = Pattern.compile(IPADDRESS_PATTERN);
-			match = pattern.matcher(tagID.substring(1, tagID.length()));
+			match = pattern.matcher(address.substring(1, address.length()));
 			return match.matches();
 		case BLUETOOTH:
 			pattern = Pattern.compile(BLUETOOTH_PATTERN);
-			match = pattern.matcher(tagID.substring(1, tagID.length()));
+			match = pattern.matcher(address.substring(1, address.length()));
 			return match.matches();
 		case INVALID:
 			return false;
@@ -88,8 +119,15 @@ public class TagParser {
 		return false;
 	}
 
-	private static Type getType(String tagID) {
-		switch (tagID.charAt(0)) {
+	/**
+	 * Turn i to Type.ID and b to Type.BLUETOOTH. if not b or i it returns
+	 * Type.INVALID
+	 * 
+	 * @param type
+	 * @return Type
+	 */
+	private static Type getType(String type) {
+		switch (type.charAt(0)) {
 		case 'b':
 			return Type.BLUETOOTH;
 		case 'i':

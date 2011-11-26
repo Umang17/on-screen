@@ -6,6 +6,13 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+/**
+ * A ip connection. Gets the ip to connect to in the constructor. For additional
+ * comments see ConnectionInterface.java
+ * 
+ * @author Elias Näslund and John Viklund
+ * 
+ */
 public class IPConnection implements ConnectionInterface {
 	private Socket mSocket = null;
 	private String mAddr;
