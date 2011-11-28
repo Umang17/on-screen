@@ -7,8 +7,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -22,6 +27,10 @@ public class SelectServerActivity extends Activity {
 	private static final String SERVER_COUNT = "serverCount";
 	private static final String SERVER_ADDRESS = "serverAddress";
 	private static final String SERVER_NAME = "serverName";
+
+	private static final int ID_CONNECT = 0;
+	private static final int ID_EDIT = 1;
+	private static final int ID_DELETE = 2;
 
 	private ArrayList<ServerInfo> servers = new ArrayList<ServerInfo>();
 
@@ -53,6 +62,9 @@ public class SelectServerActivity extends Activity {
 		lv.setAdapter(new ArrayAdapter<ServerInfo>(this,
 				R.layout.server_list_item, servers));
 
+		// Register listeners
+		registerForContextMenu(lv);
+
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -82,6 +94,40 @@ public class SelectServerActivity extends Activity {
 			editor.putString(SERVER_NAME + i, s.getName());
 		}
 		editor.commit();
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		if (v.getId() == R.id.list) {
+			AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+			int pos = info.position;
+			ServerInfo s = servers.get(pos);
+			menu.setHeaderTitle(s.toString());
+			menu.add(pos, ID_CONNECT, Menu.NONE, R.string.select_connect);
+			menu.add(pos, ID_EDIT, Menu.NONE, R.string.select_edit);
+			menu.add(pos, ID_DELETE, Menu.NONE, R.string.select_delete);
+		} else {
+			super.onCreateContextMenu(menu, v, menuInfo);
+		}
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		Log.d(TAG, "Menu: " + item.getItemId() + " " + item.getGroupId());
+		switch (item.getItemId()) {
+		case ID_CONNECT:
+			// TODO
+			return true;
+		case ID_EDIT:
+			// TODO
+			return true;
+		case ID_DELETE:
+			// TODO
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
 	}
 
 	public void onServerConnectClick(View v) {
