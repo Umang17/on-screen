@@ -57,6 +57,8 @@ public class SelectPDFActivity extends ListActivity {
 				finish();
 			}
 		});
+		
+		//Using nfc but only for ignoring calls and get no popup about nfc discovered.
 		ConcreteHandleTagDiscover concreteHandler = new ConcreteHandleTagDiscover();
 		HandleTagDiscoverWithBlock handleTagIDDiscoverWithBlock = new HandleTagDiscoverWithBlock(
 				concreteHandler);

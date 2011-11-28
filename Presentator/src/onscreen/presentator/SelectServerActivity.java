@@ -2,6 +2,10 @@ package onscreen.presentator;
 
 import java.util.ArrayList;
 
+import onscreen.presentator.nfc.ConcreteHandleTagDiscover;
+import onscreen.presentator.nfc.HandleTagDiscoverWithBlock;
+import onscreen.presentator.nfc.ReadNfcTag;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,6 +37,8 @@ public class SelectServerActivity extends Activity {
 	private static final int ID_DELETE = 2;
 
 	private ArrayList<ServerInfo> servers = new ArrayList<ServerInfo>();
+
+	private ReadNfcTag readNfcTag;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +81,28 @@ public class SelectServerActivity extends Activity {
 				}
 			}
 		});
+		
+		//Using nfc but only for ignoring calls and get no popup about nfc discovered.
+		ConcreteHandleTagDiscover concreteHandler = new ConcreteHandleTagDiscover();
+		HandleTagDiscoverWithBlock handleTagIDDiscoverWithBlock = new HandleTagDiscoverWithBlock(
+				concreteHandler);
+		
+		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
+		readNfcTag.onCreate(this);
 	}
+	
+	@Override
+	protected void onPause() {
+		readNfcTag.onPause();
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		readNfcTag.onResume(getIntent());
+	}
+	
 
 	@Override
 	protected void onStop() {
