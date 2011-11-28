@@ -43,7 +43,6 @@
             android:label="@string/open_presentation"
             android:name=".SelectPDFActivity"
             android:screenOrientation="portrait" >
-            
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
@@ -52,6 +51,22 @@
             <intent-filter >
                 <action android:name="android.nfc.action.TECH_DISCOVERED" />
             </intent-filter>
+        </activity>
+        <activity
+            android:label="@string/select_server"
+            android:name=".SelectServerActivity"
+            android:screenOrientation="portrait" >
+
+            <!--
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter >
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+            </intent-filter>
+            -->
         </activity>
     </application>
 

@@ -14,6 +14,9 @@
     <string name="selected_file">Selected: %1$s</string>
     <string name="disconnected_message">Disconnected from server.</string>
 
+    <!-- SelectServer -->
+    <string name="select_server">Connect to</string>
+
     <!-- PDFActivity -->
     <string name="pdf_none_found">Didn\'t find any PDF files on the phone.</string>
     <string name="pdf_storage_failed">Can\'t open the external storage.</string>
