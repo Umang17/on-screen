@@ -1,7 +1,5 @@
 package onscreen.presentator;
 
-import java.util.ArrayList;
-
 import onscreen.presentator.nfc.ConcreteHandleTagDiscover;
 import onscreen.presentator.nfc.HandleTagDiscoverWithBlock;
 import onscreen.presentator.nfc.ReadNfcTag;
@@ -36,7 +34,7 @@ public class SelectServerActivity extends Activity {
 	private static final int ID_EDIT = 1;
 	private static final int ID_DELETE = 2;
 
-	private ArrayList<ServerInfo> servers = new ArrayList<ServerInfo>();
+	private ArrayAdapter<ServerInfo> serverAdapter;
 
 	private ReadNfcTag readNfcTag;
 
@@ -44,6 +42,9 @@ public class SelectServerActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.server_list);
+
+		serverAdapter = new ArrayAdapter<ServerInfo>(this,
+				R.layout.server_list_item);
 
 		// Read all old servers
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME,
@@ -54,19 +55,18 @@ public class SelectServerActivity extends Activity {
 			address = settings.getString(SERVER_ADDRESS + i, "");
 			name = settings.getString(SERVER_NAME + i, "");
 			if (address.length() > 0) {
-				servers.add(new ServerInfo(address, name));
+				serverAdapter.add(new ServerInfo(address, name));
 			}
 		}
 
 		// TODO Remove debug code
-		if (servers.size() == 0) {
-			servers.add(new ServerInfo("130.240.93.115"));
-			servers.add(new ServerInfo("00:1F:E1:EB:3B:DE"));
+		if (serverAdapter.getCount() == 0) {
+			serverAdapter.add(new ServerInfo("130.240.93.115"));
+			serverAdapter.add(new ServerInfo("00:1F:E1:EB:3B:DE"));
 		}
 
 		ListView lv = (ListView) findViewById(R.id.list);
-		lv.setAdapter(new ArrayAdapter<ServerInfo>(this,
-				R.layout.server_list_item, servers));
+		lv.setAdapter(serverAdapter);
 
 		// Register listeners
 		registerForContextMenu(lv);
@@ -112,11 +112,11 @@ public class SelectServerActivity extends Activity {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME,
 				MODE_PRIVATE);
 		SharedPreferences.Editor editor = settings.edit();
-		int size = servers.size();
-		editor.putInt(SERVER_COUNT, size);
+		int count = serverAdapter.getCount();
+		editor.putInt(SERVER_COUNT, count);
 		ServerInfo s;
-		for (int i = 0; i < size; i++) {
-			s = servers.get(i);
+		for (int i = 0; i < count; i++) {
+			s = serverAdapter.getItem(i);
 			editor.putString(SERVER_ADDRESS + i, s.getAddress());
 			editor.putString(SERVER_NAME + i, s.getName());
 		}
@@ -129,7 +129,7 @@ public class SelectServerActivity extends Activity {
 		if (v.getId() == R.id.list) {
 			AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 			int pos = info.position;
-			ServerInfo s = servers.get(pos);
+			ServerInfo s = serverAdapter.getItem(pos);
 			menu.setHeaderTitle(s.toString());
 			menu.add(pos, ID_CONNECT, Menu.NONE, R.string.select_connect);
 			menu.add(pos, ID_EDIT, Menu.NONE, R.string.select_edit);
@@ -150,7 +150,7 @@ public class SelectServerActivity extends Activity {
 			// TODO
 			return true;
 		case ID_DELETE:
-			// TODO
+			serverAdapter.remove(serverAdapter.getItem(item.getGroupId()));
 			return true;
 		default:
 			return super.onContextItemSelected(item);
@@ -164,7 +164,7 @@ public class SelectServerActivity extends Activity {
 		Log.d(TAG, "Connect with: " + text);
 		if (text.length() > 0) {
 			ServerInfo serverInfo = new ServerInfo(text);
-			servers.add(serverInfo);
+			serverAdapter.add(serverInfo);
 			setResultAndFinish(serverInfo);
 		}
 	}
