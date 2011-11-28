@@ -257,16 +257,12 @@ public class PresentatorActivity extends Activity implements Observer {
 	}
 
 	public void onStartStopClick(View v) {
-		switch (stopWatch.getState()) {
-		case RUNNING:
+		if(stopWatch.running()){
 			mConnection.sendPauseClock();
 			pauseClockAndSetButtons();
-			break;
-		case PAUSED:
-		case STOPPED:
+		}else {
 			startClockAndSetButtons();
 			mConnection.sendStartClock();
-			break;
 		}
 	}
 
@@ -295,7 +291,7 @@ public class PresentatorActivity extends Activity implements Observer {
 		((TextView) findViewById(R.id.presentationName)).setText(String.format(
 				getResources().getString(R.string.presenting_file), name));
 		mPresentationFile = null;
-		stopWatch.setBaseTime(time);
+		stopWatch.setTime(time);
 		Log.d("TIME", "Time is: " + time);
 		if (running) {
 			mConnection.sendStartClock();

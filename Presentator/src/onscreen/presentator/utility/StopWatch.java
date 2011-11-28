@@ -11,37 +11,49 @@ public class StopWatch extends Chronometer {
 	private boolean isRunning = false;
 	private boolean clockReseted = true;
 
-	public enum WatchState {
-		RUNNING, PAUSED, STOPPED
-	};
 
-	private WatchState state = WatchState.STOPPED;
-
+	/**
+	 * A StopWatch with start, pause, reset functionality.
+	 * 
+	 * Example usage: stopWatch = (StopWatch) findViewById(R.id.chronometer);
+	 * 
+	 * @param context
+	 */
 	public StopWatch(Context context) {
 		super(context);
 	}
 	
+	/**
+	 * A StopWatch with start, pause, reset functionality.
+	 * 
+	 * Example usage: stopWatch = (StopWatch) findViewById(R.id.chronometer);
+	 * 
+	 * @param context
+	 * @param attr
+	 */
 	public StopWatch(Context context, AttributeSet attr) {
 		super(context, attr);
 	}
 
 	/**
+	 * 
 	 * @return the displayed time in seconds
 	 */
-	public Long getStopWatchTime() {
+	public Long getTime() {
 		if (!isRunning) {
-			return getRestoreTime() / 1000;
+			return currentTimeLastStop - this.getBase() / 1000;
 		} else {
 			return (time() - this.getBase()) / 1000;
 		}
 	}
 
 	/**
+	 * Sets the time that the display should show.
+	 * Call this method will not change state(if it is running or paused.). 
 	 * 
-	 * @param time
-	 *            the stopwatch is displayed
+	 * @param time in seconds
 	 */
-	public void setBaseTime(int time) {
+	public void setTime(int time) {
 		Long time2 = time();
 		this.setBase(time2 - time * 1000);
 		clockReseted = false;
@@ -49,7 +61,9 @@ public class StopWatch extends Chronometer {
 	}
 
 	/**
-	 * Start the clock to tick
+	 * Start the clock to tick.
+	 * 
+	 * Can be called multiple times, it just set the state to running.
 	 */
 	public void startClock() {
 		if (isRunning)
@@ -65,45 +79,67 @@ public class StopWatch extends Chronometer {
 		this.start();
 		isRunning = true;
 		clockReseted = false;
-		state = WatchState.RUNNING;
 	}
 
+	/**
+	 * Get restore time for clock, used for set base time.
+	 * @return base time for clock.
+	 */
 	private long getRestoreTime() {
 		return this.getBase() + time() - currentTimeLastStop;
-	}
-
+	}	
+	
+	/**
+	 * Can be called multiple times, sets the state to paused
+	 */
 	public void pauseClock() {
 		if (!isRunning) {
 			return;
 		}
 		this.stop();
 		setClockIsNotRunning();
-		state = WatchState.PAUSED;
 	}
-
+	
+	/**
+	 * Reset the clock to time 00:00 and stop the clock.
+	 * Do not ignore multiple reset.
+	 */
 	public void resetClock() {
 		this.setBase(time());
 		this.refreshDrawableState();
 		this.stop();
 		setClockIsNotRunning();
 		clockReseted = true;
-		state = WatchState.STOPPED;
 	}
-
+	
+	/**
+	 * Sets currentTimeLastStop to time.
+	 * @param time 
+	 */
 	private void setClockIsNotRunning(Long time) {
 		currentTimeLastStop = time;
 		isRunning = false;
 	}
-
+	/**
+	 * Sets currentTimeLastStop to the time now.
+	 */
 	private void setClockIsNotRunning() {
 		setClockIsNotRunning(time());
 	}
 
+	/**
+	 * Relative time since something. It just have to be constant.
+	 * @return
+	 */
 	private Long time() {
 		return SystemClock.elapsedRealtime();
 	}
-
-	public WatchState getState() {
-		return state;
+	
+	/**
+	 * Tells if the clock is running or not, true is running.
+	 * @return
+	 */
+	public boolean running(){
+		return isRunning;
 	}
 }
