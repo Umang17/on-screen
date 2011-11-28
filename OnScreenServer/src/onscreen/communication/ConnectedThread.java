@@ -90,6 +90,7 @@ public class ConnectedThread implements Runnable, Observer {
             }
         } catch (Exception e) {
             Notification.debugMessage("Something went wrong: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

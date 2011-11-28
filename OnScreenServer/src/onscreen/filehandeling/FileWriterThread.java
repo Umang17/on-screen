@@ -43,6 +43,7 @@ public class FileWriterThread extends Thread {
         while (!isInterrupted()) {
             write(wb.get());
         }
+        Notification.debugMessage("Exitiing writing");
     }
 
     /**
@@ -55,6 +56,7 @@ public class FileWriterThread extends Thread {
             out.write(bytes);
         } catch (IOException ex) {
         } catch (NullPointerException ex) {
+            Notification.debugMessage("Exiting due to null pointer exception");
             close();
         }
     }

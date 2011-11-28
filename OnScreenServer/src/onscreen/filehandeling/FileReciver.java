@@ -3,6 +3,7 @@ package onscreen.filehandeling;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.zip.CRC32;
 import onscreen.Notification;
 
 /**
@@ -64,7 +65,6 @@ public class FileReciver {
 
         // Creates the file and makes sure that it does not exist already.
         File file = new File(fileLocation + fileName);
-        System.out.println(fileName);
         for (int i = 0; file.exists();) {
             String fName = fileName.split("\\.")[0];
             String type = fileName.split("\\.")[1];
@@ -79,23 +79,24 @@ public class FileReciver {
             
             for (int a = 0; a < size;) {
                 if ((a + NUM_BYTES) > size) {
-                    int use = NUM_BYTES;
-                    use = size - a;
+                    // For the last bytes
+                    int use = size - a;
                     bytes = new byte[use];
-                } 
+                }
                 
                 int read = stream.read(bytes);
                 wb.put(subArray(bytes, 0, read));
-                 
+                
                 a += read;
             }
         } catch (IOException ex) {
             Notification.debugMessage("Failed in reciving or writing data");
         } catch (NullPointerException ex) {
-            Notification.debugMessage("Failed in reciving or writing data np excpe");
+            Notification.debugMessage("Failed in reciving or writing data");
         }
+        wb.waitForAllRead();
         fw.close();
-
+        
         FilePresented filePres = new FilePresented(fileLocation, file.getName());
         return filePres;
     }
@@ -198,9 +199,6 @@ public class FileReciver {
      * @return the byte array stripped down
      */
     private byte[] subArray(byte[] bytes, int first, int last) {
-        if (first == 0 && last == bytes.length) {
-            return bytes;
-        }
         byte[] stripped = new byte[last - first];
         for (int i = first; i < last; i++) {
             stripped[i - first] = bytes[i];

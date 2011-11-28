@@ -1,6 +1,8 @@
 package onscreen.filehandeling;
 
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
+import onscreen.Notification;
 
 /**
  * A write buffer to be used between threads.
@@ -9,8 +11,9 @@ import java.util.ArrayList;
  */
 public class WriteBuffer {
 
-    private static int MAXINQUEUE = 3;
-    Queue q = new Queue();
+    private static int MAXINQUEUE = 15;
+    //Queue q = new Queue();
+    ArrayBlockingQueue<byte[]> q = new ArrayBlockingQueue<byte[]>(MAXINQUEUE);
 
     /**
      * Get the next byte array to use
@@ -25,7 +28,7 @@ public class WriteBuffer {
                 return null;
             }
         }
-        byte[] b = q.get();
+        byte[] b = q.poll();
         notifyAll();
         return b;
     }
@@ -36,15 +39,21 @@ public class WriteBuffer {
      * @param b the byte array to add
      */
     public synchronized void put(byte[] b) {
-        if (q.isFull()) {
+        if (q.size() >= MAXINQUEUE) {
             try {
                 wait();
             } catch (InterruptedException ex) {
+                ex.printStackTrace();
                 return;
             }
         }
-        q.put(b);
+        q.add(b);
         notifyAll();
+    }
+
+    public void waitForAllRead() {
+        while (!q.isEmpty()) {
+        }
     }
 
     /**
