@@ -17,6 +17,7 @@ public class IPConnection implements ConnectionInterface {
 	private Socket mSocket = null;
 	private String mAddr;
 	private static final int mPort = 8633;
+	private static final int NUMBER_OF_RETRIES = 2;
 
 	public IPConnection(String addr) {
 		mAddr = addr;
@@ -61,5 +62,9 @@ public class IPConnection implements ConnectionInterface {
 	@Override
 	public String toString() {
 		return "IPConnection: " + mAddr;
+	}
+
+	public int getRetries() {
+		return NUMBER_OF_RETRIES;
 	}
 }

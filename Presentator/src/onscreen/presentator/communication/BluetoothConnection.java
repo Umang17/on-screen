@@ -25,6 +25,7 @@ public class BluetoothConnection implements ConnectionInterface {
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothDevice mBlueToothDevice;
 	private String mAddr = null;
+	private static final int NUMBER_OF_RETRIES = 10;
 
 	public BluetoothConnection(String addr) {
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -80,5 +81,9 @@ public class BluetoothConnection implements ConnectionInterface {
 	@Override
 	public String toString() {
 		return "BluetoothConnection: " + mBlueToothDevice.getAddress();
+	}
+
+	public int getRetries() {
+		return NUMBER_OF_RETRIES;
 	}
 }

@@ -63,4 +63,11 @@ public interface ConnectionInterface {
 	 */
 	public String getAddr();
 
+	/**
+	 * Returns the number if times to retry to connect.
+	 * 
+	 * @return
+	 */
+	public int getRetries();
+
 }

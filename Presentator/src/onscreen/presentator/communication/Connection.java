@@ -357,7 +357,8 @@ public class Connection {
 
 		@Override
 		public void run() {
-			for (int i = 0; i < 10; i++) {
+			int retries = mmConnection.getRetries();
+			for (int i = 0; i < retries; i++) {
 				try {
 					mmConnection.connect();
 					connected(mmConnection);
