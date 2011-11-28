@@ -1,6 +1,19 @@
 package onscreen.presentator.utility;
 
+/**
+ * Class used for converting to and from bytes.
+ * 
+ * @author Elias Näslund and Mattias Lundberg
+ *
+ */
 public class ByteOperation {
+	
+	/**
+	 * Takes a long and converts it to a 8 bytes array.
+	 * 
+	 * @param v long to convert
+	 * @return array with 8 bytes
+	 */
 	public static final byte[] longToBytes(long v) {
 		byte[] writeBuffer = new byte[8];
 
@@ -12,9 +25,16 @@ public class ByteOperation {
 		writeBuffer[5] = (byte) (v >>> 16);
 		writeBuffer[6] = (byte) (v >>> 8);
 		writeBuffer[7] = (byte) (v >>> 0);
+		
 		return writeBuffer;
 	}
 
+	/**
+	 * Takes an int and converts it to a 4 bytes array.
+	 * 
+	 * @param v int to convert
+	 * @return array with 4 bytes
+	 */
 	public static final byte[] intToBytes(int v) {
 		byte[] writeBuffer = new byte[4];
 
@@ -26,6 +46,12 @@ public class ByteOperation {
 		return writeBuffer;
 	}
 
+	/**
+	 * Convert a 4 bytes array to an int.
+	 * 
+	 * @param b byte array to convert
+	 * @return int
+	 */
 	public static final int bytesToInt(byte[] b) {
 		int i = 0;
 
@@ -40,6 +66,12 @@ public class ByteOperation {
 		return (int) b & 0xFF;
 	}
 
+	/**
+	 * Convert an array with chars to an equal size array of bytes.
+	 * 
+	 * @param array with chars
+	 * @return array with bytes
+	 */
 	public static final byte[] charArrayToBytes(char[] array) {
 		byte[] bytes = new byte[array.length];
 		for (int i = 0; i < array.length; i++) {
