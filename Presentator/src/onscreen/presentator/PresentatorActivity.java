@@ -1,11 +1,15 @@
 package onscreen.presentator;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
+import onscreen.presentator.communication.BluetoothConnection;
 import onscreen.presentator.communication.Connection;
 import onscreen.presentator.communication.ConnectionInterface;
+import onscreen.presentator.communication.IPConnection;
 import onscreen.presentator.communication.TagParser;
 import onscreen.presentator.nfc.ConcreteHandleTagDiscover;
 import onscreen.presentator.nfc.HandleTagDiscoverWithBlock;
@@ -15,7 +19,10 @@ import onscreen.presentator.utility.StopWatch;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PresentatorActivity extends Activity implements Observer {
 
@@ -53,6 +61,7 @@ public class PresentatorActivity extends Activity implements Observer {
 
 	public static final int STATE_TAKE_OVER = 1;
 	public static final int STATE_LOAD = 2;
+	public static final int REQUEST_ENABLE_BT = 3;
 
 	private static final int DIALOG_FILE_PROGRESS = 0;
 	private static final int DIALOG_TAKE_OVER = 1;
@@ -63,6 +72,7 @@ public class PresentatorActivity extends Activity implements Observer {
 	private boolean running;
 	private int time;
 	private String name;
+	private String tag;
 
 	private final String TAG = "PresentatorActivity";
 
@@ -103,6 +113,7 @@ public class PresentatorActivity extends Activity implements Observer {
 
 		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
 		readNfcTag.onCreate(this);
+
 	}
 
 	@Override
@@ -164,11 +175,7 @@ public class PresentatorActivity extends Activity implements Observer {
 			resetWatch();
 			return true;
 		case R.id.connect:
-			ConnectionInterface connection = TagParser.parse("bla");
-			if (connection.getAddr() != mConnection.getAddr()) {
-				mConnection.stop();
-				mConnection.connect(connection);
-			}
+			connect("bla");
 			// TODO remove
 			Log.d(TAG, "After connect");
 			return true;
@@ -178,6 +185,75 @@ public class PresentatorActivity extends Activity implements Observer {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void connect(String tag) {
+		ArrayList<ConnectionInterface> connections = TagParser.parse(tag);
+		this.tag = tag;
+
+		boolean bluetooth = false;
+		boolean ip = false;
+		Iterator<ConnectionInterface> iter = connections.iterator();
+
+		while (iter.hasNext()) {
+			ConnectionInterface connection = iter.next();
+
+			if (connection instanceof BluetoothConnection) {
+				bluetooth = true;
+				BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+						.getDefaultAdapter();
+				if (bluetoothAdapter == null) {
+					continue;
+				}
+				if (bluetoothAdapter.isEnabled()) {
+					if (mConnection.getAddr() == null
+							|| connection.getAddr().compareTo(
+									(mConnection.getAddr())) != 0) {
+						mConnection.stop();
+						mConnection.connect(connection);
+					}
+					return;
+				}
+			} else if (connection instanceof IPConnection) {
+				ip = true;
+				ConnectivityManager connManager = (ConnectivityManager) getSystemService(PresentatorActivity.CONNECTIVITY_SERVICE);
+				NetworkInfo mWifi = connManager
+						.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+				if (mWifi.isConnected()) {
+					if (mConnection.getAddr() == null
+							|| connection.getAddr().compareTo(
+									(mConnection.getAddr())) != 0) {
+						mConnection.stop();
+						mConnection.connect(connection);
+					}
+					return;
+				}
+			}
+
+		}
+		// tell user that either or neither bluetooth and wifi is on
+		CharSequence text;
+		int duration = Toast.LENGTH_SHORT;
+
+		if (bluetooth && ip) {
+			text = "Please enable bluetooth or connect to wifi and try again!";
+		} else if (bluetooth) {
+			BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+					.getDefaultAdapter();
+
+			if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
+				Intent enableBtIntent = new Intent(
+						BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+				return;
+			}
+			text = "Bluetooth unavailable, you can't connect!";
+		} else {
+			text = "Please connect to wifi and try again!";
+		}
+		Toast toast = Toast.makeText(this, text, duration);
+		toast.show();
 	}
 
 	@Override
@@ -217,6 +293,12 @@ public class PresentatorActivity extends Activity implements Observer {
 							name));
 			upload();
 			break;
+		case REQUEST_ENABLE_BT:
+			if (resultCode == RESULT_OK) {
+				connect(tag);
+			} else {
+				// no bluetooth :(
+			}
 		}
 	}
 
@@ -224,13 +306,7 @@ public class PresentatorActivity extends Activity implements Observer {
 		if (arg0 instanceof ConcreteHandleTagDiscover) {
 			String tagID = ((ConcreteHandleTagDiscover) arg0).getTag();
 
-			ConnectionInterface connection = TagParser.parse(tagID);
-
-			if (mConnection.getAddr() == null
-					|| connection.getAddr().compareTo((mConnection.getAddr())) != 0) {
-				mConnection.stop();
-				mConnection.connect(connection);
-			}
+			connect(tagID);
 		}
 	}
 

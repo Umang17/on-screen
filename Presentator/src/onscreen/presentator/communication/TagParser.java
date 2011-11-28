@@ -1,5 +1,6 @@
 package onscreen.presentator.communication;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,43 +29,26 @@ public class TagParser {
 	/**
 	 * Parse a tag from the nfc. The tag should look something like b:addr\ni:ip
 	 * 
-	 * TODO return all valid connections
-	 * 
 	 * @param tagID
-	 * @return ConnectionInterface or null if none is valid
+	 * @return ArrayList with ConnectionInterface or null if none is valid
 	 */
-	public static ConnectionInterface parse(String tagID) {
+	public static ArrayList<ConnectionInterface> parse(String tagID) {
 		// Split the string to get all different kinds of connections.
 		String[] addresses = tagID.split("\n");
+		ArrayList<ConnectionInterface> connections = new ArrayList<ConnectionInterface>();
+		
 		for (String s : addresses) {
 			// call the parser to check that the address is correct and returned
 			// as a ConnectionInterface ready to use.
 			ConnectionInterface connection = parserHelper(s);
 			if (connection != null) {
-
-				// BluetoothAdapter bluetoothAdapter =
-				// BluetoothAdapter.getDefaultAdapter();
-				// if (bluetoothAdapter == null) {
-				// // bluetooth not existing on the device
-				// continue;
-				// }
-				// if (bluetoothAdapter.isEnabled()) {
-				// // check if bluetooth is enabled
-				// }
-				//
-				// ConnectivityManager connManager = (ConnectivityManager)
-				// getSystemService(PresentatorActivity.CONNECTIVITY_SERVICE);
-				// NetworkInfo mWifi =
-				// connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-				//
-				// if (mWifi.isConnected()) {
-				// // Do whatever
-				// }
-
-				return connection;
+				connections.add(connection);
 			}
 		}
-		return null;
+		if (connections.isEmpty()) {
+			return null;
+		}
+		return connections;
 	}
 
 	/**
