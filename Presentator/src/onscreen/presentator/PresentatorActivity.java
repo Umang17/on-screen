@@ -33,7 +33,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -59,9 +58,10 @@ public class PresentatorActivity extends Activity implements Observer {
 	public static final String BUNDLE_TIME = "Time";
 	public static final String BUNDLE_RUNNING = "Running";
 
-	public static final int STATE_TAKE_OVER = 1;
-	public static final int STATE_LOAD = 2;
-	public static final int REQUEST_ENABLE_BT = 3;
+	private static final int STATE_TAKE_OVER = 1;
+	private static final int STATE_LOAD = 2;
+	private static final int REQUEST_ENABLE_BT = 3;
+	private static final int STATE_SELECT_SERVER = 4;
 
 	private static final int DIALOG_FILE_PROGRESS = 0;
 	private static final int DIALOG_TAKE_OVER = 1;
@@ -89,14 +89,15 @@ public class PresentatorActivity extends Activity implements Observer {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		final boolean customTitleSupported = requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		// final boolean customTitleSupported =
+		// requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
 		setContentView(R.layout.presentation);
 
-		if (customTitleSupported) {
-			getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-					R.layout.titlebar);
-		}
+		// if (customTitleSupported) {
+		// getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
+		// R.layout.titlebar);
+		// }
 
 		setControlButtonsVisible(false);
 
@@ -175,9 +176,7 @@ public class PresentatorActivity extends Activity implements Observer {
 			resetWatch();
 			return true;
 		case R.id.connect:
-			connect("bla");
-			// TODO remove
-			Log.d(TAG, "After connect");
+			openSelectServer();
 			return true;
 		case R.id.disconnect:
 			mConnection.stop();
@@ -299,6 +298,16 @@ public class PresentatorActivity extends Activity implements Observer {
 			} else {
 				// no bluetooth :(
 			}
+			break;
+		case STATE_SELECT_SERVER:
+			if (resultCode != RESULT_OK) {
+				Log.d("SelectServerReturn", "Not ok");
+				break;
+			}
+			String address = data
+					.getStringExtra(SelectServerActivity.SERVER_ADDRESS_INTENT);
+			connect(address);
+			break;
 		}
 	}
 
@@ -333,10 +342,10 @@ public class PresentatorActivity extends Activity implements Observer {
 	}
 
 	public void onStartStopClick(View v) {
-		if(stopWatch.running()){
+		if (stopWatch.running()) {
 			mConnection.sendPauseClock();
 			pauseClockAndSetButtons();
-		}else {
+		} else {
 			startClockAndSetButtons();
 			mConnection.sendStartClock();
 		}
@@ -404,14 +413,18 @@ public class PresentatorActivity extends Activity implements Observer {
 		startActivityForResult(loadIntent, STATE_LOAD);
 	}
 
+	private void openSelectServer() {
+		Intent loadIntent = new Intent(PresentatorActivity.this,
+				SelectServerActivity.class);
+		startActivityForResult(loadIntent, STATE_SELECT_SERVER);
+	}
+
 	private class PresentatorHandler extends Handler {
 
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MESSAGE_CONNECTED:
-				((ImageView) findViewById(R.id.titleImage))
-						.setImageResource(R.drawable.connected);
 				setControlButtonsVisible(true);
 				break;
 			case MESSAGE_DISCONNECTED:
@@ -419,8 +432,6 @@ public class PresentatorActivity extends Activity implements Observer {
 				// R.string.disconnected_message, Toast.LENGTH_LONG)
 				// .show();
 				Log.d(TAG, "Disconnected from: " + mConnection.getAddr());
-				((ImageView) findViewById(R.id.titleImage))
-						.setImageResource(R.drawable.disconnected);
 				if (mFileProgressDialog != null) {
 					if (mFileProgressDialog.isShowing()) {
 						dismissDialog(DIALOG_FILE_PROGRESS);
