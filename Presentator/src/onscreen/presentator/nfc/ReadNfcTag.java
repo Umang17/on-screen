@@ -10,23 +10,30 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Parcelable;
 
-public class ReadNfcTag {
+/**
+ * Handles everything that has with nfc.
+ * It will call handleTagDiscover(text) when a tag is discovered.
+ * 
+ * Use onCreate, onPause, onNewIntent and onResume functions in your Activity.
+ * @author viktor
+ *
+ */
 
-	//private static final String TAG = "ReadNfcTag";
+public class ReadNfcTag {
 
 	private PendingIntent mNfcPendingIntent;
 	private IntentFilter[] mWriteTagFilters;
 
-	private Activity mainClass;
+	private Activity activity;
 	private NfcAdapter mNfcAdapter;
 
 	private HandleTagDiscover hTIDD;
 
 	/**
 	 * Calls handleTagIDDiscover.handleTagIDDiscover(message) when a new tag is
-	 * discovered. If no message found the tagID is returned if it is found, else ignores.
+	 * discovered. If no message found the tag ID is returned and if that is not found, else ignores.
 	 * 
-	 * Don't forget to use onPause, onResume and onCreate
+	 * Don't forget to use onPause, onResume, onNewIntent and onCreate in your Activity.
 	 * 
 	 * @param handleTagIDDiscover
 	 */
@@ -41,7 +48,7 @@ public class ReadNfcTag {
 	 */
 	public void onCreate(Activity mainClass) {
 
-		this.mainClass = mainClass;
+		this.activity = mainClass;
 
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(mainClass);
 		if (mNfcAdapter == null) {
@@ -54,6 +61,10 @@ public class ReadNfcTag {
 				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 	}
 
+	/**
+	 * Enables nfc and see if a tag was discovered.
+	 * @param intent
+	 */
 	public void onResume(Intent intent) {
 		if (mNfcAdapter == null) {
 			return;
@@ -65,30 +76,35 @@ public class ReadNfcTag {
 		}
 	}
 
+	/**
+	 * Setting filters
+	 */
 	private void enableNFC() {
 
 		IntentFilter tagDetected = new IntentFilter(
 				NfcAdapter.ACTION_TAG_DISCOVERED);
 		mWriteTagFilters = new IntentFilter[] { tagDetected };
-		mNfcAdapter.enableForegroundDispatch(mainClass, mNfcPendingIntent,
+		mNfcAdapter.enableForegroundDispatch(activity, mNfcPendingIntent,
 				mWriteTagFilters, null);
 	}
 
+	/**
+	 * Disables nfc forground.
+	 */
 	public void onPause() {
 		if (mNfcAdapter == null) {
 			return;
 		}
 		try {
-			mNfcAdapter.disableForegroundDispatch(mainClass);
+			mNfcAdapter.disableForegroundDispatch(activity);
 		} catch (Exception e) {
 			try {
 				if(!mNfcAdapter.isEnabled()){
-					mNfcAdapter = NfcAdapter.getDefaultAdapter(mainClass);
+					mNfcAdapter = NfcAdapter.getDefaultAdapter(activity);
+					mNfcAdapter.disableForegroundDispatch(activity);
 				}
-			} catch (Exception e2) {}
-			
-		}
-		
+			} catch (Exception e2) {}			
+		}		
 	}
 
 	/**
@@ -104,12 +120,20 @@ public class ReadNfcTag {
 		return (tagID.length == 0) ? "" : ByteArrayToHexString(tagID);
 	}
 
+	/**
+	 * Checks if it is a ACTION_TAG_DISCOVERED intent and handles it. 
+	 * @param intent to handle.
+	 */
 	public void onNewIntent(Intent intent) {
-		//Log.d(TAG, "onNewIntent " + intent.getAction());
 		if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
 			handleNewTagIDIntent(intent);
 		}
 	}
+	
+	/**
+	 * Try to read message, else try to read tagID, else do nothing and not call handleTagDiscover.
+	 * @param intent to read message from.
+	 */
 	
 	private void handleNewTagIDIntent(Intent intent) {
 		String text = null;
@@ -143,6 +167,7 @@ public class ReadNfcTag {
 
 		hTIDD.handleTagDiscover(text);
 	}
+	
 	/**
 	 * Handles NDEF messages
 	 * @param intent to get messages from
@@ -179,7 +204,7 @@ public class ReadNfcTag {
     }
 	
 	/**
-	 * Converts to a hexstring
+	 * Converts from a bytearray to a hextring
 	 * @param inarray
 	 * @return
 	 */

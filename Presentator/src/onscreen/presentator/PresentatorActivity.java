@@ -313,7 +313,7 @@ public class PresentatorActivity extends Activity implements Observer {
 
 	public void update(Observable arg0, Object arg1) {
 		if (arg0 instanceof ConcreteHandleTagDiscover) {
-			String tagID = ((ConcreteHandleTagDiscover) arg0).getTag();
+			String tagID = ((ConcreteHandleTagDiscover) arg0).getTagText();
 
 			connect(tagID);
 		}
