@@ -17,24 +17,25 @@ public class Notification {
     private static TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("tray.gif"));
 
     public static void init() {
-        SystemTray tray = SystemTray.getSystemTray();
-        try {
-            tray.add(trayIcon);
-        } catch (AWTException ex) {
-            return;
-        }
-        ActionListener exitListener = new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Exiting...");
-                System.exit(0);
+        if (SystemTray.isSupported()) {
+            SystemTray tray = SystemTray.getSystemTray();
+            try {
+                tray.add(trayIcon);
+            } catch (AWTException ex) {
+                return;
             }
-        };
- 
-        trayIcon.setImageAutoSize(true);
-        trayIcon.addActionListener(exitListener);
-        init = true;
+            ActionListener exitListener = new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    System.exit(0);
+                }
+            };
+
+            trayIcon.setImageAutoSize(true);
+            trayIcon.addActionListener(exitListener);
+            init = true;
+        }
     }
 
     /**
@@ -49,15 +50,20 @@ public class Notification {
     }
 
     /**
-     * Displays a notification in the system tray
+     * Displays a notification in the system tray or prints to command line.
+     * 
      * @param notification 
      */
     public static void message(String notification) {
-        if (!init) {
-            init();
+        if (SystemTray.isSupported()) {
+            if (!init) {
+                init();
+            }
+            trayIcon.displayMessage("OnScreen", notification,
+                    TrayIcon.MessageType.INFO);
+        } else {
+            System.out.println(notification);
         }
-        trayIcon.displayMessage("OnScreen", notification,
-                TrayIcon.MessageType.INFO);
     }
 
     /**

@@ -131,7 +131,15 @@ public class ConnectedThread implements Runnable, Observer {
         }
         filePresented = fileReciver.reciveFile(bufferedInputStream);
         Runtime rt = Runtime.getRuntime();
-        Process pr = rt.exec(OnScreen.pdfReader + "\"" + filePresented.getFullName() + "\"");
+        
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            rt.exec(OnScreen.pdfReader + "\"" + filePresented.getFullName() + "\"");
+        } else {
+            String fileRun = filePresented.getFullName();
+            fileRun.replace(" ", "\\ ");
+            rt.exec(OnScreen.pdfReader + fileRun);
+        }
+               
         outputStream.write(STARTPRESENTATION);
         presentationTimer.reset(this);
         presentationTimer.start(this);
