@@ -65,6 +65,7 @@ public class SelectPDFActivity extends ListActivity {
 		readNfcTag.onCreate(this);
 	}
 
+	
 	@Override
 	protected void onPause() {
 		readNfcTag.onPause();
@@ -75,11 +76,6 @@ public class SelectPDFActivity extends ListActivity {
 	protected void onResume() {
 		super.onResume();
 		readNfcTag.onResume(getIntent());
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent) {
-		readNfcTag.onNewIntent(intent);
 	}
 	
 	/**
