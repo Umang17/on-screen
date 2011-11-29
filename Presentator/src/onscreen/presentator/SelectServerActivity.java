@@ -89,7 +89,7 @@ public class SelectServerActivity extends Activity {
 		for (int i = 0; i < serverCount; i++) {
 			address = settings.getString(SERVER_ADDRESS + i, "");
 			name = settings.getString(SERVER_NAME + i, "");
-			if (address.length() > 0) {
+			if (address.length() > 0) { // Discard items with empty address
 				serverAdapter.add(new ServerInfo(address, name, true));
 			}
 		}
