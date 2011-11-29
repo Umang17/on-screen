@@ -14,6 +14,13 @@
     <string name="selected_file">Selected: %1$s</string>
     <string name="disconnected_message">Disconnected from server.</string>
 
+    <!-- EditServerDialog -->
+    <string name="edit_title">Edit server</string>
+    <string name="edit_name">Name</string>
+    <string name="edit_address">Address</string>
+    <string name="edit_save">Save</string>
+    <string name="edit_cancel">Cancel</string>
+
     <!-- SelectServer -->
     <string name="select_server">Connect to</string>
     <string name="select_connect">Connect</string>

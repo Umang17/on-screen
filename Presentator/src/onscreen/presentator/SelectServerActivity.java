@@ -5,11 +5,17 @@ import onscreen.presentator.nfc.HandleTagDiscoverWithBlock;
 import onscreen.presentator.nfc.ReadNfcTag;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +40,10 @@ public class SelectServerActivity extends Activity {
 	private static final int ID_EDIT = 1;
 	private static final int ID_DELETE = 2;
 
+	private static final int EDIT_DIALOG = 0;
+
 	private ArrayAdapter<ServerInfo> serverAdapter;
+	private ServerInfo editingItem;
 
 	private ReadNfcTag readNfcTag;
 
@@ -147,13 +156,69 @@ public class SelectServerActivity extends Activity {
 			setResultAndFinish(serverAdapter.getItem(item.getGroupId()));
 			return true;
 		case ID_EDIT:
-			// TODO
+			editingItem = serverAdapter.getItem(item.getGroupId());
+			showDialog(EDIT_DIALOG);
 			return true;
 		case ID_DELETE:
 			serverAdapter.remove(serverAdapter.getItem(item.getGroupId()));
 			return true;
 		default:
 			return super.onContextItemSelected(item);
+		}
+	}
+
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		switch (id) {
+		case EDIT_DIALOG:
+			EditText eName = (EditText) dialog
+					.findViewById(R.id.editText_server_name);
+			EditText eAddress = (EditText) dialog
+					.findViewById(R.id.editText_server_address);
+
+			eName.setText(editingItem.getName());
+			eAddress.setText(editingItem.getAddress());
+			return;
+		}
+		super.onPrepareDialog(id, dialog);
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case EDIT_DIALOG:
+			View v = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+					.inflate(R.layout.edit_server_dialog, null);
+			final EditText eName = (EditText) v
+					.findViewById(R.id.editText_server_name);
+			final EditText eAddress = (EditText) v
+					.findViewById(R.id.editText_server_address);
+
+			eName.setText(editingItem.getName());
+			eAddress.setText(editingItem.getAddress());
+
+			return new AlertDialog.Builder(SelectServerActivity.this)
+					.setView(v)
+					.setTitle(R.string.edit_title)
+					.setPositiveButton(R.string.edit_save,
+							new OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									String newName = eName.getText().toString();
+									String newAddress = eAddress.getText()
+											.toString();
+									if (newName.length() > 0) {
+										editingItem.setName(newName);
+									}
+									if (newAddress.length() > 0) {
+										editingItem.setAddress(newAddress);
+									}
+									serverAdapter.notifyDataSetChanged();
+								}
+							}).setNegativeButton(R.string.edit_cancel, null)
+					.create();
+		default:
+			return super.onCreateDialog(id);
 		}
 	}
 
@@ -196,6 +261,14 @@ public class SelectServerActivity extends Activity {
 
 		public ServerInfo(String address, String name) {
 			this.address = address;
+			this.name = name;
+		}
+
+		public void setAddress(String address) {
+			this.address = address;
+		}
+
+		public void setName(String name) {
 			this.name = name;
 		}
 
