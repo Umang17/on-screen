@@ -58,15 +58,12 @@ public class PresentatorActivity extends Activity implements Observer {
 	public static final String BUNDLE_TIME = "Time";
 	public static final String BUNDLE_RUNNING = "Running";
 
-	private static final int STATE_TAKE_OVER = 1;
 	private static final int STATE_LOAD = 2;
 	private static final int REQUEST_ENABLE_BT = 3;
 	private static final int STATE_SELECT_SERVER = 4;
 
 	private static final int DIALOG_FILE_PROGRESS = 0;
 	private static final int DIALOG_TAKE_OVER = 1;
-
-	public int state = 0;
 
 	// used while taking over
 	private boolean running;
@@ -89,15 +86,8 @@ public class PresentatorActivity extends Activity implements Observer {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// final boolean customTitleSupported =
-		// requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
 		setContentView(R.layout.presentation);
-
-		// if (customTitleSupported) {
-		// getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-		// R.layout.titlebar);
-		// }
 
 		setControlButtonsVisible(false);
 
