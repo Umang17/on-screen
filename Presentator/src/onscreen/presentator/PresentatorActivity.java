@@ -18,8 +18,11 @@ import onscreen.presentator.utility.FileProgressDialog;
 import onscreen.presentator.utility.StopWatch;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,7 +31,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -116,10 +118,24 @@ public class PresentatorActivity extends Activity implements Observer {
 			dialog = mFileProgressDialog;
 			break;
 		case DIALOG_TAKE_OVER:
-			dialog = new Dialog(this);
-			LinearLayout ll = (LinearLayout) LayoutInflater.from(this).inflate(
-					R.layout.take_over_dialog, null);
-			dialog.setContentView(ll);
+			dialog = new AlertDialog.Builder(this)
+					.setTitle(R.string.dialog_take_title)
+					.setMessage(R.string.dialog_take_message)
+					.setCancelable(false)
+					.setPositiveButton(R.string.dialog_continue,
+							new OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									onTakeOverClick();
+								}
+							})
+					.setNegativeButton(R.string.dialog_upload,
+							new OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									onUploadClick();
+								}
+							}).create();
 			break;
 		default:
 			dialog = null;
@@ -254,12 +270,12 @@ public class PresentatorActivity extends Activity implements Observer {
 		}
 	}
 
-	public void onUploadClick(View v) {
+	private void onUploadClick() {
 		dismissDialog(DIALOG_TAKE_OVER);
 		upload();
 	}
 
-	public void onTakeOverClick(View v) {
+	private void onTakeOverClick() {
 		dismissDialog(DIALOG_TAKE_OVER);
 		takeOver();
 	}
