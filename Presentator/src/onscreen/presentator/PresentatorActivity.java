@@ -157,6 +157,20 @@ public class PresentatorActivity extends Activity implements Observer {
 	}
 
 	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		boolean connected = mConnection.isConnected();
+		MenuItem disconnectItem = menu.findItem(R.id.disconnect);
+		if (disconnectItem != null) {
+			disconnectItem.setEnabled(connected);
+		}
+		MenuItem resetTimerItem = menu.findItem(R.id.menu_reset_watch);
+		if (resetTimerItem != null) {
+			resetTimerItem.setEnabled(connected);
+		}
+		return true;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.open_presentation:
@@ -174,75 +188,6 @@ public class PresentatorActivity extends Activity implements Observer {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	private void connect(String tag) {
-		ArrayList<ConnectionInterface> connections = TagParser.parse(tag);
-		this.tag = tag;
-
-		boolean bluetooth = false;
-		boolean ip = false;
-		Iterator<ConnectionInterface> iter = connections.iterator();
-
-		while (iter.hasNext()) {
-			ConnectionInterface connection = iter.next();
-
-			if (connection instanceof BluetoothConnection) {
-				bluetooth = true;
-				BluetoothAdapter bluetoothAdapter = BluetoothAdapter
-						.getDefaultAdapter();
-				if (bluetoothAdapter == null) {
-					continue;
-				}
-				if (bluetoothAdapter.isEnabled()) {
-					if (mConnection.getAddr() == null
-							|| connection.getAddr().compareTo(
-									(mConnection.getAddr())) != 0) {
-						mConnection.stop();
-						mConnection.connect(connection);
-					}
-					return;
-				}
-			} else if (connection instanceof IPConnection) {
-				ip = true;
-				ConnectivityManager connManager = (ConnectivityManager) getSystemService(PresentatorActivity.CONNECTIVITY_SERVICE);
-				NetworkInfo mWifi = connManager
-						.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-				if (mWifi.isConnected()) {
-					if (mConnection.getAddr() == null
-							|| connection.getAddr().compareTo(
-									(mConnection.getAddr())) != 0) {
-						mConnection.stop();
-						mConnection.connect(connection);
-					}
-					return;
-				}
-			}
-
-		}
-		// tell user that either or neither bluetooth and wifi is on
-		CharSequence text;
-		int duration = Toast.LENGTH_SHORT;
-
-		if (bluetooth && ip) {
-			text = "Please enable bluetooth or connect to wifi and try again!";
-		} else if (bluetooth) {
-			BluetoothAdapter bluetoothAdapter = BluetoothAdapter
-					.getDefaultAdapter();
-
-			if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
-				Intent enableBtIntent = new Intent(
-						BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-				return;
-			}
-			text = "Bluetooth unavailable, you can't connect!";
-		} else {
-			text = "Please connect to wifi and try again!";
-		}
-		Toast toast = Toast.makeText(this, text, duration);
-		toast.show();
 	}
 
 	@Override
@@ -339,6 +284,75 @@ public class PresentatorActivity extends Activity implements Observer {
 			startClockAndSetButtons();
 			mConnection.sendCommand(Connection.COMMAND_START);
 		}
+	}
+
+	private void connect(String tag) {
+		ArrayList<ConnectionInterface> connections = TagParser.parse(tag);
+		this.tag = tag;
+
+		boolean bluetooth = false;
+		boolean ip = false;
+		Iterator<ConnectionInterface> iter = connections.iterator();
+
+		while (iter.hasNext()) {
+			ConnectionInterface connection = iter.next();
+
+			if (connection instanceof BluetoothConnection) {
+				bluetooth = true;
+				BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+						.getDefaultAdapter();
+				if (bluetoothAdapter == null) {
+					continue;
+				}
+				if (bluetoothAdapter.isEnabled()) {
+					if (mConnection.getAddr() == null
+							|| connection.getAddr().compareTo(
+									(mConnection.getAddr())) != 0) {
+						mConnection.stop();
+						mConnection.connect(connection);
+					}
+					return;
+				}
+			} else if (connection instanceof IPConnection) {
+				ip = true;
+				ConnectivityManager connManager = (ConnectivityManager) getSystemService(PresentatorActivity.CONNECTIVITY_SERVICE);
+				NetworkInfo mWifi = connManager
+						.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+				if (mWifi.isConnected()) {
+					if (mConnection.getAddr() == null
+							|| connection.getAddr().compareTo(
+									(mConnection.getAddr())) != 0) {
+						mConnection.stop();
+						mConnection.connect(connection);
+					}
+					return;
+				}
+			}
+
+		}
+		// tell user that either or neither bluetooth and wifi is on
+		CharSequence text;
+		int duration = Toast.LENGTH_SHORT;
+
+		if (bluetooth && ip) {
+			text = "Please enable bluetooth or connect to wifi and try again!";
+		} else if (bluetooth) {
+			BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+					.getDefaultAdapter();
+
+			if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
+				Intent enableBtIntent = new Intent(
+						BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+				return;
+			}
+			text = "Bluetooth unavailable, you can't connect!";
+		} else {
+			text = "Please connect to wifi and try again!";
+		}
+		Toast toast = Toast.makeText(this, text, duration);
+		toast.show();
 	}
 
 	private void setControlButtonsVisible(boolean visible) {
