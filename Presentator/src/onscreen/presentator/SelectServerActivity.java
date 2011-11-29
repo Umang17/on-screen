@@ -81,16 +81,17 @@ public class SelectServerActivity extends Activity {
 				}
 			}
 		});
-		
-		//Using nfc but only for ignoring calls and get no popup about nfc discovered.
+
+		// Using nfc but only for ignoring calls and get no popup about nfc
+		// discovered.
 		ConcreteHandleTagDiscover concreteHandler = new ConcreteHandleTagDiscover();
 		HandleTagDiscoverWithBlock handleTagIDDiscoverWithBlock = new HandleTagDiscoverWithBlock(
 				concreteHandler);
-		
+
 		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
 		readNfcTag.onCreate(this);
 	}
-	
+
 	@Override
 	protected void onPause() {
 		readNfcTag.onPause();
@@ -102,7 +103,6 @@ public class SelectServerActivity extends Activity {
 		super.onResume();
 		readNfcTag.onResume(getIntent());
 	}
-	
 
 	@Override
 	protected void onStop() {
@@ -144,7 +144,7 @@ public class SelectServerActivity extends Activity {
 		Log.d(TAG, "Menu: " + item.getItemId() + " " + item.getGroupId());
 		switch (item.getItemId()) {
 		case ID_CONNECT:
-			// TODO
+			setResultAndFinish(serverAdapter.getItem(item.getGroupId()));
 			return true;
 		case ID_EDIT:
 			// TODO
