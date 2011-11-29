@@ -7,10 +7,14 @@ import onscreen.presentator.nfc.ReadNfcTag;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +49,28 @@ public class SelectServerActivity extends Activity {
 
 	private ServerInfoAdapter serverAdapter;
 	private ServerInfo editingItem;
+
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			// When discovery finds a device
+			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+				// Get the BluetoothDevice object from the Intent
+				BluetoothDevice device = intent
+						.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+				// Add the name and address to the adapter
+				String address = device.getAddress();
+				for (int i = 0; i < serverAdapter.getCount(); i++) {
+					if (serverAdapter.getItem(i).address.compareTo(address) == 0) {
+						// Only add it if it isn't there.
+						return;
+					}
+				}
+				serverAdapter.add(new ServerInfo(address, device.getName(),
+						true));
+			}
+		}
+	};
 
 	private ReadNfcTag readNfcTag;
 
@@ -98,6 +124,15 @@ public class SelectServerActivity extends Activity {
 	@Override
 	protected void onPause() {
 		readNfcTag.onPause();
+
+		// Unregister the BroadcastReceiver
+		BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+				.getDefaultAdapter();
+		if (bluetoothAdapter != null) {
+			bluetoothAdapter.cancelDiscovery();
+		}
+		unregisterReceiver(mReceiver);
+
 		super.onPause();
 	}
 
@@ -105,6 +140,15 @@ public class SelectServerActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		readNfcTag.onResume(getIntent());
+
+		// Register the BroadcastReceiver
+		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+		registerReceiver(mReceiver, filter);
+		BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+				.getDefaultAdapter();
+		if (bluetoothAdapter != null) {
+			bluetoothAdapter.startDiscovery();
+		}
 	}
 
 	@Override
@@ -116,13 +160,17 @@ public class SelectServerActivity extends Activity {
 				MODE_PRIVATE);
 		SharedPreferences.Editor editor = settings.edit();
 		int count = serverAdapter.getCount();
-		editor.putInt(SERVER_COUNT, count);
+		int numberOfItems = 0;
 		ServerInfo s;
 		for (int i = 0; i < count; i++) {
 			s = serverAdapter.getItem(i);
-			editor.putString(SERVER_ADDRESS + i, s.getAddress());
-			editor.putString(SERVER_NAME + i, s.getName());
+			if (!s.isAutoDiscovered()) {
+				editor.putString(SERVER_ADDRESS + numberOfItems, s.getAddress());
+				editor.putString(SERVER_NAME + numberOfItems, s.getName());
+				numberOfItems++;
+			}
 		}
+		editor.putInt(SERVER_COUNT, numberOfItems);
 		editor.commit();
 	}
 
@@ -235,6 +283,7 @@ public class SelectServerActivity extends Activity {
 	 * @param server
 	 */
 	private void setResultAndFinish(ServerInfo server) {
+		server.setAutoDiscovered(false); // Save it
 		Intent data = new Intent();
 		data.putExtra(SERVER_ADDRESS_INTENT, server.getAddress());
 		setResult(RESULT_OK, data);
@@ -277,14 +326,20 @@ public class SelectServerActivity extends Activity {
 	private class ServerInfo {
 		private String address;
 		private String name;
+		private boolean autoDiscovered;
 
 		public ServerInfo(String address) {
 			this(address, address);
 		}
 
 		public ServerInfo(String address, String name) {
+			this(address, name, false);
+		}
+
+		public ServerInfo(String address, String name, boolean autoDiscovered) {
 			this.address = address;
 			this.name = name;
+			this.autoDiscovered = autoDiscovered;
 		}
 
 		public void setAddress(String address) {
@@ -295,6 +350,10 @@ public class SelectServerActivity extends Activity {
 			this.name = name;
 		}
 
+		public void setAutoDiscovered(boolean autoDiscovered) {
+			this.autoDiscovered = autoDiscovered;
+		}
+
 		public String getAddress() {
 			return address;
 		}
@@ -303,9 +362,13 @@ public class SelectServerActivity extends Activity {
 			return name;
 		}
 
+		public boolean isAutoDiscovered() {
+			return autoDiscovered;
+		}
+
 		@Override
 		public String toString() {
-			return name;
+			return name + " - " + address;
 		}
 	}
 }
