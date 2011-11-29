@@ -91,58 +91,7 @@ public class Connection {
 
 		return true;
 	}
-
-	public boolean sendExit() {
-		if (!mConnected)
-			return false;
-		mConnectedThread.write(TYPE_COMMANDS);
-		mConnectedThread.write(COMMAND_EXIT);
-		return true;
-	}
-
-	public boolean sendNext() {
-		if (!mConnected)
-			return false;
-		mConnectedThread.write(TYPE_COMMANDS);
-		mConnectedThread.write(COMMAND_NEXT);
-		return true;
-	}
-
-	public boolean sendPrev() {
-		if (!mConnected)
-			return false;
-		mConnectedThread.write(TYPE_COMMANDS);
-		mConnectedThread.write(COMMAND_PREV);
-		return true;
-	}
-
-	public boolean sendBlank() {
-		if (!mConnected)
-			return false;
-		mConnectedThread.write(TYPE_COMMANDS);
-		mConnectedThread.write(COMMAND_BLANK);
-		return true;
-	}
-
-	public void sendStartClock() {
-		sendClockSetting(COMMAND_START); // Start
-	}
-
-	public void sendPauseClock() {
-		sendClockSetting(COMMAND_PAUSE); // Pause
-	}
-
-	public void sendResetClock() {
-		sendClockSetting(COMMAND_RESET); // Reset
-	}
-
-	private void sendClockSetting(byte command) {
-		if (isConnected()) {
-			mConnectedThread.write(TYPE_TIME); // Time
-			mConnectedThread.write(command); // Type: Start,Pause,Reset
-		}
-	}
-
+	
 	/**
 	 * Check if a connection is running.
 	 * 

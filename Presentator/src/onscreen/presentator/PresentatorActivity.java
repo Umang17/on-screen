@@ -150,10 +150,10 @@ public class PresentatorActivity extends Activity implements Observer {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-			mConnection.sendNext();
+			mConnection.sendCommand(Connection.COMMAND_NEXT);
 			return true;
 		} else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-			mConnection.sendPrev();
+			mConnection.sendCommand(Connection.COMMAND_PREV);
 			return true;
 		}
 		return super.onKeyUp(keyCode, event);
@@ -330,24 +330,24 @@ public class PresentatorActivity extends Activity implements Observer {
 	}
 
 	public void onPrevClick(View v) {
-		mConnection.sendPrev();
+		mConnection.sendCommand(Connection.COMMAND_PREV);
 	}
 
 	public void onNextClick(View v) {
-		mConnection.sendNext();
+		mConnection.sendCommand(Connection.COMMAND_NEXT);
 	}
 
 	public void onBlankClick(View v) {
-		mConnection.sendBlank();
+		mConnection.sendCommand(Connection.COMMAND_BLANK);
 	}
 
 	public void onStartStopClick(View v) {
 		if (stopWatch.running()) {
-			mConnection.sendPauseClock();
+			mConnection.sendCommand(Connection.COMMAND_PAUSE);
 			pauseClockAndSetButtons();
 		} else {
 			startClockAndSetButtons();
-			mConnection.sendStartClock();
+			mConnection.sendCommand(Connection.COMMAND_START);
 		}
 	}
 
@@ -379,7 +379,7 @@ public class PresentatorActivity extends Activity implements Observer {
 		stopWatch.setTime(time);
 		Log.d("TIME", "Time is: " + time);
 		if (running) {
-			mConnection.sendStartClock();
+			mConnection.sendCommand(Connection.COMMAND_START);
 			startClockAndSetButtons();
 		} else {
 			pauseClockAndSetButtons();
@@ -387,7 +387,7 @@ public class PresentatorActivity extends Activity implements Observer {
 	}
 
 	private void resetWatch() {
-		mConnection.sendResetClock();
+		mConnection.sendCommand(Connection.COMMAND_RESET);
 		resetClockAndSetButtons();
 	}
 
