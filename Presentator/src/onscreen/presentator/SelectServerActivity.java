@@ -15,10 +15,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -26,6 +26,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class SelectServerActivity extends Activity {
 	public static final String SERVER_ADDRESS_INTENT = "ServerAddress";
@@ -42,7 +43,7 @@ public class SelectServerActivity extends Activity {
 
 	private static final int EDIT_DIALOG = 0;
 
-	private ArrayAdapter<ServerInfo> serverAdapter;
+	private ServerInfoAdapter serverAdapter;
 	private ServerInfo editingItem;
 
 	private ReadNfcTag readNfcTag;
@@ -52,8 +53,7 @@ public class SelectServerActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.server_list);
 
-		serverAdapter = new ArrayAdapter<ServerInfo>(this,
-				R.layout.server_list_item);
+		serverAdapter = new ServerInfoAdapter(this, R.layout.server_list_item);
 
 		// Read all old servers
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME,
@@ -66,12 +66,6 @@ public class SelectServerActivity extends Activity {
 			if (address.length() > 0) {
 				serverAdapter.add(new ServerInfo(address, name));
 			}
-		}
-
-		// TODO Remove debug code
-		if (serverAdapter.getCount() == 0) {
-			serverAdapter.add(new ServerInfo("130.240.93.115"));
-			serverAdapter.add(new ServerInfo("00:1F:E1:EB:3B:DE"));
 		}
 
 		ListView lv = (ListView) findViewById(R.id.list);
@@ -187,8 +181,8 @@ public class SelectServerActivity extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		case EDIT_DIALOG:
-			View v = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-					.inflate(R.layout.edit_server_dialog, null);
+			View v = getLayoutInflater().inflate(R.layout.edit_server_dialog,
+					null);
 			final EditText eName = (EditText) v
 					.findViewById(R.id.editText_server_name);
 			final EditText eAddress = (EditText) v
@@ -247,8 +241,37 @@ public class SelectServerActivity extends Activity {
 		finish();
 	}
 
+	private class ServerInfoAdapter extends ArrayAdapter<ServerInfo> {
+
+		public ServerInfoAdapter(Context context, int textViewResourceId) {
+			super(context, textViewResourceId);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+				convertView = getLayoutInflater().inflate(
+						R.layout.server_list_item, null);
+			}
+			ServerInfo s = getItem(position);
+			if (s != null) {
+				TextView textViewName = (TextView) convertView
+						.findViewById(R.id.textViewName);
+				TextView textViewAddress = (TextView) convertView
+						.findViewById(R.id.textViewAddress);
+				if (textViewName != null) {
+					textViewName.setText(s.getName());
+				}
+				if (textViewAddress != null) {
+					textViewAddress.setText(s.getAddress());
+				}
+			}
+			return convertView;
+		}
+	}
+
 	/**
-	 * A small class to handle information about servers.
+	 * A class to handle information about servers.
 	 * 
 	 */
 	private class ServerInfo {
