@@ -12,6 +12,7 @@ import onscreen.Notification;
 import onscreen.systemcontrol.NotifyThread;
 import onscreen.OnScreen;
 import onscreen.systemcontrol.PresentationTimer;
+import sun.net.ConnectionResetException;
 
 /**
  * Connected thread is lanunched when a connection is initialized. It does all 
@@ -130,21 +131,25 @@ public class ConnectedThread implements Runnable, Observer {
         if (filePresented != null) {
             OnScreen.keyController.exit();
         }
-        filePresented = fileReciver.reciveFile(bufferedInputStream);
-        Runtime rt = Runtime.getRuntime();
-        
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            rt.exec(OnScreen.pdfReader + "\"" + filePresented.getFullName() + "\"");
-        } else {
-            String fileRun = filePresented.getFullName();
-            fileRun.replace(" ", "\\ ");
-            rt.exec(OnScreen.pdfReader + fileRun);
+        try {
+            filePresented = fileReciver.reciveFile(bufferedInputStream);
+            Runtime rt = Runtime.getRuntime();
+
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                rt.exec(OnScreen.pdfReader + "\"" + filePresented.getFullName() + "\"");
+            } else {
+                String fileRun = filePresented.getFullName();
+                fileRun.replace(" ", "\\ ");
+                rt.exec(OnScreen.pdfReader + fileRun);
+            }
+
+            outputStream.write(STARTPRESENTATION);
+            presentationTimer.reset(this);
+            presentationTimer.start(this);
+            presentationTimer.addObserver(this);
+        } catch (ConnectionResetException ex) {
+            Notification.message("Client disconnected during transfer.");
         }
-               
-        outputStream.write(STARTPRESENTATION);
-        presentationTimer.reset(this);
-        presentationTimer.start(this);
-        presentationTimer.addObserver(this);
     }
 
     /**
