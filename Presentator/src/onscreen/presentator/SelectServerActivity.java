@@ -67,7 +67,7 @@ public class SelectServerActivity extends Activity {
 					}
 				}
 				serverAdapter.add(new ServerInfo(address, device.getName(),
-						true));
+						false));
 			}
 		}
 	};
@@ -90,7 +90,7 @@ public class SelectServerActivity extends Activity {
 			address = settings.getString(SERVER_ADDRESS + i, "");
 			name = settings.getString(SERVER_NAME + i, "");
 			if (address.length() > 0) {
-				serverAdapter.add(new ServerInfo(address, name));
+				serverAdapter.add(new ServerInfo(address, name, true));
 			}
 		}
 
@@ -164,7 +164,7 @@ public class SelectServerActivity extends Activity {
 		ServerInfo s;
 		for (int i = 0; i < count; i++) {
 			s = serverAdapter.getItem(i);
-			if (!s.isAutoDiscovered()) {
+			if (s.doSave()) {
 				editor.putString(SERVER_ADDRESS + numberOfItems, s.getAddress());
 				editor.putString(SERVER_NAME + numberOfItems, s.getName());
 				numberOfItems++;
@@ -255,6 +255,8 @@ public class SelectServerActivity extends Activity {
 									if (newAddress.length() > 0) {
 										editingItem.setAddress(newAddress);
 									}
+									editingItem.setSave(true); // Save it
+
 									serverAdapter.notifyDataSetChanged();
 								}
 							}).setNegativeButton(R.string.edit_cancel, null)
@@ -283,7 +285,7 @@ public class SelectServerActivity extends Activity {
 	 * @param server
 	 */
 	private void setResultAndFinish(ServerInfo server) {
-		server.setAutoDiscovered(false); // Save it
+		server.setSave(true); // Save it
 		Intent data = new Intent();
 		data.putExtra(SERVER_ADDRESS_INTENT, server.getAddress());
 		setResult(RESULT_OK, data);
@@ -326,20 +328,16 @@ public class SelectServerActivity extends Activity {
 	private class ServerInfo {
 		private String address;
 		private String name;
-		private boolean autoDiscovered;
+		private boolean save;
 
 		public ServerInfo(String address) {
-			this(address, address);
+			this(address, address, true);
 		}
 
-		public ServerInfo(String address, String name) {
-			this(address, name, false);
-		}
-
-		public ServerInfo(String address, String name, boolean autoDiscovered) {
+		public ServerInfo(String address, String name, boolean save) {
 			this.address = address;
 			this.name = name;
-			this.autoDiscovered = autoDiscovered;
+			this.save = save;
 		}
 
 		public void setAddress(String address) {
@@ -350,8 +348,8 @@ public class SelectServerActivity extends Activity {
 			this.name = name;
 		}
 
-		public void setAutoDiscovered(boolean autoDiscovered) {
-			this.autoDiscovered = autoDiscovered;
+		public void setSave(boolean save) {
+			this.save = save;
 		}
 
 		public String getAddress() {
@@ -362,8 +360,8 @@ public class SelectServerActivity extends Activity {
 			return name;
 		}
 
-		public boolean isAutoDiscovered() {
-			return autoDiscovered;
+		public boolean doSave() {
+			return save;
 		}
 
 		@Override
