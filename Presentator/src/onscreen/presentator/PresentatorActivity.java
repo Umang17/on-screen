@@ -14,7 +14,7 @@ import onscreen.presentator.communication.TagParser;
 import onscreen.presentator.nfc.ConcreteHandleTagDiscover;
 import onscreen.presentator.nfc.HandleTagDiscoverWithBlock;
 import onscreen.presentator.nfc.ReadNfcTag;
-import onscreen.presentator.utility.FileProgressDialog;
+import onscreen.presentator.utility.FileProgress;
 import onscreen.presentator.utility.StopWatch;
 
 import android.app.Activity;
@@ -77,7 +77,7 @@ public class PresentatorActivity extends Activity implements Observer {
 
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;
-	private FileProgressDialog mFileProgressDialog = null;
+	private FileProgress mFileProgress = null;
 	private HandleTagDiscoverWithBlock handleTagIDDiscoverWithBlock;
 
 	private ImageView imageStartStop;
@@ -114,8 +114,19 @@ public class PresentatorActivity extends Activity implements Observer {
 		Dialog dialog;
 		switch (id) {
 		case DIALOG_FILE_PROGRESS:
-			mFileProgressDialog = new FileProgressDialog(this, 0);
-			dialog = mFileProgressDialog;
+			mFileProgress = new FileProgress(this);
+			dialog = new AlertDialog.Builder(this)
+					.setTitle(R.string.file_progress_dialog)
+					.setMessage(R.string.file_progress_message)
+					.setView(mFileProgress.getView())
+					.setCancelable(false)
+					.setNegativeButton(R.string.cancel_transfer,
+							new OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									onCancelTransferClick();
+								}
+							}).create();
 			break;
 		case DIALOG_TAKE_OVER:
 			dialog = new AlertDialog.Builder(this)
@@ -268,6 +279,12 @@ public class PresentatorActivity extends Activity implements Observer {
 
 			connect(tagID);
 		}
+	}
+
+	private void onCancelTransferClick() {
+		dismissDialog(DIALOG_FILE_PROGRESS);
+		// TODO
+		mConnection.stop();
 	}
 
 	private void onUploadClick() {
@@ -452,10 +469,8 @@ public class PresentatorActivity extends Activity implements Observer {
 				// R.string.disconnected_message, Toast.LENGTH_LONG)
 				// .show();
 				Log.d(TAG, "Disconnected from: " + mConnection.getAddr());
-				if (mFileProgressDialog != null) {
-					if (mFileProgressDialog.isShowing()) {
-						dismissDialog(DIALOG_FILE_PROGRESS);
-					}
+				if (mFileProgress != null) {
+					dismissDialog(DIALOG_FILE_PROGRESS);
 				}
 				if (mPresentationFile == null) {
 					((TextView) findViewById(R.id.presentationName))
@@ -504,10 +519,10 @@ public class PresentatorActivity extends Activity implements Observer {
 						.format(getResources().getString(
 								R.string.transferring_file), name));
 				showDialog(DIALOG_FILE_PROGRESS);
-				mFileProgressDialog.setFileSize((Long) msg.obj);
+				mFileProgress.setFileSize((Long) msg.obj);
 				break;
 			case MESSAGE_PROGRESS_INC:
-				mFileProgressDialog.setProgress((Long) msg.obj);
+				mFileProgress.setProgress((Long) msg.obj);
 				break;
 			case MESSAGE_CLOCK:
 				boolean runningClock = msg.arg1 == 1 ? true : false;

@@ -1,27 +1,36 @@
 package onscreen.presentator.utility;
 
 import onscreen.presentator.R;
-import android.app.Dialog;
 import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class FileProgressDialog extends Dialog {
+public class FileProgress {
+	private View view;
 	private TextView textLeft, textRight;
 	private ProgressBar progressBar;
 	private long fileSize = 0;
 
-	public FileProgressDialog(Context context, long fileSize) {
-		super(context);
+	public FileProgress(Context context) {
+		this(context, 0);
+	}
 
-		setContentView(R.layout.file_progress_dialog);
-		setTitle(R.string.file_progress_dialog);
+	public FileProgress(Context context, long fileSize) {
+		view = ((LayoutInflater) context
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.file_progress_view, null);
 
-		textLeft = (TextView) findViewById(R.id.textLeft);
-		textRight = (TextView) findViewById(R.id.textRight);
-		progressBar = (ProgressBar) findViewById(R.id.progressBar);
+		textLeft = (TextView) view.findViewById(R.id.textLeft_file_progress);
+		textRight = (TextView) view.findViewById(R.id.textRight_file_progress);
+		progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
 		setFileSize(fileSize);
+	}
+
+	public View getView() {
+		return view;
 	}
 
 	public void setFileSize(long fileSize) {
@@ -65,4 +74,5 @@ public class FileProgressDialog extends Dialog {
 			setPercent((int) (100 * progress / fileSize));
 		}
 	}
+
 }
