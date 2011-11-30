@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import onscreen.Notification;
-import sun.net.ConnectionResetException;
 
 /**
  * Recives a file on a connection and take care of writing it to file.
@@ -60,7 +59,7 @@ public class FileReciver {
      * @return the file recived 
      * @throws IOException if problem writing or reading
      */
-    private FilePresented reciveFile(BufferedInputStream stream, int size, String fileName) throws ConnectionResetException {
+    private FilePresented reciveFile(BufferedInputStream stream, int size, String fileName) throws IOException {
         WriteBuffer wb = new WriteBuffer();
 
         // Creates the file and makes sure that it does not exist already.
@@ -87,14 +86,12 @@ public class FileReciver {
                 int read = stream.read(bytes);
                 if (read == -1) {
                     fw.abort();
-                    throw new ConnectionResetException();
+                    throw new IOException("The connection where closed!");
                 }
                 wb.put(subArray(bytes, 0, read));
                 
                 a += read;
             }
-        } catch (IOException ex) {
-            Notification.debugMessage("Failed in reciving or writing data");
         } catch (NullPointerException ex) {
             Notification.debugMessage("Failed in reciving or writing data");
         }

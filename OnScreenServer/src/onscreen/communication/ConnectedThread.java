@@ -12,7 +12,6 @@ import onscreen.Notification;
 import onscreen.systemcontrol.NotifyThread;
 import onscreen.OnScreen;
 import onscreen.systemcontrol.PresentationTimer;
-import sun.net.ConnectionResetException;
 
 /**
  * Connected thread is lanunched when a connection is initialized. It does all 
@@ -147,8 +146,8 @@ public class ConnectedThread implements Runnable, Observer {
             presentationTimer.reset(this);
             presentationTimer.start(this);
             presentationTimer.addObserver(this);
-        } catch (ConnectionResetException ex) {
-            Notification.message("Client disconnected during transfer.");
+        } catch (IOException ex) {
+            Notification.message(ex.getMessage());
         }
     }
 
