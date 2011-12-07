@@ -34,6 +34,7 @@
     <string name="select_connect">Connect</string>
     <string name="select_edit">Edit</string>
     <string name="select_delete">Delete</string>
+    <string name="select_input_hint">Enter server address...</string>
 
     <!-- PDFActivity -->
     <string name="pdf_none_found">Didn\'t find any PDF files on the phone.</string>
