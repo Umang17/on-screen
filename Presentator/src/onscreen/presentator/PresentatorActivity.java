@@ -55,6 +55,8 @@ public class PresentatorActivity extends Activity implements Observer {
 	public static final int MESSAGE_CLOCK = 5;
 	public static final int MESSAGE_CONNECTED = 6;
 	public static final int MESSAGE_DISCONNECTED = 7;
+	public static final int MESSAGE_CONNECTION_LOST = 8;
+	public static final int MESSAGE_CONNECTION_FAILED = 9;
 
 	public static final String BUNDLE_NAME = "Name";
 	public static final String BUNDLE_TIME = "Time";
@@ -283,7 +285,6 @@ public class PresentatorActivity extends Activity implements Observer {
 
 	private void onCancelTransferClick() {
 		dismissDialog(DIALOG_FILE_PROGRESS);
-		// TODO
 		mConnection.stop();
 	}
 
@@ -464,10 +465,19 @@ public class PresentatorActivity extends Activity implements Observer {
 			case MESSAGE_CONNECTED:
 				setControlButtonsVisible(true);
 				break;
+			case MESSAGE_CONNECTION_FAILED:
+				Toast.makeText(PresentatorActivity.this,
+						R.string.connection_failed, Toast.LENGTH_LONG)
+						.show();
+				break;
+			case MESSAGE_CONNECTION_LOST:
+				Toast.makeText(PresentatorActivity.this,
+						R.string.connection_lost, Toast.LENGTH_LONG)
+						.show();
 			case MESSAGE_DISCONNECTED:
-				// Toast.makeText(PresentatorActivity.this,
-				// R.string.disconnected_message, Toast.LENGTH_LONG)
-				// .show();
+//				Toast.makeText(PresentatorActivity.this,
+//						R.string.disconnected_message, Toast.LENGTH_LONG)
+//						.show();
 				Log.d(TAG, "Disconnected from: " + mConnection.getAddr());
 				if (mFileProgress != null) {
 					dismissDialog(DIALOG_FILE_PROGRESS);

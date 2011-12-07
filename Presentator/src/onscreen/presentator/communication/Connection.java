@@ -185,7 +185,7 @@ public class Connection {
 		if (D)
 			Log.d(TAG, "in connectionFailed");
 		mConnected = false;
-		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_DISCONNECTED);
+		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_CONNECTION_FAILED);
 		// Send a failure message back to the Activity
 		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
 		// Bundle bundle = new Bundle();
@@ -204,7 +204,7 @@ public class Connection {
 		if (D)
 			Log.d(TAG, "in connectionLost");
 		mConnected = false;
-		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_DISCONNECTED);
+		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_CONNECTION_LOST);
 		stop();
 		// Send a failure message back to the Activity
 		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
@@ -358,7 +358,7 @@ public class Connection {
 				tmpIn = connection.getInputStream();
 				tmpOut = connection.getOutputStream();
 			} catch (IOException e) {
-				// TODO kill connection
+				stop();
 			}
 
 			mmInStream = tmpIn;
