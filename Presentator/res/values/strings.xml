@@ -14,8 +14,8 @@
     <string name="transferring_file">Transferring: %1$s</string>
     <string name="selected_file">Selected: %1$s</string>
     <string name="disconnected_message">Disconnected from server.</string>
-    <string name="connection_failed">Connection failed.</string>
-    <string name="connection_lost">Connection to the server lost.</string>
+    <string name="connection_failed">Failed to connect to the server.</string>
+    <string name="connection_lost">Disconnected from the server.</string>
     <string name="cancel_transfer">Cancel transfer</string>
 
     <!-- Take over dialog -->
