@@ -7,6 +7,7 @@ package onscreen.systemcontrol;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import onscreen.communication.ConnectedThread;
 
 /**
  * Controls the system by sending key events to the system, used to control a 
@@ -39,11 +40,11 @@ public class KeyController {
      * @param read the control int
      * @return true if the system should exit presentation mode, false otherwise.
      */
-    public boolean recive(int read) {
+    public void recive(int read) {
         switch (read) {
             case EXIT:
                 exit();
-                return true;
+                break;
             case NEXT:
                 rob.keyPress(KeyEvent.VK_LEFT);
                 break;
@@ -54,7 +55,6 @@ public class KeyController {
                 rob.keyPress(KeyEvent.VK_PERIOD);
                 break;
         }
-        return false;
     }
 
     /**
@@ -67,5 +67,6 @@ public class KeyController {
         } catch (InterruptedException ex) {
         }
         rob.keyPress(KeyEvent.VK_ESCAPE);
+        ConnectedThread.filePresented.getFile().delete();
     }
 }

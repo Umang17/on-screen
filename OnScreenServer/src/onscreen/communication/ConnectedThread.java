@@ -25,13 +25,14 @@ public class ConnectedThread implements Runnable, Observer {
     private FileReciver fileReciver;
     private OutputStream outputStream;
     private BufferedInputStream bufferedInputStream;
-    private static FilePresented filePresented = null;
+    public static FilePresented filePresented = null;
     private static PresentationTimer presentationTimer = null;
     private static final int EXIT_CMD = -1;
     private static final int FILE = 1;
     private static final int KEYCONTROLLER = 5;
     private static final int TIMECONTROLL = 7;
     private static final int STARTPRESENTATION = 4;
+    private static int connected = 0;
 
     /**
      * 
@@ -42,6 +43,7 @@ public class ConnectedThread implements Runnable, Observer {
             presentationTimer = new PresentationTimer(this);
         }
         mConnection = connection;
+        connected++;
         fileReciver = new FileReciver();
     }
 
@@ -66,18 +68,21 @@ public class ConnectedThread implements Runnable, Observer {
                     case EXIT_CMD:
                         // Clean and terminate the connection.
                         Notification.debugMessage("Killing connection.");
+                        connected--;
                         presentationTimer.deleteObserver(this);
                         mConnection.close();
+                        if(connected <= 0) {
+                            OnScreen.keyController.exit();
+                            filePresented = null;
+                            presentationTimer = null;
+                        }
                         return;
                     case FILE:
                         startPresenting();
                         break;
                     case KEYCONTROLLER:
                         int read = bufferedInputStream.read();
-                        boolean exit = OnScreen.keyController.recive(read);
-                        if (exit) {
-                            filePresented = null;
-                        }
+                        OnScreen.keyController.recive(read);
                         break;
                     case TIMECONTROLL:
                         Notification.debugMessage("Some timer event was recived!");
