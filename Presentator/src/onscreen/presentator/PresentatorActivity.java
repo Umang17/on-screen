@@ -478,6 +478,7 @@ public class PresentatorActivity extends Activity implements Observer {
 				Toast.makeText(PresentatorActivity.this,
 						R.string.connection_lost, Toast.LENGTH_LONG)
 						.show();
+				break;
 			case MESSAGE_DISCONNECTED:
 //				Toast.makeText(PresentatorActivity.this,
 //						R.string.disconnected_message, Toast.LENGTH_LONG)

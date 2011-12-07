@@ -184,8 +184,12 @@ public class Connection {
 	private void connectionFailed() {
 		if (D)
 			Log.d(TAG, "in connectionFailed");
-		mConnected = false;
+		if (!mConnected) {
+			return;
+		}
 		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_CONNECTION_FAILED);
+		mConnected = false;
+
 		// Send a failure message back to the Activity
 		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
 		// Bundle bundle = new Bundle();
@@ -203,9 +207,13 @@ public class Connection {
 	private void connectionLost() {
 		if (D)
 			Log.d(TAG, "in connectionLost");
-		mConnected = false;
+		if (!mConnected) {
+			return;
+		}
 		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_CONNECTION_LOST);
 		stop();
+		mConnected = false;
+
 		// Send a failure message back to the Activity
 		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
 		// Bundle bundle = new Bundle();
@@ -326,7 +334,7 @@ public class Connection {
 		/** Will cancel an in-progress connection, and close the socket */
 		public void cancel() {
 			try {
-				mConnection.disconnect();
+				mmConnection.disconnect();
 			} catch (IOException e) {
 			}
 		}
