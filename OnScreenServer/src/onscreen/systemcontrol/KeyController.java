@@ -67,6 +67,8 @@ public class KeyController {
         } catch (InterruptedException ex) {
         }
         rob.keyPress(KeyEvent.VK_ESCAPE);
-        ConnectedThread.filePresented.getFile().delete();
+        try {
+            ConnectedThread.filePresented.getFile().delete();
+        } catch(NullPointerException e) {}
     }
 }
