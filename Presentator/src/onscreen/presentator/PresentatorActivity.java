@@ -344,6 +344,8 @@ public class PresentatorActivity extends Activity implements Observer {
 									(mConnection.getAddr())) != 0) {
 						mConnection.stop();
 						mConnection.connect(connection);
+					} else if (connection.getAddr().compareTo(mConnection.getAddr()) == 0){
+						mConnection.stop();
 					}
 					return;
 				}
@@ -359,6 +361,8 @@ public class PresentatorActivity extends Activity implements Observer {
 									(mConnection.getAddr())) != 0) {
 						mConnection.stop();
 						mConnection.connect(connection);
+					} else if (connection.getAddr().compareTo(mConnection.getAddr()) == 0){
+						mConnection.stop();
 					}
 					return;
 				}
