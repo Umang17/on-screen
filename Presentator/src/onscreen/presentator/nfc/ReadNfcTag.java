@@ -147,7 +147,7 @@ public class ReadNfcTag {
 	        if (payload.length-1<=1) return;
 	        
 //	        //Removing first byte, the uri.
-//	        We want plain text, only touchaatag that contains a webbaddress
+//	        We want plain text from the tag(only touchaatag that contains a webbaddress).
 //	        byte[] newPayload=new byte[payload.length-1];
 //	        for (int i = 0; i < payload.length; i++) {
 //	        	if (i+1==payload.length){
