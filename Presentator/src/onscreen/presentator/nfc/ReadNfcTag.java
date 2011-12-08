@@ -143,17 +143,19 @@ public class ReadNfcTag {
 			NdefMessage[] messages = getNdefMessages(intent);
 	        byte[] payload = messages[0].getRecords()[0].getPayload();
 	        
-	        //Removing first byte, the uri.
+	        
 	        if (payload.length-1<=1) return;
 	        
-	        byte[] newPayload=new byte[payload.length-1];
-	        for (int i = 0; i < payload.length; i++) {
-	        	if (i+1==payload.length){
-	        		break;
-	        	}
-	        	newPayload[i]=payload[i+1];
-			}
-	        text=new String(newPayload);
+//	        //Removing first byte, the uri.
+//	        We want plain text, only touchaatag that contains a webbaddress
+//	        byte[] newPayload=new byte[payload.length-1];
+//	        for (int i = 0; i < payload.length; i++) {
+//	        	if (i+1==payload.length){
+//	        		break;
+//	        	}
+//	        	newPayload[i]=payload[i+1];
+//			}
+	        text=new String(payload);
 		} catch (Exception e) {}
 		
         //If no message return tagID instead
