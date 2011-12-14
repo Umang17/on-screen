@@ -13,10 +13,22 @@ public class FileProgress {
 	private ProgressBar progressBar;
 	private long fileSize = 0;
 
+	/**
+	 * Constructs a new FileProgress with fileSize = 0.
+	 * 
+	 * @param context
+	 */
 	public FileProgress(Context context) {
 		this(context, 0);
 	}
 
+	/**
+	 * Constructs a new FileProgress.
+	 * 
+	 * @param context
+	 * @param fileSize
+	 *            The size of the file.
+	 */
 	public FileProgress(Context context, long fileSize) {
 		view = ((LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
@@ -29,26 +41,60 @@ public class FileProgress {
 		setFileSize(fileSize);
 	}
 
+	/**
+	 * Gets the view showing the progress.
+	 * 
+	 * @return The view that shows the progress.
+	 */
 	public View getView() {
 		return view;
 	}
 
+	/**
+	 * Changes the file size to show progress for, also sets the progress to 0.
+	 * 
+	 * @param fileSize
+	 *            The size of the file, in bytes.
+	 */
 	public void setFileSize(long fileSize) {
 		this.fileSize = fileSize;
 		setProgress(0);
 	}
 
+	/**
+	 * Sets the progress in the progress bar, also changes the % text.
+	 * 
+	 * @param percent
+	 *            The percentage amount which has been sent.
+	 */
 	private void setPercent(int percent) {
 		textLeft.setText(percent + "%");
 		progressBar.setProgress(percent);
 	}
 
+	/**
+	 * Changes the text of the amount of data transfered e.g 10/100B
+	 * 
+	 * @param progress
+	 *            The amount hat has been sent.
+	 * @param prefix
+	 *            The prefix before B e.g MB where M is the prefix.
+	 * @param divider
+	 *            How much to divide the progress when showing it. Like 1000000
+	 *            for MB.
+	 */
 	private void setTransferText(long progress, Character prefix, float divider) {
 		textRight.setText(String.format("%.2f", progress / divider) + " / "
 				+ String.format("%.2f", fileSize / divider) + " "
 				+ (prefix == null ? "" : prefix) + "B");
 	}
 
+	/**
+	 * Sets the current progress of the transfer.
+	 * 
+	 * @param progress
+	 *            The amount that has been sent.
+	 */
 	public void setProgress(long progress) {
 		if (progress > fileSize) {
 			progress = fileSize;
