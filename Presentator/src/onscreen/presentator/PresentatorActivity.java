@@ -42,11 +42,18 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Main class for this program. Sets everything up and handles the UI etc.
+ * 
+ * @author Elias Näslund, John Viklund and Viktor Lindgren
+ *
+ */
 public class PresentatorActivity extends Activity implements Observer {
 
 	private Connection mConnection;
 	private File mPresentationFile = null;
 
+	// MESSAGE_* is used for sending messages to the Handler
 	public static final int MESSAGE_FILE_REC = 0;
 	public static final int MESSAGE_TAKE_OVER = 1;
 	public static final int MESSAGE_NO_PRES = 2;
@@ -58,24 +65,28 @@ public class PresentatorActivity extends Activity implements Observer {
 	public static final int MESSAGE_CONNECTION_LOST = 8;
 	public static final int MESSAGE_CONNECTION_FAILED = 9;
 
+	// Used for sending a bundle to the Handler
 	public static final String BUNDLE_NAME = "Name";
 	public static final String BUNDLE_TIME = "Time";
 	public static final String BUNDLE_RUNNING = "Running";
 
+	// Used in onActivityResult
 	private static final int STATE_LOAD = 2;
 	private static final int REQUEST_ENABLE_BT = 3;
 	private static final int STATE_SELECT_SERVER = 4;
 
+	// Used for dialogs
 	private static final int DIALOG_FILE_PROGRESS = 0;
 	private static final int DIALOG_TAKE_OVER = 1;
 
-	// used while taking over
+	// Used while taking over
 	private boolean running;
 	private int time;
 	private String name;
 	private String tag;
 
-	private final String TAG = "PresentatorActivity";
+	// Used for debugging
+	// private final String TAG = "PresentatorActivity";
 
 	private ReadNfcTag readNfcTag;
 	private StopWatch stopWatch;
@@ -99,8 +110,10 @@ public class PresentatorActivity extends Activity implements Observer {
 		stopWatch = (StopWatch) findViewById(R.id.chrono);
 		imageStartStop = (ImageView) findViewById(R.id.start_stop_image);
 
+		// Setting up the object used for the connection to the server
 		mConnection = new Connection(mHandler);
 
+		// Used for reading RFID/NFC-tags
 		ConcreteHandleTagDiscover concreteHandler = new ConcreteHandleTagDiscover();
 		concreteHandler.addObserver(this);
 		handleTagIDDiscoverWithBlock = new HandleTagDiscoverWithBlock(
@@ -111,6 +124,9 @@ public class PresentatorActivity extends Activity implements Observer {
 
 	}
 
+	/**
+	 * Handles dialogs
+	 */
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
@@ -157,6 +173,10 @@ public class PresentatorActivity extends Activity implements Observer {
 		return dialog;
 	}
 
+	/**
+	 * Override the functionality of the volume button. Can't change volume with
+	 * them anymore.
+	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP
@@ -166,6 +186,10 @@ public class PresentatorActivity extends Activity implements Observer {
 		return super.onKeyDown(keyCode, event);
 	}
 
+	/**
+	 * Override the functionality of the volume button. Next/Prev when using
+	 * volumebuttons.
+	 */
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
@@ -178,6 +202,9 @@ public class PresentatorActivity extends Activity implements Observer {
 		return super.onKeyUp(keyCode, event);
 	}
 
+	/**
+	 * Our own menu.
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -185,6 +212,9 @@ public class PresentatorActivity extends Activity implements Observer {
 		return true;
 	}
 
+	/**
+	 * Set some menu buttons disabled.
+	 */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		boolean connected = mConnection.isConnected();
@@ -199,6 +229,9 @@ public class PresentatorActivity extends Activity implements Observer {
 		return true;
 	}
 
+	/**
+	 * Decides what happens when selecting menu item.
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -231,16 +264,23 @@ public class PresentatorActivity extends Activity implements Observer {
 		readNfcTag.onResume(getIntent());
 	}
 
+	/**
+	 * When reading a NFC-tag, open this program!
+	 */
 	@Override
 	protected void onNewIntent(Intent intent) {
 		readNfcTag.onNewIntent(intent);
 	}
 
+	/**
+	 * Handle the result of different intents.
+	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
+		// Intent of choosing pdf file returns
 		case STATE_LOAD:
 			if (resultCode != RESULT_OK) {
 				Log.d("SelectPDFReturn", "Not ok");
@@ -256,6 +296,7 @@ public class PresentatorActivity extends Activity implements Observer {
 							name));
 			upload();
 			break;
+		// Intent of starting bluetooth returns
 		case REQUEST_ENABLE_BT:
 			if (resultCode == RESULT_OK) {
 				connect(tag);
@@ -263,6 +304,7 @@ public class PresentatorActivity extends Activity implements Observer {
 				// no bluetooth :(
 			}
 			break;
+		// Intent of selecting server returns
 		case STATE_SELECT_SERVER:
 			if (resultCode != RESULT_OK) {
 				Log.d("SelectServerReturn", "Not ok");
@@ -275,6 +317,9 @@ public class PresentatorActivity extends Activity implements Observer {
 		}
 	}
 
+	/**
+	 * Called when a nfc-tag is read.
+	 */
 	public void update(Observable arg0, Object arg1) {
 		if (arg0 instanceof ConcreteHandleTagDiscover) {
 			String tagID = ((ConcreteHandleTagDiscover) arg0).getTagText();
@@ -320,8 +365,16 @@ public class PresentatorActivity extends Activity implements Observer {
 		}
 	}
 
+	/**
+	 * Pares the NFC-tag and then tries to connect to the addresses.
+	 * 
+	 * @param tag
+	 */
 	private void connect(String tag) {
 		ArrayList<ConnectionInterface> connections = TagParser.parse(tag);
+		if (connections == null) {
+			return;
+		}
 		this.tag = tag;
 
 		boolean bluetooth = false;
@@ -344,7 +397,8 @@ public class PresentatorActivity extends Activity implements Observer {
 									(mConnection.getAddr())) != 0) {
 						mConnection.stop();
 						mConnection.connect(connection);
-					} else if (connection.getAddr().compareTo(mConnection.getAddr()) == 0){
+					} else if (connection.getAddr().compareTo(
+							mConnection.getAddr()) == 0) {
 						mConnection.stop();
 					}
 					return;
@@ -361,7 +415,8 @@ public class PresentatorActivity extends Activity implements Observer {
 									(mConnection.getAddr())) != 0) {
 						mConnection.stop();
 						mConnection.connect(connection);
-					} else if (connection.getAddr().compareTo(mConnection.getAddr()) == 0){
+					} else if (connection.getAddr().compareTo(
+							mConnection.getAddr()) == 0) {
 						mConnection.stop();
 					}
 					return;
@@ -374,7 +429,7 @@ public class PresentatorActivity extends Activity implements Observer {
 		int duration = Toast.LENGTH_SHORT;
 
 		if (bluetooth && ip) {
-			text = "Please enable bluetooth or connect to wifi and try again!";
+			text = getString(R.string.neither_bluetooth_or_wifi);
 		} else if (bluetooth) {
 			BluetoothAdapter bluetoothAdapter = BluetoothAdapter
 					.getDefaultAdapter();
@@ -385,14 +440,20 @@ public class PresentatorActivity extends Activity implements Observer {
 				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 				return;
 			}
-			text = "Bluetooth unavailable, you can't connect!";
+			text = getString(R.string.bluetooth_disabled);
 		} else {
-			text = "Please connect to wifi and try again!";
+			text = getString(R.string.wifi_disabled);
 		}
+
 		Toast toast = Toast.makeText(this, text, duration);
 		toast.show();
 	}
 
+	/**
+	 * Makes screen buttons disabled and enabled.
+	 * 
+	 * @param visible
+	 */
 	private void setControlButtonsVisible(boolean visible) {
 		if (visible) {
 			((TextView) findViewById(R.id.textViewInfo)).setText("");
@@ -409,17 +470,20 @@ public class PresentatorActivity extends Activity implements Observer {
 	}
 
 	private void upload() {
-		Log.d("Handler", "Before sending");
+		// Log.d("Handler", "Before sending");
 		mConnection.sendPresentation(mPresentationFile);
-		Log.d("Handler", "After sending");
+		// Log.d("Handler", "After sending");
 	}
 
+	/**
+	 * Called when taking over an existing presentation
+	 */
 	private void takeOver() {
 		((TextView) findViewById(R.id.presentationName)).setText(String.format(
 				getResources().getString(R.string.presenting_file), name));
 		mPresentationFile = null;
 		stopWatch.setTime(time);
-		Log.d("TIME", "Time is: " + time);
+		// Log.d("TIME", "Time is: " + time);
 		if (running) {
 			mConnection.sendCommand(Connection.COMMAND_START);
 			startClockAndSetButtons();
@@ -461,6 +525,12 @@ public class PresentatorActivity extends Activity implements Observer {
 		startActivityForResult(loadIntent, STATE_SELECT_SERVER);
 	}
 
+	/**
+	 * Handler for communication from the connection object.
+	 * 
+	 * @author Elias Näslund
+	 * 
+	 */
 	private class PresentatorHandler extends Handler {
 
 		@Override
@@ -471,19 +541,14 @@ public class PresentatorActivity extends Activity implements Observer {
 				break;
 			case MESSAGE_CONNECTION_FAILED:
 				Toast.makeText(PresentatorActivity.this,
-						R.string.connection_failed, Toast.LENGTH_LONG)
-						.show();
+						R.string.connection_failed, Toast.LENGTH_LONG).show();
 				break;
 			case MESSAGE_CONNECTION_LOST:
 				Toast.makeText(PresentatorActivity.this,
-						R.string.connection_lost, Toast.LENGTH_LONG)
-						.show();
+						R.string.connection_lost, Toast.LENGTH_LONG).show();
 				break;
 			case MESSAGE_DISCONNECTED:
-//				Toast.makeText(PresentatorActivity.this,
-//						R.string.disconnected_message, Toast.LENGTH_LONG)
-//						.show();
-				Log.d(TAG, "Disconnected from: " + mConnection.getAddr());
+				// Log.d(TAG, "Disconnected from: " + mConnection.getAddr());
 				if (mFileProgress != null) {
 					dismissDialog(DIALOG_FILE_PROGRESS);
 				}

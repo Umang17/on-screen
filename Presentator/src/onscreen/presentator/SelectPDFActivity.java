@@ -57,17 +57,17 @@ public class SelectPDFActivity extends ListActivity {
 				finish();
 			}
 		});
-		
-		//Using nfc but only for ignoring calls and get no popup about nfc discovered.
+
+		// Using nfc but only for ignoring calls and get no popup about nfc
+		// discovered.
 		ConcreteHandleTagDiscover concreteHandler = new ConcreteHandleTagDiscover();
 		HandleTagDiscoverWithBlock handleTagIDDiscoverWithBlock = new HandleTagDiscoverWithBlock(
 				concreteHandler);
-		
+
 		readNfcTag = new ReadNfcTag(handleTagIDDiscoverWithBlock);
 		readNfcTag.onCreate(this);
 	}
 
-	
 	@Override
 	protected void onPause() {
 		readNfcTag.onPause();
@@ -79,7 +79,7 @@ public class SelectPDFActivity extends ListActivity {
 		super.onResume();
 		readNfcTag.onResume(getIntent());
 	}
-	
+
 	/**
 	 * Adds all PDF files on the phone to the list.
 	 */

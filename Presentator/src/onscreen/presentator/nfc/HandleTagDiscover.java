@@ -12,7 +12,9 @@ public interface HandleTagDiscover {
 
 	/**
 	 * Call this function when a tag is discovered.
-	 * @param text that was found on the tag.
+	 * 
+	 * @param text
+	 *            that was found on the tag.
 	 */
 	public void handleTagDiscover(String text);
 }

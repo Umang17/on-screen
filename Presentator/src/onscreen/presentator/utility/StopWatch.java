@@ -7,15 +7,15 @@ import android.widget.Chronometer;
 
 /**
  * A StopWatch with start, pause, reset functionality.
+ * 
  * @author Viktor Lindgren
- *
+ * 
  */
 public class StopWatch extends Chronometer {
 
 	private Long currentTimeLastStop;
 	private boolean isRunning = false;
 	private boolean clockReseted = true;
-
 
 	/**
 	 * A StopWatch with start, pause, reset functionality.
@@ -27,7 +27,7 @@ public class StopWatch extends Chronometer {
 	public StopWatch(Context context) {
 		super(context);
 	}
-	
+
 	/**
 	 * A StopWatch with start, pause, reset functionality.
 	 * 
@@ -53,10 +53,11 @@ public class StopWatch extends Chronometer {
 	}
 
 	/**
-	 * Sets the time that the display should show.
-	 * Call this method will not change state(if it is running or paused.). 
+	 * Sets the time that the display should show. Call this method will not
+	 * change state(if it is running or paused.).
 	 * 
-	 * @param time in seconds
+	 * @param time
+	 *            in seconds
 	 */
 	public void setTime(int time) {
 		Long time2 = time();
@@ -88,12 +89,13 @@ public class StopWatch extends Chronometer {
 
 	/**
 	 * Get restore time for clock, used for set base time.
+	 * 
 	 * @return base time for clock.
 	 */
 	private long getRestoreTime() {
 		return this.getBase() + time() - currentTimeLastStop;
-	}	
-	
+	}
+
 	/**
 	 * Can be called multiple times, sets the state to paused
 	 */
@@ -104,10 +106,10 @@ public class StopWatch extends Chronometer {
 		this.stop();
 		setClockIsNotRunning();
 	}
-	
+
 	/**
-	 * Reset the clock to time 00:00 and stop the clock.
-	 * Do not ignore multiple reset.
+	 * Reset the clock to time 00:00 and stop the clock. Do not ignore multiple
+	 * reset.
 	 */
 	public void resetClock() {
 		this.setBase(time());
@@ -116,15 +118,17 @@ public class StopWatch extends Chronometer {
 		setClockIsNotRunning();
 		clockReseted = true;
 	}
-	
+
 	/**
 	 * Sets currentTimeLastStop to time.
-	 * @param time 
+	 * 
+	 * @param time
 	 */
 	private void setClockIsNotRunning(Long time) {
 		currentTimeLastStop = time;
 		isRunning = false;
 	}
+
 	/**
 	 * Sets currentTimeLastStop to the time now.
 	 */
@@ -134,17 +138,19 @@ public class StopWatch extends Chronometer {
 
 	/**
 	 * Relative time since something. It just have to be constant.
+	 * 
 	 * @return
 	 */
 	private Long time() {
 		return SystemClock.elapsedRealtime();
 	}
-	
+
 	/**
 	 * Tells if the clock is running or not, true is running.
+	 * 
 	 * @return
 	 */
-	public boolean running(){
+	public boolean running() {
 		return isRunning;
 	}
 }

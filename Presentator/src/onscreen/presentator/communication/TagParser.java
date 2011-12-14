@@ -60,10 +60,9 @@ public class TagParser {
 	private static ConnectionInterface parserHelper(String address) {
 		Type type = validateAddress(address);
 		if (type == Type.INVALID) {
-			return new BluetoothConnection("00:1F:E1:EB:3B:DE");
-			// TODO removes
+			return null;
 		}
-		
+
 		switch (type) {
 		case BLUETOOTH:
 			return new BluetoothConnection(address);
@@ -84,7 +83,7 @@ public class TagParser {
 		if (address.length() <= 2) {
 			return Type.INVALID;
 		}
-		
+
 		Pattern pattern = Pattern.compile(IPADDRESS_PATTERN);
 
 		if (BluetoothAdapter.checkBluetoothAddress(address)) {

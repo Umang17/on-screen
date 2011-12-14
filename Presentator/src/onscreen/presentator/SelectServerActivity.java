@@ -49,7 +49,7 @@ public class SelectServerActivity extends Activity {
 
 	private ServerInfoAdapter serverAdapter;
 	private ServerInfo editingItem;
-	
+
 	private ReadNfcTag readNfcTag;
 
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

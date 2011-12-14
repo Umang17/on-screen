@@ -11,12 +11,13 @@ import android.nfc.Tag;
 import android.os.Parcelable;
 
 /**
- * Handles everything that has with nfc.
- * It will call handleTagDiscover(text) when a tag is discovered.
+ * Handles everything that has with nfc. It will call handleTagDiscover(text)
+ * when a tag is discovered.
  * 
  * Use onCreate, onPause, onNewIntent and onResume functions in your Activity.
+ * 
  * @author Viktor Lindgren
- *
+ * 
  */
 
 public class ReadNfcTag {
@@ -31,9 +32,11 @@ public class ReadNfcTag {
 
 	/**
 	 * Calls handleTagIDDiscover.handleTagIDDiscover(message) when a new tag is
-	 * discovered. If no message found the tag ID is returned and if that is not found, else ignores.
+	 * discovered. If no message found the tag ID is returned and if that is not
+	 * found, else ignores.
 	 * 
-	 * Don't forget to use onPause, onResume, onNewIntent and onCreate in your Activity.
+	 * Don't forget to use onPause, onResume, onNewIntent and onCreate in your
+	 * Activity.
 	 * 
 	 * @param handleTagIDDiscover
 	 */
@@ -42,8 +45,9 @@ public class ReadNfcTag {
 	}
 
 	/**
-	 * The class that you want to handle the intents in.
-	 * Use this in your onCreate-method.
+	 * The class that you want to handle the intents in. Use this in your
+	 * onCreate-method.
+	 * 
 	 * @param mainClass
 	 */
 	public void onCreate(Activity mainClass) {
@@ -63,6 +67,7 @@ public class ReadNfcTag {
 
 	/**
 	 * Enables nfc and see if a tag was discovered.
+	 * 
 	 * @param intent
 	 */
 	public void onResume(Intent intent) {
@@ -99,12 +104,13 @@ public class ReadNfcTag {
 			mNfcAdapter.disableForegroundDispatch(activity);
 		} catch (Exception e) {
 			try {
-				if(!mNfcAdapter.isEnabled()){
+				if (!mNfcAdapter.isEnabled()) {
 					mNfcAdapter = NfcAdapter.getDefaultAdapter(activity);
 					mNfcAdapter.disableForegroundDispatch(activity);
 				}
-			} catch (Exception e2) {}			
-		}		
+			} catch (Exception e2) {
+			}
+		}
 	}
 
 	/**
@@ -121,83 +127,90 @@ public class ReadNfcTag {
 	}
 
 	/**
-	 * Checks if it is a ACTION_TAG_DISCOVERED intent and handles it. 
-	 * @param intent to handle.
+	 * Checks if it is a ACTION_TAG_DISCOVERED intent and handles it.
+	 * 
+	 * @param intent
+	 *            to handle.
 	 */
 	public void onNewIntent(Intent intent) {
 		if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
 			handleNewTagIDIntent(intent);
 		}
 	}
-	
+
 	/**
-	 * Try to read message, else try to read tagID, else do nothing and not call handleTagDiscover.
-	 * @param intent to read message from.
+	 * Try to read message, else try to read tagID, else do nothing and not call
+	 * handleTagDiscover.
+	 * 
+	 * @param intent
+	 *            to read message from.
 	 */
-	
+
 	private void handleNewTagIDIntent(Intent intent) {
 		String text = null;
-		
-		//Read content from tag
+
+		// Read content from tag
 		try {
 			NdefMessage[] messages = getNdefMessages(intent);
-	        byte[] payload = messages[0].getRecords()[0].getPayload();
-	        
-	        
-	        if (payload.length-1<=1) return;
-	        
-	        text=new String(payload);
-		} catch (Exception e) {}
-		
-        //If no message return tagID instead
-        if (text==null || text==""){
-        	String tagID = getNFCTagID(intent);
-    		if (tagID == "") {
-    			return;
-    		}
-        	text=tagID; 
-        }
+			byte[] payload = messages[0].getRecords()[0].getPayload();
+
+			if (payload.length - 1 <= 1)
+				return;
+
+			text = new String(payload);
+		} catch (Exception e) {
+		}
+
+		// If no message return tagID instead
+		if (text == null || text == "") {
+			String tagID = getNFCTagID(intent);
+			if (tagID == "") {
+				return;
+			}
+			text = tagID;
+		}
 
 		hTIDD.handleTagDiscover(text);
 	}
-	
+
 	/**
 	 * Handles NDEF messages
-	 * @param intent to get messages from
+	 * 
+	 * @param intent
+	 *            to get messages from
 	 * @return Can be null
 	 */
 	private NdefMessage[] getNdefMessages(Intent intent) {
-        // Parse the intent
-        NdefMessage[] msgs = null;
-        String action = intent.getAction();
-        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (rawMsgs != null) {
-                msgs = new NdefMessage[rawMsgs.length];
-                for (int i = 0; i < rawMsgs.length; i++) {
-                    msgs[i] = (NdefMessage) rawMsgs[i];
-                }
-            } else {
-                // Unknown tag type
-                byte[] empty = new byte[] {};
-                NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, empty, empty);
-                NdefMessage msg = new NdefMessage(new NdefRecord[] {
-                    record
-                });
-                msgs = new NdefMessage[] {
-                    msg
-                };
-            }
-        } else {
-            //Log.d(TAG, "Unknown intent.");
-            //finish();
-        }
-        return msgs;
-    }
-	
+		// Parse the intent
+		NdefMessage[] msgs = null;
+		String action = intent.getAction();
+		if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+				|| NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+			Parcelable[] rawMsgs = intent
+					.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+			if (rawMsgs != null) {
+				msgs = new NdefMessage[rawMsgs.length];
+				for (int i = 0; i < rawMsgs.length; i++) {
+					msgs[i] = (NdefMessage) rawMsgs[i];
+				}
+			} else {
+				// Unknown tag type
+				byte[] empty = new byte[] {};
+				NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN,
+						empty, empty, empty);
+				NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
+				msgs = new NdefMessage[] { msg };
+			}
+		} else {
+			// Log.d(TAG, "Unknown intent.");
+			// finish();
+		}
+		return msgs;
+	}
+
 	/**
 	 * Converts from a bytearray to a hextring
+	 * 
 	 * @param inarray
 	 * @return
 	 */

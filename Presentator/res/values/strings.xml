@@ -17,6 +17,11 @@
     <string name="connection_failed">Failed to connect to the server.</string>
     <string name="connection_lost">Disconnected from the server.</string>
     <string name="cancel_transfer">Cancel transfer</string>
+    
+    <!-- Bluetooth and Wifi not enabled messages -->
+    <string name="neither_bluetooth_or_wifi">Please enable bluetooth or connect to wifi and try again!</string>
+    <string name="bluetooth_disabled">Bluetooth unavailable, you can\'t connect!</string>
+    <string name="wifi_disabled">Please connect to wifi and try again!</string>
 
     <!-- Take over dialog -->
     <string name="dialog_take_title">Active presentation</string>
