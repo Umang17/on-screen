@@ -5,6 +5,11 @@ import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.widget.Chronometer;
 
+/**
+ * A StopWatch with start, pause, reset functionality.
+ * @author Viktor Lindgren
+ *
+ */
 public class StopWatch extends Chronometer {
 
 	private Long currentTimeLastStop;

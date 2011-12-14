@@ -4,7 +4,7 @@ import java.util.Observable;
 
 /**
  * The Concreate Handle Tag Discover which is observable and notify observers if change so they can get tag text.
- * @author viktor
+ * @author Viktor Lindgren
  *
  */
 public class ConcreteHandleTagDiscover extends Observable implements

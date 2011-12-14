@@ -9,7 +9,7 @@ import java.util.TimerTask;
  * 
  * If not blocked continue with the other HandleTagDiscover.
  * 
- * @author viktor
+ * @author Viktor Lindgren
  *
  */
 public class HandleTagDiscoverWithBlock implements HandleTagDiscover {

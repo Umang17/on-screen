@@ -4,7 +4,7 @@ package onscreen.presentator.nfc;
  * Interface that is used for handling when a new tag is discover and the
  * handleTagDiscover should be called.
  * 
- * @author viktor
+ * @author Viktor Lindgren
  * 
  */
 

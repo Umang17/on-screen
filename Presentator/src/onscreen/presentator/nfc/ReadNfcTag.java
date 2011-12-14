@@ -15,7 +15,7 @@ import android.os.Parcelable;
  * It will call handleTagDiscover(text) when a tag is discovered.
  * 
  * Use onCreate, onPause, onNewIntent and onResume functions in your Activity.
- * @author viktor
+ * @author Viktor Lindgren
  *
  */
 
@@ -146,15 +146,6 @@ public class ReadNfcTag {
 	        
 	        if (payload.length-1<=1) return;
 	        
-//	        //Removing first byte, the uri.
-//	        We want plain text from the tag(only touchaatag that contains a webbaddress).
-//	        byte[] newPayload=new byte[payload.length-1];
-//	        for (int i = 0; i < payload.length; i++) {
-//	        	if (i+1==payload.length){
-//	        		break;
-//	        	}
-//	        	newPayload[i]=payload[i+1];
-//			}
 	        text=new String(payload);
 		} catch (Exception e) {}
 		
