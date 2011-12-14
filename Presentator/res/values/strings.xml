@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Presentator</string>
+    <string name="app_name">Pervasive Presentor</string>
     <string name="open_presentation">Select presentation</string>
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
