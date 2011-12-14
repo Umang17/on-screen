@@ -91,7 +91,7 @@ public class Connection {
 
 		return true;
 	}
-	
+
 	/**
 	 * Check if a connection is running.
 	 * 
@@ -189,16 +189,6 @@ public class Connection {
 		}
 		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_CONNECTION_FAILED);
 		mConnected = false;
-
-		// Send a failure message back to the Activity
-		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
-		// Bundle bundle = new Bundle();
-		// bundle.putString(BluetoothChat.TOAST, "Unable to connect device");
-		// msg.setData(bundle);
-		// mHandler.sendMessage(msg);
-
-		// Start the service over to restart listening mode
-		// Bluetooth.this.start();
 	}
 
 	/**
@@ -213,16 +203,6 @@ public class Connection {
 		mHandler.sendEmptyMessage(PresentatorActivity.MESSAGE_CONNECTION_LOST);
 		stop();
 		mConnected = false;
-
-		// Send a failure message back to the Activity
-		// Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
-		// Bundle bundle = new Bundle();
-		// bundle.putString(BluetoothChat.TOAST, "Device connection was lost");
-		// msg.setData(bundle);
-		// mHandler.sendMessage(msg);
-
-		// Start the service over to restart listening mode
-		// BluetoothChatService.this.start();
 	}
 
 	/**
@@ -504,7 +484,7 @@ public class Connection {
 				connectionLost();
 			}
 		}
-		
+
 		/**
 		 * Call this to send data to the remote device
 		 * 
@@ -534,7 +514,7 @@ public class Connection {
 		}
 
 		/**
-		 *  Call this from the main Activity to shutdown the connection 
+		 * Call this from the main Activity to shutdown the connection
 		 */
 		public void cancel() {
 			try {
