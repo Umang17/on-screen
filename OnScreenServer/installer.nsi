@@ -1,7 +1,3 @@
-;InstallOptions Test Script
-;Written by Joost Verburg
-;--------------------------
-
 ;The name of the installer
 Name "On Screen Server Installer"
 
@@ -15,8 +11,17 @@ InstallDir $PROGRAMFILES\OnScreen
 
 Section "Installer"
 	SetOutPath $INSTDIR
-	File /r C:\Users\Mattias\Documents\NetBeansProjects\OnScreen\dist\*.jar
-	File C:\Users\Mattias\Documents\NetBeansProjects\OnScreen\SumatraPDF.exe
+	File /r C:\Users\Mattias\Documents\NetBeansProjects\OnScreenServer\dist\*.jar
+	File C:\Users\Mattias\Documents\NetBeansProjects\OnScreenServer\SumatraPDF.exe
+	File C:\Users\Mattias\Documents\NetBeansProjects\OnScreenServer\tray.gif
+	WriteUninstaller "$INSTDIR\Uninstall.exe"
+	CreateShortCut "$SMPROGRAMS\Startup\OnScreen.lnk" "$INSTDIR\OnScreen.jar"
+    ExecShell "" "$SMPROGRAMS\Startup\OnScreen.lnk"
+SectionEnd
 
-	CreateShortCut "$SMPROGRAMS\Startup\OnScreen.lnk" "$INSTDIR\OnScreen.jar"	
+Section "Uninstall"
+  Delete "$INSTDIR\Uninstall.exe"
+  RMDir /r "$INSTDIR\lib"
+  RMDir /r "$INSTDIR"
+  Delete "$SMPROGRAMS\Startup\OnScreen.lnk"
 SectionEnd
