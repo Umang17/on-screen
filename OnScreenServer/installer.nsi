@@ -13,7 +13,7 @@ Section "Installer"
 	SetOutPath $INSTDIR
 	File /r C:\Users\Mattias\Documents\NetBeansProjects\OnScreenServer\dist\*.jar
 	File C:\Users\Mattias\Documents\NetBeansProjects\OnScreenServer\SumatraPDF.exe
-	File C:\Users\Mattias\Documents\NetBeansProjects\OnScreenServer\tray.gif
+	File C:\Users\Mattias\Documents\NetBeansProjects\OnScreenServer\tray.png
 	WriteUninstaller "$INSTDIR\Uninstall.exe"
 	CreateShortCut "$SMPROGRAMS\Startup\OnScreen.lnk" "$INSTDIR\OnScreen.jar"
     ExecShell "" "$SMPROGRAMS\Startup\OnScreen.lnk"
