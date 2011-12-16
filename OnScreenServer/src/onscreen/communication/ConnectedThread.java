@@ -33,6 +33,7 @@ public class ConnectedThread implements Runnable, Observer {
     private static final int TIMECONTROLL = 7;
     private static final int STARTPRESENTATION = 4;
     private static int connected = 0;
+    private static Process running = null;
 
     /**
      * 
@@ -72,7 +73,10 @@ public class ConnectedThread implements Runnable, Observer {
                         presentationTimer.deleteObserver(this);
                         mConnection.close();
                         if(connected <= 0) {
-                            OnScreen.keyController.exit();
+                            if (running != null) {
+                                running.destroy();
+                            }
+                            running = null;
                             filePresented = null;
                             presentationTimer = null;
                         }
@@ -113,7 +117,7 @@ public class ConnectedThread implements Runnable, Observer {
             outputStream.write(1);
             outputStream.write(filePresented.getLengthofName());
             outputStream.write(filePresented.getNameAsByte());
-            presentationTimer.pause(this);
+            //presentationTimer.pause(this);
             outputStream.write(presentationTimer.getTime());
             outputStream.write(presentationTimer.getRunning());
             presentationTimer.addObserver(this);
@@ -133,18 +137,18 @@ public class ConnectedThread implements Runnable, Observer {
      */
     private void startPresenting() throws IOException {
         if (filePresented != null) {
-            OnScreen.keyController.exit();
+            running.destroy();
         }
         try {
             filePresented = fileReciver.reciveFile(bufferedInputStream);
             Runtime rt = Runtime.getRuntime();
 
             if (System.getProperty("os.name").startsWith("Windows")) {
-                rt.exec(OnScreen.pdfReader + "\"" + filePresented.getFullName() + "\"");
+                running = rt.exec(OnScreen.pdfReader + "\"" + filePresented.getFullName() + "\"");
             } else {
                 String fileRun = filePresented.getFullName();
                 fileRun.replace(" ", "\\ ");
-                rt.exec(OnScreen.pdfReader + fileRun);
+                running = rt.exec(OnScreen.pdfReader + fileRun);
             }
 
             outputStream.write(STARTPRESENTATION);

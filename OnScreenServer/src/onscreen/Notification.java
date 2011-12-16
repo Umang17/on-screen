@@ -59,8 +59,8 @@ public class Notification {
             if (!init) {
                 init();
             }
-            trayIcon.displayMessage("OnScreen", notification,
-                    TrayIcon.MessageType.INFO);
+            //trayIcon.displayMessage("OnScreen", notification,
+            //        TrayIcon.MessageType.INFO);
         } else {
             System.out.println(notification);
         }
