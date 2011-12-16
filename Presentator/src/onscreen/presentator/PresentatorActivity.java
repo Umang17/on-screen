@@ -35,6 +35,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -103,6 +104,8 @@ public class PresentatorActivity extends Activity implements Observer {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.presentation);
+		
+		getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		setControlButtonsVisible(false);
 
